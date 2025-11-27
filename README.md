@@ -1,15 +1,26 @@
-🧙‍♂️ RPG Notes — Seu grimório digital de aventuras
+# 🧙‍♂️ RPG Notes
 
-Uma aplicação moderna para organizar anotações de RPG, criada com foco em velocidade, organização e experiência do usuário.
-Construída com Vite, roteamento sólido usando TanStack Router, gerenciamento global de estado com Zustand e uma interface elegante baseada em BaseUI.
+Uma aplicação moderna para gerenciamento de anotações de RPG, criada para ajudar mestres e jogadores a organizarem personagens, sessões, lore, itens, mapas e tudo mais que faz parte de uma boa campanha.
 
-📘 Recursos principais
+Desenvolvida com foco em velocidade, usabilidade e arquitetura escalável.
 
-- Organização de personagens, sessões, mapas e lore
-- Navegação rápida com file-based routing do TanStack
-- Estado global estável e performático com Zustand
-- UI limpa e responsiva usando BaseUI
-- Estrutura pronta para escalar com Vite + TypeScript
+## 🚀 Tecnologias Utilizadas
 
-🛠️ Tecnologias
-React • Vite • TanStack Router • Zustand • BaseUI
+- Vite — build ultrarrápido e ambiente de desenvolvimento leve
+- React — interface dinâmica e componentizada
+- TanStack Router — roteamento file-based simples, poderoso e tipado
+- Zustand — gerenciamento de estado global minimalista e performático
+- BaseUI — componentes estilizados, acessíveis e profissionais
+
+## ✨ Sobre o Projeto
+
+O RPG Notes funciona como um grimório digital, permitindo que você registre e organize facilmente todas as informações da sua campanha de RPG:
+
+- 📓 Sessões e resumos
+- 👥 Personagens e NPCs
+- 🗺️ Localizações e mapas
+- 📜 Lore e anotações gerais
+- 🏺 Itens, inventário, criaturas e muito mais
+
+A navegação fluida do TanStack Router, combinada com o estado global do Zustand, torna a experiência rápida e intuitiva.
+A interface construída com BaseUI garante aparência moderna e acessível.
