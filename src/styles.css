@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 .root {
   isolation: isolate;
 }
@@ -16,4 +18,9 @@ body {
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
+}
+
+.dark {
+  background-color: #121212;
+  color: #ffffff;
 }
