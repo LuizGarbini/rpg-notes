@@ -50,7 +50,7 @@ function App() {
 										3
 									</span>
 								</div>
-								<div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-purple-800/0 via-purple-800/50 to-purple-800/0 opacity-0 transition-opacity group-hover:opacity-100"></div>
+								<div className="absolute inset-x-0 bottom-0 h-1 bg-linear-to-r from-purple-800/0 via-purple-800/50 to-purple-800/0 opacity-0 transition-opacity group-hover:opacity-100"></div>
 							</a>
 							<a
 								href="/npcs"
@@ -76,10 +76,10 @@ function App() {
 										3
 									</span>
 								</div>
-								<div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-purple-800/0 via-purple-800/50 to-purple-800/0 opacity-0 transition-opacity group-hover:opacity-100"></div>
+								<div className="absolute inset-x-0 bottom-0 h-1 bg-linear-to-r from-purple-800/0 via-purple-800/50 to-purple-800/0 opacity-0 transition-opacity group-hover:opacity-100"></div>
 							</a>
 							<a
-								href="/npcs"
+								href="/sessoes"
 								className="group relative z-10 rounded-xl border border-purple-800/25 p-6 transition-all hover:border-purple-500/20 hover:shadow-lg"
 							>
 								<div className="flex items-start justify-between">
@@ -90,7 +90,7 @@ function App() {
 											</div>
 											<div>
 												<h3 className="font-semibold text-foreground group-hover:text-primary group-hover:text-purple-500">
-													NPCs
+													Sessões
 												</h3>
 												<p className="text-sm text-muted-foreground">
 													Histórico de Sessões
@@ -102,7 +102,7 @@ function App() {
 										3
 									</span>
 								</div>
-								<div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-purple-800/0 via-purple-800/50 to-purple-800/0 opacity-0 transition-opacity group-hover:opacity-100"></div>
+								<div className="absolute inset-x-0 bottom-0 h-1 bg-linear-to-r from-purple-800/0 via-purple-800/50 to-purple-800/0 opacity-0 transition-opacity group-hover:opacity-100"></div>
 							</a>
 							<a
 								href="/itens"
@@ -128,7 +128,7 @@ function App() {
 										3
 									</span>
 								</div>
-								<div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-purple-800/0 via-purple-800/50 to-purple-800/0 opacity-0 transition-opacity group-hover:opacity-100"></div>
+								<div className="absolute inset-x-0 bottom-0 h-1 bg-linear-to-r from-purple-800/0 via-purple-800/50 to-purple-800/0 opacity-0 transition-opacity group-hover:opacity-100"></div>
 							</a>
 							<a
 								href="/locais"
@@ -154,7 +154,7 @@ function App() {
 										3
 									</span>
 								</div>
-								<div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-purple-800/0 via-purple-800/50 to-purple-800/0 opacity-0 transition-opacity group-hover:opacity-100"></div>
+								<div className="absolute inset-x-0 bottom-0 h-1 bg-linear-to-r from-purple-800/0 via-purple-800/50 to-purple-800/0 opacity-0 transition-opacity group-hover:opacity-100"></div>
 							</a>
 							<a
 								href="/lore"
@@ -180,7 +180,7 @@ function App() {
 										3
 									</span>
 								</div>
-								<div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-purple-800/0 via-purple-800/50 to-purple-800/0 opacity-0 transition-opacity group-hover:opacity-100"></div>
+								<div className="absolute inset-x-0 bottom-0 h-1 bg-linear-to-r from-purple-800/0 via-purple-800/50 to-purple-800/0 opacity-0 transition-opacity group-hover:opacity-100"></div>
 							</a>
 						</div>
 					</div>
