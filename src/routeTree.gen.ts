@@ -10,33 +10,115 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SessionsIndexRouteImport } from './routes/sessions/index'
+import { Route as NpcsIndexRouteImport } from './routes/npcs/index'
+import { Route as LoreIndexRouteImport } from './routes/lore/index'
+import { Route as LocationsIndexRouteImport } from './routes/locations/index'
+import { Route as ItemsIndexRouteImport } from './routes/items/index'
+import { Route as CharactersIndexRouteImport } from './routes/characters/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SessionsIndexRoute = SessionsIndexRouteImport.update({
+  id: '/sessions/',
+  path: '/sessions/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NpcsIndexRoute = NpcsIndexRouteImport.update({
+  id: '/npcs/',
+  path: '/npcs/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoreIndexRoute = LoreIndexRouteImport.update({
+  id: '/lore/',
+  path: '/lore/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LocationsIndexRoute = LocationsIndexRouteImport.update({
+  id: '/locations/',
+  path: '/locations/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ItemsIndexRoute = ItemsIndexRouteImport.update({
+  id: '/items/',
+  path: '/items/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CharactersIndexRoute = CharactersIndexRouteImport.update({
+  id: '/characters/',
+  path: '/characters/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/characters': typeof CharactersIndexRoute
+  '/items': typeof ItemsIndexRoute
+  '/locations': typeof LocationsIndexRoute
+  '/lore': typeof LoreIndexRoute
+  '/npcs': typeof NpcsIndexRoute
+  '/sessions': typeof SessionsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/characters': typeof CharactersIndexRoute
+  '/items': typeof ItemsIndexRoute
+  '/locations': typeof LocationsIndexRoute
+  '/lore': typeof LoreIndexRoute
+  '/npcs': typeof NpcsIndexRoute
+  '/sessions': typeof SessionsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/characters/': typeof CharactersIndexRoute
+  '/items/': typeof ItemsIndexRoute
+  '/locations/': typeof LocationsIndexRoute
+  '/lore/': typeof LoreIndexRoute
+  '/npcs/': typeof NpcsIndexRoute
+  '/sessions/': typeof SessionsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/characters'
+    | '/items'
+    | '/locations'
+    | '/lore'
+    | '/npcs'
+    | '/sessions'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/characters'
+    | '/items'
+    | '/locations'
+    | '/lore'
+    | '/npcs'
+    | '/sessions'
+  id:
+    | '__root__'
+    | '/'
+    | '/characters/'
+    | '/items/'
+    | '/locations/'
+    | '/lore/'
+    | '/npcs/'
+    | '/sessions/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CharactersIndexRoute: typeof CharactersIndexRoute
+  ItemsIndexRoute: typeof ItemsIndexRoute
+  LocationsIndexRoute: typeof LocationsIndexRoute
+  LoreIndexRoute: typeof LoreIndexRoute
+  NpcsIndexRoute: typeof NpcsIndexRoute
+  SessionsIndexRoute: typeof SessionsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +130,59 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sessions/': {
+      id: '/sessions/'
+      path: '/sessions'
+      fullPath: '/sessions'
+      preLoaderRoute: typeof SessionsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/npcs/': {
+      id: '/npcs/'
+      path: '/npcs'
+      fullPath: '/npcs'
+      preLoaderRoute: typeof NpcsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lore/': {
+      id: '/lore/'
+      path: '/lore'
+      fullPath: '/lore'
+      preLoaderRoute: typeof LoreIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/locations/': {
+      id: '/locations/'
+      path: '/locations'
+      fullPath: '/locations'
+      preLoaderRoute: typeof LocationsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/items/': {
+      id: '/items/'
+      path: '/items'
+      fullPath: '/items'
+      preLoaderRoute: typeof ItemsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/characters/': {
+      id: '/characters/'
+      path: '/characters'
+      fullPath: '/characters'
+      preLoaderRoute: typeof CharactersIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CharactersIndexRoute: CharactersIndexRoute,
+  ItemsIndexRoute: ItemsIndexRoute,
+  LocationsIndexRoute: LocationsIndexRoute,
+  LoreIndexRoute: LoreIndexRoute,
+  NpcsIndexRoute: NpcsIndexRoute,
+  SessionsIndexRoute: SessionsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

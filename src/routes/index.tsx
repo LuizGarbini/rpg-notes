@@ -27,7 +27,7 @@ function App() {
 					<div className="p-6">
 						<div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
 							<a
-								href="/personagens"
+								href="/characters"
 								className="group relative z-10 rounded-xl border border-purple-800/25 p-6 transition-all hover:border-purple-500/20 hover:shadow-lg"
 							>
 								<div className="flex items-start justify-between">
@@ -79,7 +79,7 @@ function App() {
 								<div className="absolute inset-x-0 bottom-0 h-1 bg-linear-to-r from-purple-800/0 via-purple-800/50 to-purple-800/0 opacity-0 transition-opacity group-hover:opacity-100"></div>
 							</a>
 							<a
-								href="/sessoes"
+								href="/sessions"
 								className="group relative z-10 rounded-xl border border-purple-800/25 p-6 transition-all hover:border-purple-500/20 hover:shadow-lg"
 							>
 								<div className="flex items-start justify-between">
@@ -105,7 +105,7 @@ function App() {
 								<div className="absolute inset-x-0 bottom-0 h-1 bg-linear-to-r from-purple-800/0 via-purple-800/50 to-purple-800/0 opacity-0 transition-opacity group-hover:opacity-100"></div>
 							</a>
 							<a
-								href="/itens"
+								href="/items"
 								className="group relative z-10 rounded-xl border border-purple-800/25 p-6 transition-all hover:border-purple-500/20 hover:shadow-lg"
 							>
 								<div className="flex items-start justify-between">
@@ -131,7 +131,7 @@ function App() {
 								<div className="absolute inset-x-0 bottom-0 h-1 bg-linear-to-r from-purple-800/0 via-purple-800/50 to-purple-800/0 opacity-0 transition-opacity group-hover:opacity-100"></div>
 							</a>
 							<a
-								href="/locais"
+								href="/locations"
 								className="group relative z-10 rounded-xl border border-purple-800/25 p-6 transition-all hover:border-purple-500/20 hover:shadow-lg"
 							>
 								<div className="flex items-start justify-between">
