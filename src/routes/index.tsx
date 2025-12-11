@@ -8,10 +8,10 @@ import {
 	Users,
 } from "lucide-react";
 export const Route = createFileRoute("/")({
-	component: App,
+	component: Dashboard,
 });
 
-function App() {
+function Dashboard() {
 	return (
 			<div className="flex flex-1">
 				<div className="w-full">

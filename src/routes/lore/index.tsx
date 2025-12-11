@@ -5,5 +5,18 @@ export const Route = createFileRoute('/lore/')({
 })
 
 function RouteComponent() {
-  return <div>Hello "/lore/"!</div>
+  return (
+    <div className="flex flex-1">
+						<div className="w-full">
+							<div className="py-6 px-8 border-b border-purple-800/25">
+          <div className="flex flex-col">
+										<h2 className="text-3xl font-bold">Lore</h2>
+										<span className="mt-1 text-sm text-muted-foreground">
+											Gerencie sua história e conhecimentos
+										</span>
+            </div>
+							</div>
+						</div>
+					</div>
+    )
 }
