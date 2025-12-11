@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
 	BookOpen,
 	MapIcon,
@@ -26,8 +26,8 @@ function App() {
 					</div>
 					<div className="p-6">
 						<div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-							<a
-								href="/characters"
+							<Link
+								to="/characters"
 								className="group relative z-10 rounded-xl border border-purple-800/25 p-6 transition-all hover:border-purple-500/20 hover:shadow-lg"
 							>
 								<div className="flex items-start justify-between">
@@ -51,9 +51,9 @@ function App() {
 									</span>
 								</div>
 								<div className="absolute inset-x-0 bottom-0 h-1 bg-linear-to-r from-purple-800/0 via-purple-800/50 to-purple-800/0 opacity-0 transition-opacity group-hover:opacity-100"></div>
-							</a>
-							<a
-								href="/npcs"
+							</Link>
+							<Link
+								to="/npcs"
 								className="group relative z-10 rounded-xl border border-purple-800/25 p-6 transition-all hover:border-purple-500/20 hover:shadow-lg"
 							>
 								<div className="flex items-start justify-between">
@@ -77,9 +77,9 @@ function App() {
 									</span>
 								</div>
 								<div className="absolute inset-x-0 bottom-0 h-1 bg-linear-to-r from-purple-800/0 via-purple-800/50 to-purple-800/0 opacity-0 transition-opacity group-hover:opacity-100"></div>
-							</a>
-							<a
-								href="/sessions"
+							</Link>
+							<Link
+								to="/sessions"
 								className="group relative z-10 rounded-xl border border-purple-800/25 p-6 transition-all hover:border-purple-500/20 hover:shadow-lg"
 							>
 								<div className="flex items-start justify-between">
@@ -103,9 +103,9 @@ function App() {
 									</span>
 								</div>
 								<div className="absolute inset-x-0 bottom-0 h-1 bg-linear-to-r from-purple-800/0 via-purple-800/50 to-purple-800/0 opacity-0 transition-opacity group-hover:opacity-100"></div>
-							</a>
-							<a
-								href="/items"
+							</Link>
+							<Link
+								to="/items"
 								className="group relative z-10 rounded-xl border border-purple-800/25 p-6 transition-all hover:border-purple-500/20 hover:shadow-lg"
 							>
 								<div className="flex items-start justify-between">
@@ -129,9 +129,9 @@ function App() {
 									</span>
 								</div>
 								<div className="absolute inset-x-0 bottom-0 h-1 bg-linear-to-r from-purple-800/0 via-purple-800/50 to-purple-800/0 opacity-0 transition-opacity group-hover:opacity-100"></div>
-							</a>
-							<a
-								href="/locations"
+							</Link>
+							<Link
+								to="/locations"
 								className="group relative z-10 rounded-xl border border-purple-800/25 p-6 transition-all hover:border-purple-500/20 hover:shadow-lg"
 							>
 								<div className="flex items-start justify-between">
@@ -155,9 +155,9 @@ function App() {
 									</span>
 								</div>
 								<div className="absolute inset-x-0 bottom-0 h-1 bg-linear-to-r from-purple-800/0 via-purple-800/50 to-purple-800/0 opacity-0 transition-opacity group-hover:opacity-100"></div>
-							</a>
-							<a
-								href="/lore"
+							</Link>
+							<Link
+								to="/lore"
 								className="group relative z-10 rounded-xl border border-purple-800/25 p-6 transition-all hover:border-purple-500/20 hover:shadow-lg"
 							>
 								<div className="flex items-start justify-between">
@@ -181,7 +181,7 @@ function App() {
 									</span>
 								</div>
 								<div className="absolute inset-x-0 bottom-0 h-1 bg-linear-to-r from-purple-800/0 via-purple-800/50 to-purple-800/0 opacity-0 transition-opacity group-hover:opacity-100"></div>
-							</a>
+							</Link>
 						</div>
 					</div>
 				</div>

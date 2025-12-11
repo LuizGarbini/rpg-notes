@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import {
 	Book,
 	BookOpen,
@@ -32,48 +33,48 @@ export function Sidebar() {
 						<House className="text-purple-500 stroke-1.5" />
 						Dashboard
 					</a>
-					<a
-						href="/personagens"
+					<Link
+						to="/characters"
 						className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground font-normal transition-colors hover:bg-purple-500/20 hover:text-white"
 					>
 						<User className="stroke-1.5" />
 						Personagens
-					</a>
-					<a
-						href="/npcs"
+					</Link>
+					<Link
+						to="/npcs"
 						className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground font-normal transition-colors hover:bg-purple-500/20 hover:text-white"
 					>
 						<Users className="stroke-1.5" />
 						NPCs
-					</a>
-					<a
-						href="/sessoes"
+					</Link>
+					<Link
+						to="/sessions"
 						className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground font-normal transition-colors hover:bg-purple-500/20 hover:text-white"
 					>
 						<ScrollText className="stroke-1.5" />
 						Sessões
-					</a>
-					<a
-						href="/itens"
+					</Link>
+					<Link
+						to="/items"
 						className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground font-normal transition-colors hover:bg-purple-500/20 hover:text-white"
 					>
 						<Package className="stroke-1.5" />
 						Itens
-					</a>
-					<a
-						href="/locais"
+					</Link>
+					<Link
+						to="/locations"
 						className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground font-normal transition-colors hover:bg-purple-500/20 hover:text-white"
 					>
 						<MapIcon className="stroke-1.5" />
 						Locais
-					</a>
-					<a
-						href="/lore"
+					</Link>
+					<Link
+						to="/lore"
 						className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted-foreground font-normal transition-colors hover:bg-purple-500/20 hover:text-white"
 					>
 						<BookOpen className="stroke-1.5" />
 						Lore
-					</a>
+					</Link>
 				</nav>
 				<div className="flex items-center gap-3 border-t p-6 border-purple-800/25">
 					<div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-500/20">
