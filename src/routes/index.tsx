@@ -7,15 +7,12 @@ import {
 	User,
 	Users,
 } from "lucide-react";
-import { Sidebar } from "@/components/sidebar";
 export const Route = createFileRoute("/")({
 	component: App,
 });
 
 function App() {
 	return (
-		<div className="flex">
-			<Sidebar />
 			<div className="flex flex-1">
 				<div className="w-full">
 					<div className="py-6 px-8 border-b border-purple-800/25">
@@ -186,6 +183,5 @@ function App() {
 					</div>
 				</div>
 			</div>
-		</div>
 	);
 }
