@@ -24,4 +24,21 @@ code {
 
 @theme {
     --color-muted-foreground: oklch(.64 .01 85);
+    
+    /* Primary purple theme colors */
+    --color-primary: #a855f7;           /* purple-500 - texto principal */
+    --color-primary-foreground: #ffffff;
+    --color-primary-dark: #6b21a8;      /* purple-800 - bordas e acentos */
+    --color-primary-muted: rgba(107, 33, 168, 0.2);  /* purple-800/20 - backgrounds suaves */
+    
+    /* Border colors */
+    --color-border: rgba(107, 33, 168, 0.25);        /* purple-800/25 */
+    --color-border-hover: rgba(168, 85, 247, 0.2);   /* purple-500/20 */
+    
+    /* Accent/Badge colors */
+    --color-accent: #a855f7;            /* purple-500 */
+    --color-accent-muted: rgba(107, 33, 168, 0.2);   /* purple-800/20 */
+    
+    /* Ring/Focus colors */
+    --color-ring: #a855f7;              /* purple-500 */
 }
