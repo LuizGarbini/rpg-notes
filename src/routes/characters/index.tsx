@@ -6,6 +6,7 @@ import {
 	CharacterFormModal,
 } from "@/components/character-form-modal";
 import { ListLayout } from "@/components/list-layout";
+import { MultiStepPlayground } from "@/components/MultiStepPlayground";
 
 export const Route = createFileRoute("/characters/")({
 	component: RouteComponent,
@@ -30,24 +31,18 @@ function RouteComponent() {
 									Gerencie seus personagens
 								</span>
 							</div>
-							<button
-								type="button"
-								onClick={() => setIsModalOpen(true)}
-								className="flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-primary-dark text-primary text-sm font-medium transition-all duration-300 hover:border-primary hover:bg-primary/10 hover:shadow-lg hover:shadow-primary/5 active:scale-95"
-							>
-								<Plus /> Adicionar Novo
-							</button>
+							<MultiStepPlayground />
 						</div>
 						<ListLayout />
 					</div>
 				</div>
 			</div>
 
-			<CharacterFormModal
+			{/* <CharacterFormModal
 				isOpen={isModalOpen}
 				onClose={() => setIsModalOpen(false)}
 				onSubmit={handleAddCharacter}
-			/>
+			/> */}
 		</div>
 	);
 }
