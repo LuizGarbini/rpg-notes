@@ -1,5 +1,6 @@
 import { Plus, User } from "lucide-react";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { Button } from "./ui/button";
 import {
 	Dialog,
@@ -16,22 +17,22 @@ import { Label } from "./ui/label";
 
 export function MultiStepPlayground() {
 	const [currentStep, setCurrentStep] = useState(0);
-	const [formData, setFormData] = useState({
-		name: "",
-		class: "",
-		level: 1,
-	});
+	const { register, handleSubmit } = useForm();
+
+	function handleCreateForm(data: any) {
+		console.log(data);
+	}
 
 	return (
 		<Dialog>
-			<form>
-				<DialogTrigger>
-					<Button type="button" variant="default">
-						<Plus />
-						Adicionar Personagem
-					</Button>
-				</DialogTrigger>
-				<DialogContent className="sm:max-w-[425px]">
+			<DialogTrigger>
+				<Button type="button" variant="default">
+					<Plus />
+					Adicionar Personagem
+				</Button>
+			</DialogTrigger>
+			<DialogContent className="sm:max-w-[425px]">
+				<form onSubmit={handleSubmit(handleCreateForm)}>
 					{currentStep === 0 && (
 						<>
 							<DialogHeader>
@@ -42,30 +43,33 @@ export function MultiStepPlayground() {
 							</DialogHeader>
 							<div className="grid gap-4">
 								<div className="grid gap-3">
-									<Label htmlFor="character-name">Nome do Personagem</Label>
+									<Label htmlFor="characterName">Nome do Personagem</Label>
 									<Input
-										name="character-name"
 										placeholder="Ex: Aragorn, Gandalf, Legolass..."
+										{...register("characterName")}
 									/>
 								</div>
 								<div className="grid gap-3 grid-cols-2">
 									<div className="flex flex-col gap-3">
 										<Label htmlFor="race">Raça</Label>
-										<Input name="race" placeholder="Ex: Elfo, Anão..." />
+										<Input
+											placeholder="Ex: Elfo, Anão..."
+											{...register("race")}
+										/>
 									</div>
 									<div className="flex flex-col gap-3">
 										<Label htmlFor="class">Classe</Label>
 										<Input
-											name="class"
 											placeholder="Ex: Guerreiro, Ladino..."
+											{...register("class")}
 										/>
 									</div>
 								</div>
 								<div className="grid gap-3">
 									<Label htmlFor="background">Background</Label>
 									<Input
-										name="background"
 										placeholder="História do personagem"
+										{...register("background")}
 									/>
 								</div>
 							</div>
@@ -94,13 +98,25 @@ export function MultiStepPlayground() {
 								</DialogDescription>
 							</DialogHeader>
 							<div className="grid gap-4">
-								<div className="grid gap-3">
-									<Label htmlFor="name-1">Name</Label>
-									<Input name="name" defaultValue="Pedro Duarte" />
-								</div>
-								<div className="grid gap-3">
-									<Label htmlFor="username-1">Username</Label>
-									<Input name="username" defaultValue="@peduarte" />
+								<div className="grid gap-3 grid-cols-2">
+									<div className="flex flex-col gap-3">
+										<Label htmlFor="level">Nível</Label>
+										<Input
+											max={20}
+											min={1}
+											type="number"
+											placeholder="5"
+											{...register("level")}
+										/>
+									</div>
+									<div className="flex flex-col gap-3">
+										<Label htmlFor="xp">Experiência</Label>
+										<Input
+											type="number"
+											placeholder="500"
+											{...register("xp")}
+										/>
+									</div>
 								</div>
 							</div>
 							<DialogFooter className="flex flex-col">
@@ -129,31 +145,57 @@ export function MultiStepPlayground() {
 								</DialogDescription>
 							</DialogHeader>
 							<div className="grid gap-4">
-								<div className="grid gap-3">
-									<Label htmlFor="name-1">Name</Label>
-									<Input name="name" defaultValue="Pedro Duarte" />
+								<div className="grid gap-3 grid-cols-2">
+									<div className="flex flex-col gap-3">
+										<Label htmlFor="health">Vida Atual</Label>
+										<Input
+											type="number"
+											placeholder="10"
+											{...register("health")}
+										/>
+									</div>
+									<div className="flex flex-col gap-3">
+										<Label htmlFor="healthMax">Vida Máxima</Label>
+										<Input
+											type="number"
+											placeholder="150"
+											{...register("healthMax")}
+										/>
+									</div>
 								</div>
-								<div className="grid gap-3">
-									<Label htmlFor="username-1">Username</Label>
-									<Input name="username" defaultValue="@peduarte" />
+								<div className="grid gap-3 grid-cols-2">
+									<div className="flex flex-col gap-3">
+										<Label htmlFor="armorClass">Classe de Armadura</Label>
+										<Input
+											type="number"
+											placeholder="25"
+											{...register("armorClass")}
+										/>
+									</div>
+									<div className="flex flex-col gap-3">
+										<Label htmlFor="initiative">Iniciativa</Label>
+										<Input
+											type="number"
+											placeholder="10"
+											{...register("initiative")}
+										/>
+									</div>
 								</div>
-								<DialogFooter className="flex flex-col">
-									<Button
-										type="button"
-										variant="outline"
-										onClick={() => setCurrentStep((prev) => prev - 1)}
-									>
-										Anterior
-									</Button>
-									<DialogClose>
-										<Button type="submit">Criar Personagem</Button>
-									</DialogClose>
-								</DialogFooter>
 							</div>
+							<DialogFooter className="flex flex-col">
+								<Button
+									type="button"
+									variant="outline"
+									onClick={() => setCurrentStep((prev) => prev - 1)}
+								>
+									Anterior
+								</Button>
+								<Button type="submit">Criar Personagem</Button>
+							</DialogFooter>
 						</>
 					)}
-				</DialogContent>
-			</form>
+				</form>
+			</DialogContent>
 		</Dialog>
 	);
 }
