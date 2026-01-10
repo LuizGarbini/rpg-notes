@@ -7,7 +7,7 @@ interface ListLayoutProps {
 
 export function ListLayout({ onSearch, onAddNew }: ListLayoutProps) {
 	return (
-		<div className="relative parchment-bg min-h-screen">
+		<div className="relative parchment-bg">
 			<div className="mt-6 flex gap-3">
 				<div className="relative flex-1 group">
 					<Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />

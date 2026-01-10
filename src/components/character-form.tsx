@@ -1,6 +1,8 @@
-import { Plus, User } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "./ui/button";
 import {
 	Dialog,
@@ -15,24 +17,45 @@ import {
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 
-export function MultiStepPlayground() {
-	const [currentStep, setCurrentStep] = useState(0);
-	const { register, handleSubmit } = useForm();
+const formFilterSchema = z.object({
+	characterName: z.string(),
+	race: z.string(),
+	class: z.string(),
+	background: z.string(),
+	level: z.coerce.number(),
+xp: z.coerce.number(),
+health: z.coerce.number(),
+healthMax: z.coerce.number(),
+armorClass: z.coerce.number(),
+initiative: z.coerce.number(),
+});
 
-	function handleCreateForm(data: any) {
+type FormFilterSchema = z.infer<typeof formFilterSchema>;
+
+export function CharacterForm() {
+	const { register, handleSubmit } = useForm<FormFilterSchema>({
+		resolver: zodResolver(formFilterSchema),
+		shouldUnregister: false,
+	});
+	const [currentStep, setCurrentStep] = useState(0);
+
+	function handleCreateForm(data: FormFilterSchema) {
 		console.log(data);
 	}
 
 	return (
 		<Dialog>
 			<DialogTrigger>
-				<Button type="button" variant="default">
+				<Button variant="default">
 					<Plus />
 					Adicionar Personagem
 				</Button>
 			</DialogTrigger>
 			<DialogContent className="sm:max-w-[425px]">
-				<form onSubmit={handleSubmit(handleCreateForm)}>
+				<form
+					className="flex flex-col gap-4"
+					onSubmit={handleSubmit(handleCreateForm)}
+				>
 					{currentStep === 0 && (
 						<>
 							<DialogHeader>
@@ -75,13 +98,12 @@ export function MultiStepPlayground() {
 							</div>
 							<DialogFooter className="flex flex-col">
 								<DialogClose>
-									<Button type="button" variant="outline">
+									<Button variant="outline">
 										Cancelar
 									</Button>
 								</DialogClose>
 
 								<Button
-									type="button"
 									onClick={() => setCurrentStep((prev) => prev + 1)}
 								>
 									Próximo
