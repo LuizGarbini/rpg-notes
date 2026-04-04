@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "./ui/button";
+import { useRPGStore } from "@/lib/store";
 import {
 	Dialog,
 	DialogClose,
@@ -33,18 +34,23 @@ initiative: z.coerce.number(),
 type FormFilterSchema = z.infer<typeof formFilterSchema>;
 
 export function CharacterForm() {
-	const { register, handleSubmit } = useForm<FormFilterSchema>({
+	const { register, handleSubmit, reset } = useForm<FormFilterSchema>({
 		resolver: zodResolver(formFilterSchema),
 		shouldUnregister: false,
 	});
 	const [currentStep, setCurrentStep] = useState(0);
+	const [isOpen, setIsOpen] = useState(false);
+	const addCharacter = useRPGStore((state) => state.addCharacter);
 
 	function handleCreateForm(data: FormFilterSchema) {
-		console.log(data);
+		addCharacter(data);
+		setIsOpen(false);
+		setCurrentStep(0);
+		reset();
 	}
 
 	return (
-		<Dialog>
+		<Dialog open={isOpen} onOpenChange={setIsOpen}>
 			<DialogTrigger>
 				<Button variant="default">
 					<Plus />

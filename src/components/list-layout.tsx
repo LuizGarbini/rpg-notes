@@ -5,7 +5,7 @@ interface ListLayoutProps {
 	onAddNew?: () => void;
 }
 
-export function ListLayout({ onSearch, onAddNew }: ListLayoutProps) {
+export function ListLayout({ onSearch }: ListLayoutProps) {
 	return (
 		<div className="relative parchment-bg">
 			<div className="mt-6 flex gap-3">
