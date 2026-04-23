@@ -7,25 +7,27 @@ interface ListLayoutProps {
 
 export function ListLayout({ onSearch }: ListLayoutProps) {
 	return (
-		<div className="relative parchment-bg">
-			<div className="mt-6 flex gap-3">
-				<div className="relative flex-1 group">
-					<Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
-					<input
-						type="text"
-						placeholder="Buscar..."
-						onChange={(e) => onSearch?.(e.target.value)}
-						className="w-full rounded-xl border border-border bg-background/30 py-2.5 pl-11 pr-4 text-sm text-foreground placeholder:text-muted-foreground transition-all duration-300 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:bg-background/50 hover:border-border-hover hover:bg-background/40"
-					/>
-				</div>
-				<button
-					type="button"
-					className="flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-dashed border-primary-dark text-primary text-sm font-medium transition-all duration-300 hover:border-primary hover:bg-primary/10 hover:shadow-lg hover:shadow-primary/5 active:scale-95"
-				>
-					<Filter className="h-4 w-4" />
-					Filtros
-				</button>
+		<div className="flex items-center gap-2">
+			<div className="relative flex-1 group">
+				<Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
+				<input
+					type="text"
+					placeholder="Buscar no grimório…"
+					onChange={(e) => onSearch?.(e.target.value)}
+					className="h-9 w-full rounded-md border border-border bg-card-elevated/60 pl-9 pr-3 text-[13px] text-foreground placeholder:text-muted-foreground/70 transition-colors focus:border-primary/60 focus:outline-none focus:ring-2 focus:ring-primary/20 hover:border-border-hover/60"
+				/>
+				<kbd className="pointer-events-none absolute right-2 top-1/2 hidden -translate-y-1/2 select-none items-center rounded border border-border bg-muted/40 px-1 py-0.5 text-[9px] font-medium uppercase tracking-wider text-muted-foreground sm:inline-flex">
+					⌘K
+				</kbd>
 			</div>
+
+			<button
+				type="button"
+				className="flex h-9 items-center gap-1.5 rounded-md border border-border bg-card-elevated/60 px-3 text-[12px] font-medium text-muted-foreground transition-colors hover:border-border-hover hover:text-foreground"
+			>
+				<Filter className="h-3.5 w-3.5" />
+				Filtros
+			</button>
 		</div>
 	);
 }

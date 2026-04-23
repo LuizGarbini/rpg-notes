@@ -1,112 +1,216 @@
-import { Plus } from "lucide-react";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { Pencil, Plus } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
+import { useForm, useWatch } from "react-hook-form";
+import type { Item } from "@/lib/store";
+import { itemDefaults, useRPGStore } from "@/lib/store";
 import { Button } from "./ui/button";
-import { useRPGStore } from "@/lib/store";
 import {
 	Dialog,
-	DialogClose,
 	DialogContent,
 	DialogDescription,
-	DialogFooter,
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
 } from "./ui/dialog";
+import { Field, FormSection } from "./ui/form-tabs";
+import { ImageUploader } from "./image-uploader";
 import { Input } from "./ui/input";
-import { Label } from "./ui/label";
+import { Select } from "./ui/select";
+import { Textarea } from "./ui/textarea";
 
-const formFilterSchema = z.object({
-	name: z.string().min(1, "Obrigatório"),
-	type: z.string(),
-	rarity: z.string(),
-	description: z.string(),
-	stats: z.string(),
-});
-
-type FormFilterSchema = z.infer<typeof formFilterSchema>;
+type ItemFormValues = Omit<Item, "id" | "createdAt" | "updatedAt">;
 
 export function ItemForm() {
-	const { register, handleSubmit, reset } = useForm<FormFilterSchema>({
-		resolver: zodResolver(formFilterSchema),
-	});
-	const [isOpen, setIsOpen] = useState(false);
-	const addItem = useRPGStore((state) => state.addItem);
+	return (
+		<ItemFormDialog
+			trigger={
+				<Button variant="default" size="sm">
+					<Plus className="h-3.5 w-3.5" />
+					Novo Item
+				</Button>
+			}
+		/>
+	);
+}
 
-	function handleCreateForm(data: FormFilterSchema) {
-		addItem(data);
-		setIsOpen(false);
-		reset();
+interface ItemEditButtonProps {
+	item: Item;
+	open?: boolean;
+	onOpenChange?: (open: boolean) => void;
+	trigger?: ReactNode;
+}
+
+export function ItemEditButton({ item, open, onOpenChange, trigger }: ItemEditButtonProps) {
+	return (
+		<ItemFormDialog
+			item={item}
+			open={open}
+			onOpenChange={onOpenChange}
+			trigger={
+				trigger ?? (
+					<Button variant="ghost" size="sm">
+						<Pencil className="h-3.5 w-3.5" />
+						Editar
+					</Button>
+				)
+			}
+		/>
+	);
+}
+
+interface ItemFormDialogProps {
+	item?: Item;
+	trigger?: ReactNode;
+	open?: boolean;
+	onOpenChange?: (open: boolean) => void;
+}
+
+function ItemFormDialog({ item, trigger, open: openProp, onOpenChange }: ItemFormDialogProps) {
+	const isEdit = !!item;
+	const [internalOpen, setInternalOpen] = useState(false);
+	const open = openProp ?? internalOpen;
+	const setOpen = onOpenChange ?? setInternalOpen;
+
+	const addItem = useRPGStore((state) => state.addItem);
+	const updateItem = useRPGStore((state) => state.updateItem);
+
+	const { register, handleSubmit, reset, control, setValue } = useForm<ItemFormValues>({
+		defaultValues: { ...itemDefaults, ...(item ?? {}) },
+	});
+
+	const imageUrl = useWatch({ control, name: "imageUrl" });
+
+	useEffect(() => {
+		if (open) reset({ ...itemDefaults, ...(item ?? {}) });
+	}, [open, item, reset]);
+
+	function onSubmit(data: ItemFormValues) {
+		if (isEdit && item) updateItem(item.id, data);
+		else addItem(data);
+		setOpen(false);
 	}
 
 	return (
-		<Dialog open={isOpen} onOpenChange={setIsOpen}>
-			<DialogTrigger>
-				<Button variant="default">
-					<Plus className="mr-2 h-4 w-4" />
-					Adicionar Item
-				</Button>
-			</DialogTrigger>
-			<DialogContent className="sm:max-w-[425px]">
-				<form
-					className="flex flex-col gap-4"
-					onSubmit={handleSubmit(handleCreateForm)}
-				>
-					<DialogHeader>
-						<DialogTitle>Novo Item</DialogTitle>
+		<Dialog open={open} onOpenChange={setOpen}>
+			{trigger && <DialogTrigger render={trigger as React.ReactElement} />}
+			<DialogContent className="!max-w-2xl max-h-[92vh] overflow-hidden p-0">
+				<form onSubmit={handleSubmit(onSubmit)} className="flex max-h-[92vh] flex-col">
+					<DialogHeader className="border-b border-border px-6 pt-6 pb-4">
+						<DialogTitle className="font-display text-lg">
+							{isEdit ? `Editar: ${item?.name || "Item"}` : "Novo Item"}
+						</DialogTitle>
 						<DialogDescription>
-							Registre um armamento, poção ou relíquia.
+							Registre uma arma, armadura, poção ou relíquia.
 						</DialogDescription>
 					</DialogHeader>
-					<div className="grid gap-4">
-						<div className="grid gap-3">
-							<Label htmlFor="name">Nome do Item</Label>
-							<Input
-								placeholder="Ex: Espada Longa Flamejante"
-								{...register("name")}
+
+					<div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
+						<FormSection title="Identificação">
+							<ImageUploader
+								value={imageUrl ?? ""}
+								onChange={(url) => setValue("imageUrl", url, { shouldDirty: true })}
+								label="Ilustração"
+								folder="items"
+								size="md"
 							/>
-						</div>
-						<div className="grid gap-3 grid-cols-2">
-							<div className="flex flex-col gap-3">
-								<Label htmlFor="type">Tipo</Label>
-								<Input
-									placeholder="Ex: Arma, Poção..."
-									{...register("type")}
-								/>
+							<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+								<Field label="Nome" htmlFor="name" className="sm:col-span-2">
+									<Input
+										id="name"
+										placeholder="Ex: Espada Longa Flamejante"
+										{...register("name", { required: true })}
+									/>
+								</Field>
+								<Field label="Tipo">
+									<Input placeholder="Arma, Armadura, Poção..." {...register("type")} />
+								</Field>
+								<Field label="Subtipo">
+									<Input placeholder="Ex: espada longa, escudo..." {...register("subtype")} />
+								</Field>
+								<Field label="Raridade">
+									<Select {...register("rarity")}>
+										<option value="comum">Comum</option>
+										<option value="incomum">Incomum</option>
+										<option value="raro">Raro</option>
+										<option value="muito raro">Muito Raro</option>
+										<option value="lendário">Lendário</option>
+										<option value="artefato">Artefato</option>
+									</Select>
+								</Field>
+								<Field label="Fonte / Livro">
+									<Input placeholder="Ex: PHB pg.150" {...register("source")} />
+								</Field>
 							</div>
-							<div className="flex flex-col gap-3">
-								<Label htmlFor="rarity">Raridade</Label>
-								<Input
-									placeholder="Ex: Raro, Lendário..."
-									{...register("rarity")}
-								/>
+						</FormSection>
+
+						<FormSection title="Mecânica">
+							<div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+								<Field label="Peso">
+									<Input placeholder="Ex: 1,5 kg" {...register("weight")} />
+								</Field>
+								<Field label="Valor">
+									<Input placeholder="Ex: 50 PO" {...register("value")} />
+								</Field>
+								<Field label="Cargas">
+									<Input placeholder="Ex: 3/7" {...register("charges")} />
+								</Field>
 							</div>
-						</div>
-						<div className="grid gap-3">
-							<Label htmlFor="stats">Atributos / Efeitos</Label>
-							<Input
-								placeholder="Ex: 1d8 cortante + 1d6 de fogo"
-								{...register("stats")}
-							/>
-						</div>
-						<div className="grid gap-3">
-							<Label htmlFor="description">Descrição / Lore</Label>
-							<Input
-								placeholder="Ex: Forjada nas profundezas de..."
-								{...register("description")}
-							/>
-						</div>
+							<Field label="Atributos / Efeitos mecânicos">
+								<Textarea
+									rows={3}
+									placeholder="1d8 cortante + 1d6 fogo, +1 em Persuasão..."
+									{...register("stats")}
+								/>
+							</Field>
+							<Field label="Propriedades" hint="Ex: Versátil (1d10), Alcance">
+								<Input placeholder="Versátil, Alcance..." {...register("properties")} />
+							</Field>
+						</FormSection>
+
+						<FormSection title="Posse & Sintonização">
+							<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+								<Field label="Pertence a">
+									<Input placeholder="Personagem ou local" {...register("owner")} />
+								</Field>
+								<Field label="Sintonizado com">
+									<Input placeholder="Quem está sintonizado" {...register("attunedTo")} />
+								</Field>
+							</div>
+							<div className="flex flex-wrap items-center gap-4">
+								<label className="flex items-center gap-2 text-[12px] text-muted-foreground">
+									<input
+										type="checkbox"
+										className="h-3.5 w-3.5 rounded border-border accent-primary"
+										{...register("requiresAttunement")}
+									/>
+									Requer sintonização
+								</label>
+								<label className="flex items-center gap-2 text-[12px] text-muted-foreground">
+									<input
+										type="checkbox"
+										className="h-3.5 w-3.5 rounded border-border accent-primary"
+										{...register("equipped")}
+									/>
+									Equipado
+								</label>
+							</div>
+						</FormSection>
+
+						<FormSection title="Descrição">
+							<Field label="Descrição / Lore">
+								<Textarea rows={4} placeholder="Forjada nas profundezas de..." {...register("description")} />
+							</Field>
+						</FormSection>
 					</div>
-					<DialogFooter className="flex gap-2 sm:gap-0 mt-4">
-						<DialogClose asChild>
-							<Button variant="outline" type="button">
-								Cancelar
-							</Button>
-						</DialogClose>
-						<Button type="submit">Adicionar Item</Button>
-					</DialogFooter>
+
+					<div className="flex items-center justify-end gap-2 border-t border-border bg-card-elevated/40 px-6 py-3">
+						<Button type="button" variant="ghost" size="sm" onClick={() => setOpen(false)}>
+							Cancelar
+						</Button>
+						<Button type="submit" size="sm">
+							{isEdit ? "Salvar alterações" : "Salvar Item"}
+						</Button>
+					</div>
 				</form>
 			</DialogContent>
 		</Dialog>

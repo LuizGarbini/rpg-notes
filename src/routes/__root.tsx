@@ -5,11 +5,12 @@ import { createRootRoute, Outlet } from "@tanstack/react-router";
 
 export const Route = createRootRoute({
 	component: () => (
-		<>
-			<div className="flex">
-				<Sidebar />
+		<div className="relative flex min-h-screen">
+			<div className="pointer-events-none fixed inset-0 -z-10 arcane-grid opacity-[0.07]" />
+			<Sidebar />
+			<main className="relative z-10 flex-1">
 				<Outlet />
-			</div>
+			</main>
 			{/* <TanStackDevtools
 				config={{
 					position: "bottom-right",
@@ -21,6 +22,6 @@ export const Route = createRootRoute({
 					},
 				]}
 			/> */}
-		</>
+		</div>
 	),
 });

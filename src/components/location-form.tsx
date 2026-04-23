@@ -1,104 +1,226 @@
-import { Plus } from "lucide-react";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { Pencil, Plus } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
+import { useForm, useWatch } from "react-hook-form";
+import type { GameLocation } from "@/lib/store";
+import { locationDefaults, useRPGStore } from "@/lib/store";
 import { Button } from "./ui/button";
-import { useRPGStore } from "@/lib/store";
 import {
 	Dialog,
-	DialogClose,
 	DialogContent,
 	DialogDescription,
-	DialogFooter,
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
 } from "./ui/dialog";
+import { Field, FormSection, FormTabs } from "./ui/form-tabs";
+import { ImageUploader } from "./image-uploader";
 import { Input } from "./ui/input";
-import { Label } from "./ui/label";
+import { Select } from "./ui/select";
+import { Textarea } from "./ui/textarea";
 
-const formFilterSchema = z.object({
-	name: z.string().min(1, "Obrigatório"),
-	type: z.string(),
-	dangerLevel: z.string(),
-	description: z.string(),
-});
+const TABS = [
+	{ id: "basic", label: "Básico" },
+	{ id: "society", label: "Sociedade" },
+	{ id: "history", label: "História" },
+];
 
-type FormFilterSchema = z.infer<typeof formFilterSchema>;
+type LocationFormValues = Omit<GameLocation, "id" | "createdAt" | "updatedAt">;
 
 export function LocationForm() {
-	const { register, handleSubmit, reset } = useForm<FormFilterSchema>({
-		resolver: zodResolver(formFilterSchema),
-	});
-	const [isOpen, setIsOpen] = useState(false);
-	const addLocation = useRPGStore((state) => state.addLocation);
+	return (
+		<LocationFormDialog
+			trigger={
+				<Button variant="default" size="sm">
+					<Plus className="h-3.5 w-3.5" />
+					Novo Local
+				</Button>
+			}
+		/>
+	);
+}
 
-	function handleCreateForm(data: FormFilterSchema) {
-		addLocation(data);
-		setIsOpen(false);
-		reset();
+interface LocationEditButtonProps {
+	location: GameLocation;
+	open?: boolean;
+	onOpenChange?: (open: boolean) => void;
+	trigger?: ReactNode;
+}
+
+export function LocationEditButton({ location, open, onOpenChange, trigger }: LocationEditButtonProps) {
+	return (
+		<LocationFormDialog
+			location={location}
+			open={open}
+			onOpenChange={onOpenChange}
+			trigger={
+				trigger ?? (
+					<Button variant="ghost" size="sm">
+						<Pencil className="h-3.5 w-3.5" />
+						Editar
+					</Button>
+				)
+			}
+		/>
+	);
+}
+
+interface LocationFormDialogProps {
+	location?: GameLocation;
+	trigger?: ReactNode;
+	open?: boolean;
+	onOpenChange?: (open: boolean) => void;
+}
+
+function LocationFormDialog({ location, trigger, open: openProp, onOpenChange }: LocationFormDialogProps) {
+	const isEdit = !!location;
+	const [internalOpen, setInternalOpen] = useState(false);
+	const open = openProp ?? internalOpen;
+	const setOpen = onOpenChange ?? setInternalOpen;
+
+	const [tab, setTab] = useState(TABS[0].id);
+	const addLocation = useRPGStore((state) => state.addLocation);
+	const updateLocation = useRPGStore((state) => state.updateLocation);
+
+	const { register, handleSubmit, reset, control, setValue } = useForm<LocationFormValues>({
+		defaultValues: { ...locationDefaults, ...(location ?? {}) },
+	});
+
+	const imageUrl = useWatch({ control, name: "imageUrl" });
+
+	useEffect(() => {
+		if (open) {
+			reset({ ...locationDefaults, ...(location ?? {}) });
+			setTab(TABS[0].id);
+		}
+	}, [open, location, reset]);
+
+	function onSubmit(data: LocationFormValues) {
+		if (isEdit && location) updateLocation(location.id, data);
+		else addLocation(data);
+		setOpen(false);
 	}
 
 	return (
-		<Dialog open={isOpen} onOpenChange={setIsOpen}>
-			<DialogTrigger>
-				<Button variant="default">
-					<Plus className="mr-2 h-4 w-4" />
-					Adicionar Local
-				</Button>
-			</DialogTrigger>
-			<DialogContent className="sm:max-w-[425px]">
-				<form
-					className="flex flex-col gap-4"
-					onSubmit={handleSubmit(handleCreateForm)}
-				>
-					<DialogHeader>
-						<DialogTitle>Novo Local</DialogTitle>
+		<Dialog open={open} onOpenChange={setOpen}>
+			{trigger && <DialogTrigger render={trigger as React.ReactElement} />}
+			<DialogContent className="!max-w-2xl max-h-[92vh] overflow-hidden p-0">
+				<form onSubmit={handleSubmit(onSubmit)} className="flex max-h-[92vh] flex-col">
+					<DialogHeader className="border-b border-border px-6 pt-6 pb-4">
+						<DialogTitle className="font-display text-lg">
+							{isEdit ? `Editar: ${location?.name || "Local"}` : "Novo Local"}
+						</DialogTitle>
 						<DialogDescription>
-							Registre uma cidade, masmorra ou região inexplorada.
+							Cidades, masmorras, regiões — locais visitados pelo grupo.
 						</DialogDescription>
+						<div className="mt-3">
+							<FormTabs tabs={TABS} value={tab} onChange={setTab} />
+						</div>
 					</DialogHeader>
-					<div className="grid gap-4">
-						<div className="grid gap-3">
-							<Label htmlFor="name">Nome do Local</Label>
-							<Input
-								placeholder="Ex: Cavernas Ecoantes"
-								{...register("name")}
-							/>
-						</div>
-						<div className="grid gap-3 grid-cols-2">
-							<div className="flex flex-col gap-3">
-								<Label htmlFor="type">Tipo</Label>
-								<Input
-									placeholder="Ex: Masmorra, Cidade..."
-									{...register("type")}
+
+					<div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
+						{tab === "basic" && (
+							<FormSection title="Identificação">
+								<ImageUploader
+									value={imageUrl ?? ""}
+									onChange={(url) => setValue("imageUrl", url, { shouldDirty: true })}
+									label="Imagem"
+									folder="locations"
+									size="md"
 								/>
-							</div>
-							<div className="flex flex-col gap-3">
-								<Label htmlFor="dangerLevel">Nível de Perigo</Label>
-								<Input
-									placeholder="Ex: Alto, Baixo..."
-									{...register("dangerLevel")}
-								/>
-							</div>
-						</div>
-						<div className="grid gap-3">
-							<Label htmlFor="description">Descrição</Label>
-							<Input
-								placeholder="Ex: Uma série de túneis habitados por goblins."
-								{...register("description")}
-							/>
-						</div>
+								<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+									<Field label="Nome" htmlFor="name" className="sm:col-span-2">
+										<Input
+											id="name"
+											placeholder="Ex: Cidade Livre de Greyhawk"
+											{...register("name", { required: true })}
+										/>
+									</Field>
+									<Field label="Tipo">
+										<Input placeholder="Ex: Cidade, Caverna..." {...register("type")} />
+									</Field>
+									<Field label="Região">
+										<Input placeholder="Ex: Reino de Tethyr" {...register("region")} />
+									</Field>
+									<Field label="Local pai" hint="Sub-localidade?">
+										<Input placeholder="Ex: dentro de Cidade Livre" {...register("parentLocation")} />
+									</Field>
+									<Field label="Nível de perigo">
+										<Select {...register("dangerLevel")}>
+											<option value="seguro">Seguro</option>
+											<option value="baixo">Baixo</option>
+											<option value="moderado">Moderado</option>
+											<option value="alto">Alto</option>
+											<option value="mortal">Mortal</option>
+										</Select>
+									</Field>
+									<Field label="Clima">
+										<Input placeholder="Ex: Temperado" {...register("climate")} />
+									</Field>
+									<Field label="Terreno">
+										<Input placeholder="Ex: Floresta densa" {...register("terrain")} />
+									</Field>
+								</div>
+								<Field label="Descrição">
+									<Textarea rows={3} placeholder="Como o local se parece à primeira vista?" {...register("description")} />
+								</Field>
+							</FormSection>
+						)}
+
+						{tab === "society" && (
+							<FormSection title="Sociedade & Política">
+								<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+									<Field label="População">
+										<Input placeholder="Ex: ~5.000" {...register("population")} />
+									</Field>
+									<Field label="Governo">
+										<Input placeholder="Conselho, Rei..." {...register("government")} />
+									</Field>
+									<Field label="Economia">
+										<Input placeholder="Comércio, mineração..." {...register("economy")} />
+									</Field>
+									<Field label="Habitantes notáveis">
+										<Input placeholder="Personalidades importantes" {...register("notableInhabitants")} />
+									</Field>
+								</div>
+								<Field label="Pontos de interesse">
+									<Textarea rows={4} placeholder="Templos, mercados, masmorras..." {...register("keyFeatures")} />
+								</Field>
+								<Field label="Ganchos de aventura">
+									<Textarea rows={3} placeholder="Quests que podem surgir aqui." {...register("hooks")} />
+								</Field>
+							</FormSection>
+						)}
+
+						{tab === "history" && (
+							<FormSection title="História & Mapa">
+								<Field label="História do local">
+									<Textarea rows={6} placeholder="Origens, eventos marcantes..." {...register("history")} />
+								</Field>
+								<Field label="URL do mapa (opcional)">
+									<Input placeholder="https://..." {...register("mapUrl")} />
+								</Field>
+							</FormSection>
+						)}
 					</div>
-					<DialogFooter className="flex gap-2 sm:gap-0 mt-4">
-						<DialogClose asChild>
-							<Button variant="outline" type="button">
+
+					<div className="flex items-center justify-between gap-2 border-t border-border bg-card-elevated/40 px-6 py-3">
+						<label className="flex items-center gap-2 text-[12px] text-muted-foreground">
+							<input
+								type="checkbox"
+								className="h-3.5 w-3.5 rounded border-border accent-primary"
+								{...register("visited")}
+							/>
+							O grupo já visitou
+						</label>
+						<div className="flex items-center gap-2">
+							<Button type="button" variant="ghost" size="sm" onClick={() => setOpen(false)}>
 								Cancelar
 							</Button>
-						</DialogClose>
-						<Button type="submit">Adicionar Local</Button>
-					</DialogFooter>
+							<Button type="submit" size="sm">
+								{isEdit ? "Salvar alterações" : "Salvar Local"}
+							</Button>
+						</div>
+					</div>
 				</form>
 			</DialogContent>
 		</Dialog>

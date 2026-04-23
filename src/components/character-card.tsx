@@ -1,95 +1,194 @@
-import { Shield, Heart, Sword, FastForward } from "lucide-react";
-import type { Character } from "@/lib/store";
+import { Heart, Shield, Sparkles, User, Zap } from "lucide-react";
+import { useState } from "react";
+import {
+	abilityModifier,
+	type Character,
+	formatModifier,
+	systemLabel,
+	useRPGStore,
+} from "@/lib/store";
+import { CharacterEditButton } from "./character-form";
+import { EntityActions } from "./entity-actions";
 
 interface CharacterCardProps {
-  character: Character;
+	character: Character;
 }
 
 export function CharacterCard({ character }: CharacterCardProps) {
-  return (
-    <div className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-primary/20 bg-background/50 p-5 shadow-sm transition-all hover:border-primary/50 hover:shadow-md hover:shadow-primary/10">
-      {/* Decorative Purple Gradient Background */}
-      <div className="absolute inset-x-0 -top-px h-1 bg-linear-to-r from-transparent via-primary to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-      <div className="absolute -right-20 -top-20 -z-10 h-40 w-40 rounded-full bg-primary/5 blur-[80px] transition-colors group-hover:bg-primary/10" />
+	const removeCharacter = useRPGStore((s) => s.removeCharacter);
+	const [editOpen, setEditOpen] = useState(false);
 
-      {/* Header Info */}
-      <div className="mb-4 flex items-start justify-between gap-4">
-        <div>
-          <h3 className="text-xl font-bold tracking-tight text-foreground">
-            {character.characterName}
-          </h3>
-          <p className="mt-1 text-sm font-medium text-muted-foreground">
-            {character.race} • {character.class}
-          </p>
-        </div>
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-primary/20 bg-primary/10 font-bold text-primary shadow-inner">
-          L{character.level}
-        </div>
-      </div>
+	const hpPercent = character.healthMax
+		? Math.min(100, Math.round((character.health / character.healthMax) * 100))
+		: 0;
 
-      {/* Quick Stats Grid */}
-      <div className="mb-4 grid grid-cols-2 gap-2">
-        {/* HP */}
-        <div className="flex items-center gap-2 rounded-lg border border-border/50 bg-background/50 p-2">
-          <Heart className="h-4 w-4 text-rose-500" />
-          <div className="flex flex-col">
-            <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
-              Vida
-            </span>
-            <span className="text-sm font-semibold leading-none">
-              {character.health}/{character.healthMax}
-            </span>
-          </div>
-        </div>
+	const abilities = [
+		{ label: "FOR", value: character.strength },
+		{ label: "DES", value: character.dexterity },
+		{ label: "CON", value: character.constitution },
+		{ label: "INT", value: character.intelligence },
+		{ label: "SAB", value: character.wisdom },
+		{ label: "CAR", value: character.charisma },
+	];
 
-        {/* AC */}
-        <div className="flex items-center gap-2 rounded-lg border border-border/50 bg-background/50 p-2">
-          <Shield className="h-4 w-4 text-blue-500" />
-          <div className="flex flex-col">
-            <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
-              CA
-            </span>
-            <span className="text-sm font-semibold leading-none">
-              {character.armorClass}
-            </span>
-          </div>
-        </div>
+	const hasImage = !!character.imageUrl;
 
-        {/* Initiative */}
-        <div className="flex items-center gap-2 rounded-lg border border-border/50 bg-background/50 p-2">
-          <FastForward className="h-4 w-4 text-amber-500" />
-          <div className="flex flex-col">
-            <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
-              Iniciativa
-            </span>
-            <span className="text-sm font-semibold leading-none">
-              +{character.initiative}
-            </span>
-          </div>
-        </div>
+	return (
+		<>
+			<div className="group relative flex flex-col overflow-hidden rounded-xl border border-border bg-card-elevated transition-colors hover:border-border-hover">
+				<EntityActions
+					onEdit={() => setEditOpen(true)}
+					onDelete={() => removeCharacter(character.id)}
+					entityName={character.characterName || "Sem nome"}
+					entityKindLabel="personagem"
+				/>
 
-        {/* XP */}
-        <div className="flex items-center gap-2 rounded-lg border border-border/50 bg-background/50 p-2">
-          <Sword className="h-4 w-4 text-primary" />
-          <div className="flex flex-col">
-            <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
-              XP
-            </span>
-            <span className="text-sm font-semibold leading-none">
-              {character.xp}
-            </span>
-          </div>
-        </div>
-      </div>
+				{/* Banner com imagem ou padrão */}
+				<div className="relative h-28 w-full shrink-0 overflow-hidden bg-linear-to-br from-primary/15 via-fuchsia-500/10 to-transparent">
+					{hasImage ? (
+						<img
+							src={character.imageUrl}
+							alt={character.characterName}
+							className="h-full w-full object-cover opacity-90 transition-transform duration-500 group-hover:scale-105"
+						/>
+					) : (
+						<div className="flex h-full w-full items-center justify-center text-primary/30">
+							<User className="h-12 w-12" strokeWidth={1.4} />
+						</div>
+					)}
+					<div className="absolute inset-x-0 bottom-0 h-12 bg-linear-to-t from-card to-transparent" />
+					<div className="absolute right-2 bottom-2 flex h-8 min-w-8 items-center justify-center rounded-md bg-background/85 px-1.5 backdrop-blur ring-1 ring-border">
+						<span className="text-[8px] font-semibold uppercase tracking-wider text-muted-foreground">
+							Lv
+						</span>
+						<span className="ml-1 font-display text-[13px] font-extrabold leading-none text-foreground">
+							{character.level}
+						</span>
+					</div>
+				</div>
 
-      {/* Background Snippet */}
-      {character.background && (
-        <div className="mt-auto border-t border-border/40 pt-3">
-          <p className="line-clamp-2 text-xs italic text-muted-foreground">
-            &quot;{character.background}&quot;
-          </p>
-        </div>
-      )}
-    </div>
-  );
+				<div className="flex flex-1 flex-col p-4">
+					<div className="min-w-0">
+						<h3 className="font-display truncate text-[15px] font-bold leading-tight text-foreground">
+							{character.characterName || "Sem nome"}
+						</h3>
+						<div className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[11px] text-muted-foreground">
+							{character.race && <span>{character.race}</span>}
+							{character.class && (
+								<>
+									<span className="text-primary/40">·</span>
+									<span>{character.class}</span>
+								</>
+							)}
+							{character.subclass && (
+								<>
+									<span className="text-primary/40">·</span>
+									<span className="truncate">{character.subclass}</span>
+								</>
+							)}
+						</div>
+						<div className="mt-1.5 flex items-center gap-1.5">
+							<span className="rounded bg-primary/10 px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-wider text-primary ring-1 ring-primary/15">
+								{systemLabel(character.system)}
+							</span>
+							{character.alignment && (
+								<span className="text-[10px] text-muted-foreground/80">
+									{character.alignment}
+								</span>
+							)}
+						</div>
+					</div>
+
+					{/* HP */}
+					<div className="mt-3">
+						<div className="mb-1 flex items-center justify-between text-[10px] uppercase tracking-wider text-muted-foreground">
+							<span className="flex items-center gap-1">
+								<Heart className="h-2.5 w-2.5 text-rose-400" />
+								HP
+							</span>
+							<span className="font-mono tabular-nums text-foreground/80">
+								{character.health}/{character.healthMax}
+							</span>
+						</div>
+						<div className="relative h-1.5 overflow-hidden rounded-full bg-muted">
+							<div
+								className="absolute inset-y-0 left-0 rounded-full bg-rose-400 transition-all duration-500"
+								style={{ width: `${hpPercent}%` }}
+							/>
+						</div>
+					</div>
+
+					{/* Quick stats */}
+					<div className="mt-3 grid grid-cols-3 gap-1.5 text-center">
+						<MiniStat Icon={Shield} color="text-blue-300" label="CA" value={character.armorClass} />
+						<MiniStat
+							Icon={Zap}
+							color="text-amber-300"
+							label="INI"
+							value={formatModifier(character.initiative)}
+						/>
+						<MiniStat Icon={Sparkles} color="text-violet-300" label="XP" value={character.xp} />
+					</div>
+
+					{/* Abilities row */}
+					<div className="mt-3 grid grid-cols-6 gap-1 border-t border-border/60 pt-3">
+						{abilities.map((a) => {
+							const mod = abilityModifier(a.value);
+							return (
+								<div
+									key={a.label}
+									className="flex flex-col items-center"
+									title={`${a.label} ${a.value}`}
+								>
+									<span className="text-[8px] font-semibold uppercase tracking-wider text-muted-foreground">
+										{a.label}
+									</span>
+									<span className="font-mono text-[11px] font-bold tabular-nums text-foreground">
+										{a.value}
+									</span>
+									<span className="font-mono text-[9px] tabular-nums text-primary">
+										{formatModifier(mod)}
+									</span>
+								</div>
+							);
+						})}
+					</div>
+
+					{character.background && (
+						<p className="mt-3 line-clamp-2 border-t border-border/60 pt-2.5 text-[11px] italic text-muted-foreground">
+							“{character.background}”
+						</p>
+					)}
+				</div>
+			</div>
+
+			<CharacterEditButton
+				character={character}
+				open={editOpen}
+				onOpenChange={setEditOpen}
+				trigger={null}
+			/>
+		</>
+	);
+}
+
+interface MiniStatProps {
+	Icon: React.ComponentType<{ className?: string }>;
+	color: string;
+	label: string;
+	value: string | number;
+}
+
+function MiniStat({ Icon, color, label, value }: MiniStatProps) {
+	return (
+		<div className="flex flex-col items-center gap-0.5 rounded-md bg-background/40 py-1.5 ring-1 ring-border/60">
+			<Icon className={`h-3 w-3 ${color}`} />
+			<span className="text-[8px] uppercase tracking-wider text-muted-foreground">
+				{label}
+			</span>
+			<span className="font-mono text-[11px] font-bold tabular-nums leading-none">
+				{value}
+			</span>
+		</div>
+	);
 }

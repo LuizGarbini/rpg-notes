@@ -1,94 +1,219 @@
-import { Plus } from "lucide-react";
-import { useState } from "react";
+import { Pencil, Plus } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import type { Session } from "@/lib/store";
+import { sessionDefaults, useRPGStore } from "@/lib/store";
 import { Button } from "./ui/button";
-import { useRPGStore } from "@/lib/store";
 import {
 	Dialog,
-	DialogClose,
 	DialogContent,
 	DialogDescription,
-	DialogFooter,
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
 } from "./ui/dialog";
+import { Field, FormSection, FormTabs } from "./ui/form-tabs";
 import { Input } from "./ui/input";
-import { Label } from "./ui/label";
+import { Textarea } from "./ui/textarea";
 
-const formFilterSchema = z.object({
-	title: z.string().min(1, "Obrigatório"),
-	date: z.string(),
-	summary: z.string(),
-});
+const TABS = [
+	{ id: "basic", label: "Visão Geral" },
+	{ id: "people", label: "Presentes" },
+	{ id: "events", label: "Eventos" },
+	{ id: "rewards", label: "Recompensas" },
+	{ id: "dm", label: "Notas do Mestre" },
+];
 
-type FormFilterSchema = z.infer<typeof formFilterSchema>;
+type SessionFormValues = Omit<Session, "id" | "createdAt" | "updatedAt">;
 
 export function SessionForm() {
-	const { register, handleSubmit, reset } = useForm<FormFilterSchema>({
-		resolver: zodResolver(formFilterSchema),
-	});
-	const [isOpen, setIsOpen] = useState(false);
-	const addSession = useRPGStore((state) => state.addSession);
+	return (
+		<SessionFormDialog
+			trigger={
+				<Button variant="default" size="sm">
+					<Plus className="h-3.5 w-3.5" />
+					Nova Sessão
+				</Button>
+			}
+		/>
+	);
+}
 
-	function handleCreateForm(data: FormFilterSchema) {
-		addSession(data);
-		setIsOpen(false);
-		reset();
+interface SessionEditButtonProps {
+	session: Session;
+	open?: boolean;
+	onOpenChange?: (open: boolean) => void;
+	trigger?: ReactNode;
+}
+
+export function SessionEditButton({ session, open, onOpenChange, trigger }: SessionEditButtonProps) {
+	return (
+		<SessionFormDialog
+			session={session}
+			open={open}
+			onOpenChange={onOpenChange}
+			trigger={
+				trigger ?? (
+					<Button variant="ghost" size="sm">
+						<Pencil className="h-3.5 w-3.5" />
+						Editar
+					</Button>
+				)
+			}
+		/>
+	);
+}
+
+interface SessionFormDialogProps {
+	session?: Session;
+	trigger?: ReactNode;
+	open?: boolean;
+	onOpenChange?: (open: boolean) => void;
+}
+
+function SessionFormDialog({ session, trigger, open: openProp, onOpenChange }: SessionFormDialogProps) {
+	const isEdit = !!session;
+	const [internalOpen, setInternalOpen] = useState(false);
+	const open = openProp ?? internalOpen;
+	const setOpen = onOpenChange ?? setInternalOpen;
+
+	const [tab, setTab] = useState(TABS[0].id);
+	const addSession = useRPGStore((state) => state.addSession);
+	const updateSession = useRPGStore((state) => state.updateSession);
+
+	const { register, handleSubmit, reset } = useForm<SessionFormValues>({
+		defaultValues: { ...sessionDefaults, ...(session ?? {}) },
+	});
+
+	useEffect(() => {
+		if (open) {
+			reset({ ...sessionDefaults, ...(session ?? {}) });
+			setTab(TABS[0].id);
+		}
+	}, [open, session, reset]);
+
+	function onSubmit(data: SessionFormValues) {
+		if (isEdit && session) updateSession(session.id, data);
+		else addSession(data);
+		setOpen(false);
 	}
 
 	return (
-		<Dialog open={isOpen} onOpenChange={setIsOpen}>
-			<DialogTrigger>
-				<Button variant="default">
-					<Plus className="mr-2 h-4 w-4" />
-					Adicionar Sessão
-				</Button>
-			</DialogTrigger>
-			<DialogContent className="sm:max-w-[425px]">
-				<form
-					className="flex flex-col gap-4"
-					onSubmit={handleSubmit(handleCreateForm)}
-				>
-					<DialogHeader>
-						<DialogTitle>Nova Sessão</DialogTitle>
+		<Dialog open={open} onOpenChange={setOpen}>
+			{trigger && <DialogTrigger render={trigger as React.ReactElement} />}
+			<DialogContent className="!max-w-2xl max-h-[92vh] overflow-hidden p-0">
+				<form onSubmit={handleSubmit(onSubmit)} className="flex max-h-[92vh] flex-col">
+					<DialogHeader className="border-b border-border px-6 pt-6 pb-4">
+						<DialogTitle className="font-display text-lg">
+							{isEdit ? `Editar: ${session?.title || "Sessão"}` : "Nova Sessão"}
+						</DialogTitle>
 						<DialogDescription>
-							Registre os acontecimentos da campanha.
+							Documente os acontecimentos da campanha.
 						</DialogDescription>
+						<div className="mt-3">
+							<FormTabs tabs={TABS} value={tab} onChange={setTab} />
+						</div>
 					</DialogHeader>
-					<div className="grid gap-4">
-						<div className="grid gap-3">
-							<Label htmlFor="title">Título da Sessão</Label>
-							<Input
-								placeholder="Ex: A Caverna dos Goblins"
-								{...register("title")}
-							/>
-						</div>
-						<div className="grid gap-3">
-							<Label htmlFor="date">Data da Sessão (In Game ou Real)</Label>
-							<Input
-								placeholder="Ex: 12/04/2026 ou 15 de Mirtul"
-								{...register("date")}
-							/>
-						</div>
-						<div className="grid gap-3">
-							<Label htmlFor="summary">Resumo</Label>
-							<Input
-								placeholder="Ex: O grupo encontrou um tesouro e quase morreu."
-								{...register("summary")}
-							/>
-						</div>
+
+					<div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
+						{tab === "basic" && (
+							<FormSection title="Informações Gerais">
+								<div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+									<Field label="Título" htmlFor="title" className="sm:col-span-2">
+										<Input
+											id="title"
+											placeholder="Ex: A Caverna dos Goblins"
+											{...register("title", { required: true })}
+										/>
+									</Field>
+									<Field label="Sessão #">
+										<Input type="number" min={1} {...register("number", { valueAsNumber: true })} />
+									</Field>
+									<Field label="Data real">
+										<Input placeholder="Ex: 12/04/2026" {...register("date")} />
+									</Field>
+									<Field label="Data in-game">
+										<Input placeholder="Ex: 15 de Mirtul" {...register("inGameDate")} />
+									</Field>
+									<Field label="Duração">
+										<Input placeholder="Ex: 4h" {...register("duration")} />
+									</Field>
+									<Field label="Local de partida (in-game)" className="sm:col-span-2">
+										<Input placeholder="Onde a sessão começou" {...register("location")} />
+									</Field>
+									<Field label="Tom / Humor da sessão">
+										<Input placeholder="Ex: tenso, cômico..." {...register("mood")} />
+									</Field>
+								</div>
+								<Field label="Resumo geral">
+									<Textarea
+										rows={4}
+										placeholder="O grupo encontrou um tesouro e quase morreu..."
+										{...register("summary")}
+									/>
+								</Field>
+							</FormSection>
+						)}
+
+						{tab === "people" && (
+							<FormSection title="Quem & Onde">
+								<Field label="Jogadores presentes" hint="Separe por vírgula">
+									<Textarea rows={2} placeholder="Aragorn (Lucas), Lyra (Maria)..." {...register("attendees")} />
+								</Field>
+								<Field label="NPCs envolvidos">
+									<Textarea rows={3} placeholder="NPCs com quem o grupo interagiu" {...register("npcsPresent")} />
+								</Field>
+								<Field label="Locais visitados">
+									<Textarea rows={3} placeholder="Cidades, masmorras, regiões..." {...register("locationsVisited")} />
+								</Field>
+							</FormSection>
+						)}
+
+						{tab === "events" && (
+							<FormSection title="Acontecimentos">
+								<Field label="Eventos chave">
+									<Textarea rows={5} placeholder="Decisões, descobertas, combates..." {...register("keyEvents")} />
+								</Field>
+								<Field label="Combates / Eventos táticos">
+									<Textarea rows={4} placeholder="Inimigos enfrentados..." {...register("combatLog")} />
+								</Field>
+								<Field label="Cliffhanger / Como terminou">
+									<Textarea rows={2} placeholder="A sessão terminou com..." {...register("cliffhanger")} />
+								</Field>
+							</FormSection>
+						)}
+
+						{tab === "rewards" && (
+							<FormSection title="Recompensas">
+								<Field label="Loot / Itens conquistados">
+									<Textarea rows={4} placeholder="Espada +1, 200 PO..." {...register("loot")} />
+								</Field>
+								<Field label="XP concedido">
+									<Input placeholder="Ex: 750 XP por personagem" {...register("xpAwarded")} />
+								</Field>
+							</FormSection>
+						)}
+
+						{tab === "dm" && (
+							<FormSection
+								title="Notas Privadas do Mestre"
+								description="Visíveis apenas para você — planos futuros, segredos."
+							>
+								<Field label="Notas do Mestre">
+									<Textarea rows={10} placeholder="Próximos passos do vilão..." {...register("dmNotes")} />
+								</Field>
+							</FormSection>
+						)}
 					</div>
-					<DialogFooter className="flex gap-2 sm:gap-0 mt-4">
-						<DialogClose asChild>
-							<Button variant="outline" type="button">
-								Cancelar
-							</Button>
-						</DialogClose>
-						<Button type="submit">Adicionar Sessão</Button>
-					</DialogFooter>
+
+					<div className="flex items-center justify-end gap-2 border-t border-border bg-card-elevated/40 px-6 py-3">
+						<Button type="button" variant="ghost" size="sm" onClick={() => setOpen(false)}>
+							Cancelar
+						</Button>
+						<Button type="submit" size="sm">
+							{isEdit ? "Salvar alterações" : "Salvar Sessão"}
+						</Button>
+					</div>
 				</form>
 			</DialogContent>
 		</Dialog>

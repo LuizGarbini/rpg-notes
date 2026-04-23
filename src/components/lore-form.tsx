@@ -1,96 +1,185 @@
-import { Plus } from "lucide-react";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { Pencil, Plus } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
+import { useForm, useWatch } from "react-hook-form";
+import type { Lore } from "@/lib/store";
+import { loreDefaults, useRPGStore } from "@/lib/store";
 import { Button } from "./ui/button";
-import { useRPGStore } from "@/lib/store";
 import {
 	Dialog,
-	DialogClose,
 	DialogContent,
 	DialogDescription,
-	DialogFooter,
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
 } from "./ui/dialog";
+import { Field, FormSection } from "./ui/form-tabs";
+import { ImageUploader } from "./image-uploader";
 import { Input } from "./ui/input";
-import { Label } from "./ui/label";
+import { Select } from "./ui/select";
 import { Textarea } from "./ui/textarea";
 
-const formFilterSchema = z.object({
-	title: z.string().min(1, "Obrigatório"),
-	category: z.string(),
-	content: z.string(),
-});
-
-type FormFilterSchema = z.infer<typeof formFilterSchema>;
+type LoreFormValues = Omit<Lore, "id" | "createdAt" | "updatedAt">;
 
 export function LoreForm() {
-	const { register, handleSubmit, reset } = useForm<FormFilterSchema>({
-		resolver: zodResolver(formFilterSchema),
-	});
-	const [isOpen, setIsOpen] = useState(false);
-	const addLore = useRPGStore((state) => state.addLore);
+	return (
+		<LoreFormDialog
+			trigger={
+				<Button variant="default" size="sm">
+					<Plus className="h-3.5 w-3.5" />
+					Novo Lore
+				</Button>
+			}
+		/>
+	);
+}
 
-	function handleCreateForm(data: FormFilterSchema) {
-		addLore(data);
-		setIsOpen(false);
-		reset();
+interface LoreEditButtonProps {
+	lore: Lore;
+	open?: boolean;
+	onOpenChange?: (open: boolean) => void;
+	trigger?: ReactNode;
+}
+
+export function LoreEditButton({ lore, open, onOpenChange, trigger }: LoreEditButtonProps) {
+	return (
+		<LoreFormDialog
+			lore={lore}
+			open={open}
+			onOpenChange={onOpenChange}
+			trigger={
+				trigger ?? (
+					<Button variant="ghost" size="sm">
+						<Pencil className="h-3.5 w-3.5" />
+						Editar
+					</Button>
+				)
+			}
+		/>
+	);
+}
+
+interface LoreFormDialogProps {
+	lore?: Lore;
+	trigger?: ReactNode;
+	open?: boolean;
+	onOpenChange?: (open: boolean) => void;
+}
+
+function LoreFormDialog({ lore, trigger, open: openProp, onOpenChange }: LoreFormDialogProps) {
+	const isEdit = !!lore;
+	const [internalOpen, setInternalOpen] = useState(false);
+	const open = openProp ?? internalOpen;
+	const setOpen = onOpenChange ?? setInternalOpen;
+
+	const addLore = useRPGStore((state) => state.addLore);
+	const updateLore = useRPGStore((state) => state.updateLore);
+
+	const { register, handleSubmit, reset, control, setValue } = useForm<LoreFormValues>({
+		defaultValues: { ...loreDefaults, ...(lore ?? {}) },
+	});
+
+	const imageUrl = useWatch({ control, name: "imageUrl" });
+
+	useEffect(() => {
+		if (open) reset({ ...loreDefaults, ...(lore ?? {}) });
+	}, [open, lore, reset]);
+
+	function onSubmit(data: LoreFormValues) {
+		if (isEdit && lore) updateLore(lore.id, data);
+		else addLore(data);
+		setOpen(false);
 	}
 
 	return (
-		<Dialog open={isOpen} onOpenChange={setIsOpen}>
-			<DialogTrigger>
-				<Button variant="default">
-					<Plus className="mr-2 h-4 w-4" />
-					Adicionar Lore
-				</Button>
-			</DialogTrigger>
-			<DialogContent className="sm:max-w-[500px]">
-				<form
-					className="flex flex-col gap-4"
-					onSubmit={handleSubmit(handleCreateForm)}
-				>
-					<DialogHeader>
-						<DialogTitle>Registro de Lore</DialogTitle>
+		<Dialog open={open} onOpenChange={setOpen}>
+			{trigger && <DialogTrigger render={trigger as React.ReactElement} />}
+			<DialogContent className="!max-w-2xl max-h-[92vh] overflow-hidden p-0">
+				<form onSubmit={handleSubmit(onSubmit)} className="flex max-h-[92vh] flex-col">
+					<DialogHeader className="border-b border-border px-6 pt-6 pb-4">
+						<DialogTitle className="font-display text-lg">
+							{isEdit ? `Editar: ${lore?.title || "Lore"}` : "Novo Lore"}
+						</DialogTitle>
 						<DialogDescription>
-							Registre a história, divindades ou segredos do mundo.
+							Mitos, lendas, divindades, eventos históricos do mundo.
 						</DialogDescription>
 					</DialogHeader>
-					<div className="grid gap-4">
-						<div className="grid gap-3">
-							<Label htmlFor="title">Título</Label>
-							<Input
-								placeholder="Ex: A Época de Prata"
-								{...register("title")}
+
+					<div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
+						<FormSection title="Identificação">
+							<ImageUploader
+								value={imageUrl ?? ""}
+								onChange={(url) => setValue("imageUrl", url, { shouldDirty: true })}
+								label="Ilustração"
+								folder="lore"
+								size="md"
 							/>
-						</div>
-						<div className="grid gap-3">
-							<Label htmlFor="category">Categoria</Label>
-							<Input
-								placeholder="Ex: Mitologia, Religião, Evento Histórico..."
-								{...register("category")}
-							/>
-						</div>
-						<div className="grid gap-3">
-							<Label htmlFor="content">Conteúdo</Label>
-							<Textarea
-								className="min-h-[120px] resize-none"
-								placeholder="Um longo tempo atrás, os deuses caíram..."
-								{...register("content")}
-							/>
-						</div>
+							<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+								<Field label="Título" htmlFor="title" className="sm:col-span-2">
+									<Input
+										id="title"
+										placeholder="Ex: A Queda do Império de Netheril"
+										{...register("title", { required: true })}
+									/>
+								</Field>
+								<Field label="Categoria">
+									<Input placeholder="História, Religião, Magia..." {...register("category")} />
+								</Field>
+								<Field label="Era / Período">
+									<Input placeholder="Ex: Era Glacial" {...register("era")} />
+								</Field>
+								<Field label="Importância">
+									<Select {...register("importance")}>
+										<option value="minor">Curiosidade</option>
+										<option value="supporting">Relevante</option>
+										<option value="major">Importante</option>
+										<option value="core">Central da campanha</option>
+									</Select>
+								</Field>
+								<Field label="Fonte / Referência">
+									<Input placeholder="Ex: livro X, NPC Y..." {...register("source")} />
+								</Field>
+							</div>
+							<Field label="Tags" hint="Separe por vírgula. Ex: divindade, profecia">
+								<Input placeholder="Ex: profecia, magia antiga" {...register("tags")} />
+							</Field>
+						</FormSection>
+
+						<FormSection title="Conteúdo">
+							<Field label="Conteúdo principal">
+								<Textarea
+									rows={8}
+									placeholder="A história, lenda ou fato a ser registrado..."
+									{...register("content")}
+								/>
+							</Field>
+							<Field label="Conhecido por">
+								<Input placeholder="Sábios, eruditos do reino X..." {...register("knownBy")} />
+							</Field>
+							<Field label="Entidades relacionadas">
+								<Input placeholder="NPCs, lugares, itens conectados..." {...register("relatedEntities")} />
+							</Field>
+							<Field label="Notas privadas do Mestre">
+								<Textarea rows={3} placeholder="O que está por trás..." {...register("notes")} />
+							</Field>
+							<label className="flex items-center gap-2 text-[12px] text-muted-foreground">
+								<input
+									type="checkbox"
+									className="h-3.5 w-3.5 rounded border-border accent-primary"
+									{...register("isSecret")}
+								/>
+								Conhecimento secreto (não revelado aos jogadores)
+							</label>
+						</FormSection>
 					</div>
-					<DialogFooter className="flex gap-2 sm:gap-0 mt-4">
-						<DialogClose asChild>
-							<Button variant="outline" type="button">
-								Cancelar
-							</Button>
-						</DialogClose>
-						<Button type="submit">Adicionar Lore</Button>
-					</DialogFooter>
+
+					<div className="flex items-center justify-end gap-2 border-t border-border bg-card-elevated/40 px-6 py-3">
+						<Button type="button" variant="ghost" size="sm" onClick={() => setOpen(false)}>
+							Cancelar
+						</Button>
+						<Button type="submit" size="sm">
+							{isEdit ? "Salvar alterações" : "Salvar Lore"}
+						</Button>
+					</div>
 				</form>
 			</DialogContent>
 		</Dialog>
