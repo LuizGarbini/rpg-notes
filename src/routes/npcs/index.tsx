@@ -1,8 +1,11 @@
-import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import { Users } from "lucide-react";
+import { useState } from "react";
+import { EmptyState } from "@/components/empty-state";
 import { ListLayout } from "@/components/list-layout";
-import { NpcForm } from "@/components/npc-form";
 import { NpcCard } from "@/components/npc-card";
+import { NpcForm } from "@/components/npc-form";
+import { PageHeader } from "@/components/page-header";
 import { useRPGStore } from "@/lib/store";
 
 export const Route = createFileRoute("/npcs/")({
@@ -14,36 +17,35 @@ function RouteComponent() {
 	const [searchQuery, setSearchQuery] = useState("");
 
 	const filteredNpcs = npcs.filter((npc) =>
-		npc.name.toLowerCase().includes(searchQuery.toLowerCase())
+		npc.name.toLowerCase().includes(searchQuery.toLowerCase()),
 	);
 
 	return (
-		<div className="flex flex-1">
-			<div className="w-full max-h-full">
-				<div className="py-6 px-8 h-full">
-					<div className="flex flex-col">
-						<div className="flex items-center justify-between">
-							<div>
-								<h2 className="text-3xl font-bold">NPCs</h2>
-								<span className="mt-1 text-sm text-muted-foreground">
-									Gerencie seus NPCs
-								</span>
-							</div>
-							<NpcForm />
-						</div>
-						<ListLayout onSearch={setSearchQuery} />
+		<div className="w-full">
+			<PageHeader
+				title="NPCs"
+				description="Aliados, mercadores, vilões e todo coadjuvante do enredo"
+				Icon={Users}
+				iconColor="text-fuchsia-300"
+				eyebrow="Coadjuvantes"
+				count={npcs.length}
+				action={<NpcForm />}
+			/>
 
-						<div className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-							{filteredNpcs.map((npc) => (
-								<NpcCard key={npc.id} npc={npc} />
-							))}
-							{filteredNpcs.length === 0 && (
-								<div className="col-span-full py-12 text-center text-muted-foreground">
-									Nenhum NPC encontrado.
-								</div>
-							)}
-						</div>
-					</div>
+			<div className="space-y-4 px-6 py-5">
+				<ListLayout onSearch={setSearchQuery} />
+
+				<div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+					{filteredNpcs.map((npc) => (
+						<NpcCard key={npc.id} npc={npc} />
+					))}
+					{filteredNpcs.length === 0 && (
+						<EmptyState
+							Icon={Users}
+							title="Nenhum NPC encontrado"
+							description="Adicione personagens secundários para enriquecer o seu mundo."
+						/>
+					)}
 				</div>
 			</div>
 		</div>
