@@ -1,5 +1,9 @@
 import { ArrowLeft, FileText, Pencil, Plus } from "lucide-react";
+<<<<<<< feature/fichas-worldcraft
 import { type ReactNode, useEffect, useMemo, useState } from "react";
+=======
+import { useEffect, useId, useMemo, useState, type ReactNode } from "react";
+>>>>>>> main
 import { useForm, useWatch } from "react-hook-form";
 import {
 	abilityModifier,
@@ -126,8 +130,15 @@ function CharacterFormDialog({
 	const updateCharacter = useRPGStore((s) => s.updateCharacter);
 
 	const [step, setStep] = useState<DialogStep>(isEdit ? "form" : "intro");
+<<<<<<< feature/fichas-worldcraft
 	const [activeSection, setActiveSection] =
 		useState<CharacterSection>("identity");
+=======
+	const [activeSection, setActiveSection] = useState<CharacterSection>("identity");
+	const introNameId = useId();
+	const systemSelectId = useId();
+	const playerNameId = useId();
+>>>>>>> main
 
 	const form = useForm<CharacterFormValues>({
 		defaultValues: buildDefaults(character ?? undefined),
@@ -184,7 +195,7 @@ function CharacterFormDialog({
 
 	// ---- Render: Worldcraft-style intro ----
 	const renderIntro = () => (
-		<div className="flex flex-col gap-6 p-6">
+		<div className="flex flex-col gap-6 p-6 animate-in fade-in-0 slide-in-from-left-2 duration-150">
 			<DialogHeader>
 				<DialogTitle className="font-display text-lg">
 					Nova Ficha de Personagem
@@ -197,13 +208,13 @@ function CharacterFormDialog({
 			{/* Nome do personagem */}
 			<div className="space-y-1.5">
 				<label
-					htmlFor="intro-name"
+					htmlFor={introNameId}
 					className="text-[13px] font-semibold text-foreground"
 				>
 					Nome do Personagem
 				</label>
 				<Input
-					id="intro-name"
+					id={introNameId}
 					placeholder="Ex: Kael, o Andarilho"
 					{...register("characterName")}
 					className="h-10"
@@ -213,9 +224,9 @@ function CharacterFormDialog({
 
 			{/* Template picker trigger */}
 			<div className="space-y-1.5">
-				<label className="text-[13px] font-semibold text-foreground">
+				<span className="text-[13px] font-semibold text-foreground">
 					Sistema / Template
-				</label>
+				</span>
 				<button
 					type="button"
 					onClick={() => setStep("template")}
@@ -257,7 +268,7 @@ function CharacterFormDialog({
 
 	// ---- Render: Template selection ----
 	const renderTemplateStep = () => (
-		<div className="flex max-h-[92vh] flex-col">
+		<div className="flex max-h-[92vh] flex-col animate-in fade-in-0 slide-in-from-right-2 duration-150">
 			<div className="border-b border-border px-6 pt-6 pb-4">
 				<div className="flex items-center gap-3">
 					<Button
@@ -288,7 +299,7 @@ function CharacterFormDialog({
 	const renderForm = () => (
 		<form
 			onSubmit={handleSubmit(onSubmit)}
-			className="flex max-h-[92vh] flex-col"
+			className="flex max-h-[92vh] flex-col animate-in fade-in-0 slide-in-from-right-2 duration-150"
 		>
 			<DialogHeader className="border-b border-border px-6 pt-6 pb-4">
 				<div className="flex items-start justify-between gap-3">
@@ -317,8 +328,8 @@ function CharacterFormDialog({
 				</div>
 
 				<div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-					<Field label="Sistema" htmlFor="system">
-						<Select id="system" {...register("system")}>
+					<Field label="Sistema" htmlFor={systemSelectId}>
+						<Select id={systemSelectId} {...register("system")}>
 							{Object.values(SYSTEM_CONFIG).map((s) => (
 								<option key={s.value} value={s.value}>
 									{s.label}
@@ -326,9 +337,9 @@ function CharacterFormDialog({
 							))}
 						</Select>
 					</Field>
-					<Field label="Nome do jogador" htmlFor="playerName">
+					<Field label="Nome do jogador" htmlFor={playerNameId}>
 						<Input
-							id="playerName"
+							id={playerNameId}
 							placeholder="Quem joga este personagem"
 							{...register("playerName")}
 						/>
@@ -406,7 +417,7 @@ function CharacterFormDialog({
 			{trigger && <DialogTrigger render={trigger as React.ReactElement} />}
 
 			<DialogContent
-				className={`${dialogSizeClass} max-h-[92vh] overflow-hidden p-0`}
+				className={`${dialogSizeClass} max-h-[92vh] overflow-hidden p-0 transition-[max-width] duration-200 ease-out motion-reduce:transition-none`}
 				showCloseButton={step !== "intro"}
 			>
 				{step === "intro" && renderIntro()}
@@ -435,13 +446,15 @@ function IdentitySection({
 	setValue: SetValueFn;
 }) {
 	const imageUrl = useWatch({ control, name: "imageUrl" });
+	const characterNameId = useId();
+
 	return (
 		<>
 			<FormSection title="Identidade Básica">
 				<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-					<Field label="Nome do personagem" htmlFor="characterName">
+					<Field label="Nome do personagem" htmlFor={characterNameId}>
 						<Input
-							id="characterName"
+							id={characterNameId}
 							placeholder="Ex: Aragorn, Lyra Cinzal..."
 							{...register("characterName", { required: true })}
 						/>

@@ -17,8 +17,12 @@ import {
 	User,
 	Zap,
 } from "lucide-react";
+<<<<<<< feature/fichas-worldcraft
 import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
+=======
+import { useCallback, useId, useState } from "react";
+>>>>>>> main
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -55,6 +59,10 @@ function CharacterSheetPage() {
 	);
 	const [activeTab, setActiveTab] = useState<SheetTab>("geral");
 	const updateCharacter = useRPGStore((s) => s.updateCharacter);
+	const update = useCallback(
+		(patch: Partial<Character>) => updateCharacter(characterId, patch),
+		[updateCharacter, characterId],
+	);
 
 	if (!character) {
 		return (
@@ -90,11 +98,6 @@ function CharacterSheetPage() {
 	const passivePerception = 10 + abilityModifier(character.wisdom);
 	const passiveInvestigation = 10 + abilityModifier(character.intelligence);
 	const passiveInsight = 10 + abilityModifier(character.wisdom);
-
-	const update = useCallback(
-		(patch: Partial<Character>) => updateCharacter(character.id, patch),
-		[updateCharacter, character.id],
-	);
 
 	return (
 		<div className="w-full">
@@ -632,13 +635,19 @@ function EditField({
 	type?: "text" | "number" | "textarea";
 	placeholder?: string;
 }) {
+	const inputId = useId();
+
 	return (
 		<div className="space-y-1">
-			<label className="text-[9px] font-semibold uppercase tracking-widest text-muted-foreground">
+			<label
+				htmlFor={inputId}
+				className="text-[9px] font-semibold uppercase tracking-widest text-muted-foreground"
+			>
 				{label}
 			</label>
 			{type === "textarea" ? (
 				<Textarea
+					id={inputId}
 					value={value}
 					onChange={(e) => onChange(e.target.value)}
 					placeholder={placeholder}
@@ -646,6 +655,7 @@ function EditField({
 				/>
 			) : (
 				<Input
+					id={inputId}
 					type={type}
 					value={value}
 					onChange={(e) => onChange(e.target.value)}
@@ -747,9 +757,9 @@ function InlineEditTab({
 					placeholder="Ex: Campeão, Escola de Evocação"
 				/>
 				<div className="space-y-1">
-					<label className="text-[9px] font-semibold uppercase tracking-widest text-muted-foreground">
+					<span className="text-[9px] font-semibold uppercase tracking-widest text-muted-foreground">
 						Nível
-					</label>
+					</span>
 					<div className="flex items-center gap-2">
 						<Button
 							variant="ghost"
