@@ -1,9 +1,5 @@
 import { ArrowLeft, FileText, Pencil, Plus } from "lucide-react";
-<<<<<<< feature/fichas-worldcraft
-import { type ReactNode, useEffect, useMemo, useState } from "react";
-=======
 import { useEffect, useId, useMemo, useState, type ReactNode } from "react";
->>>>>>> main
 import { useForm, useWatch } from "react-hook-form";
 import {
 	abilityModifier,
@@ -130,15 +126,10 @@ function CharacterFormDialog({
 	const updateCharacter = useRPGStore((s) => s.updateCharacter);
 
 	const [step, setStep] = useState<DialogStep>(isEdit ? "form" : "intro");
-<<<<<<< feature/fichas-worldcraft
-	const [activeSection, setActiveSection] =
-		useState<CharacterSection>("identity");
-=======
 	const [activeSection, setActiveSection] = useState<CharacterSection>("identity");
 	const introNameId = useId();
 	const systemSelectId = useId();
 	const playerNameId = useId();
->>>>>>> main
 
 	const form = useForm<CharacterFormValues>({
 		defaultValues: buildDefaults(character ?? undefined),
