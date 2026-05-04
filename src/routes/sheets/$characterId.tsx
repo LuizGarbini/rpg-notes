@@ -17,10 +17,14 @@ import {
 	User,
 	Zap,
 } from "lucide-react";
+<<<<<<< feature/fichas-worldcraft
+import { useCallback, useState } from "react";
+import { Button } from "@/components/ui/button";
+=======
 import { useCallback, useId, useState } from "react";
+>>>>>>> main
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
 import {
 	abilityModifier,
 	type Character,
@@ -36,7 +40,11 @@ export const Route = createFileRoute("/sheets/$characterId")({
 
 type SheetTab = "geral" | "combate" | "inventario" | "notas" | "editar";
 
-const TABS: { id: SheetTab; label: string; Icon: React.ComponentType<{ className?: string }> }[] = [
+const TABS: {
+	id: SheetTab;
+	label: string;
+	Icon: React.ComponentType<{ className?: string }>;
+}[] = [
 	{ id: "geral", label: "Geral", Icon: BookOpen },
 	{ id: "combate", label: "Combate", Icon: Swords },
 	{ id: "inventario", label: "Inventário", Icon: Package },
@@ -333,11 +341,16 @@ function CharacterSheetPage() {
 						</SheetSection>
 
 						{/* Proficiencies */}
-						{(character.savingThrows || character.skills || character.languages) && (
+						{(character.savingThrows ||
+							character.skills ||
+							character.languages) && (
 							<SheetSection title="Proficiências">
 								<div className="space-y-3">
 									{character.savingThrows && (
-										<InfoRow label="Salvaguardas" value={character.savingThrows} />
+										<InfoRow
+											label="Salvaguardas"
+											value={character.savingThrows}
+										/>
 									)}
 									{character.skills && (
 										<InfoRow label="Perícias" value={character.skills} />
@@ -353,11 +366,17 @@ function CharacterSheetPage() {
 						)}
 
 						{/* Personality */}
-						{(character.personalityTraits || character.ideals || character.bonds || character.flaws) && (
+						{(character.personalityTraits ||
+							character.ideals ||
+							character.bonds ||
+							character.flaws) && (
 							<SheetSection title="Personalidade">
 								<div className="space-y-3">
 									{character.personalityTraits && (
-										<InfoRow label="Traços" value={character.personalityTraits} />
+										<InfoRow
+											label="Traços"
+											value={character.personalityTraits}
+										/>
 									)}
 									{character.ideals && (
 										<InfoRow label="Ideais" value={character.ideals} />
@@ -378,16 +397,34 @@ function CharacterSheetPage() {
 					<>
 						<SheetSection title="Status de Combate">
 							<div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-								<StatBlock icon={<Heart className="h-4 w-4 text-rose-400" />} value={`${character.health}/${character.healthMax}`} label="HP" />
-								<StatBlock icon={<Shield className="h-4 w-4 text-blue-400" />} value={String(character.armorClass)} label="CA" />
-								<StatBlock icon={<Zap className="h-4 w-4 text-amber-400" />} value={formatModifier(character.initiative)} label="Iniciativa" />
-								<StatBlock icon={<Sparkles className="h-4 w-4 text-emerald-400" />} value={`${character.speed}${config.speedUnit}`} label="Deslocamento" />
+								<StatBlock
+									icon={<Heart className="h-4 w-4 text-rose-400" />}
+									value={`${character.health}/${character.healthMax}`}
+									label="HP"
+								/>
+								<StatBlock
+									icon={<Shield className="h-4 w-4 text-blue-400" />}
+									value={String(character.armorClass)}
+									label="CA"
+								/>
+								<StatBlock
+									icon={<Zap className="h-4 w-4 text-amber-400" />}
+									value={formatModifier(character.initiative)}
+									label="Iniciativa"
+								/>
+								<StatBlock
+									icon={<Sparkles className="h-4 w-4 text-emerald-400" />}
+									value={`${character.speed}${config.speedUnit}`}
+									label="Deslocamento"
+								/>
 							</div>
 						</SheetSection>
 						{character.hitDice && (
 							<SheetSection title="Dados de Vida">
 								<div className="rounded-lg border border-border bg-card-elevated/40 p-4 text-center">
-									<span className="font-mono text-lg font-bold text-foreground">{character.hitDice}</span>
+									<span className="font-mono text-lg font-bold text-foreground">
+										{character.hitDice}
+									</span>
 								</div>
 							</SheetSection>
 						)}
@@ -399,29 +436,37 @@ function CharacterSheetPage() {
 						{character.equipment && (
 							<SheetSection title="Equipamento">
 								<div className="rounded-lg border border-border bg-card-elevated/40 p-4">
-									<p className="text-[13px] text-foreground/90 whitespace-pre-wrap">{character.equipment}</p>
+									<p className="text-[13px] text-foreground/90 whitespace-pre-wrap">
+										{character.equipment}
+									</p>
 								</div>
 							</SheetSection>
 						)}
 						{character.currency && (
 							<SheetSection title="Moedas / Tesouro">
 								<div className="rounded-lg border border-border bg-card-elevated/40 p-4">
-									<p className="text-[13px] text-foreground/90">{character.currency}</p>
+									<p className="text-[13px] text-foreground/90">
+										{character.currency}
+									</p>
 								</div>
 							</SheetSection>
 						)}
 						{config.showSpells && character.spells && (
 							<SheetSection title="Magias">
 								<div className="rounded-lg border border-border bg-card-elevated/40 p-4">
-									<p className="text-[13px] text-foreground/90 whitespace-pre-wrap">{character.spells}</p>
+									<p className="text-[13px] text-foreground/90 whitespace-pre-wrap">
+										{character.spells}
+									</p>
 								</div>
 							</SheetSection>
 						)}
-						{!character.equipment && !character.currency && !character.spells && (
-							<div className="text-center py-12 text-muted-foreground text-[13px]">
-								Nenhum equipamento registrado ainda.
-							</div>
-						)}
+						{!character.equipment &&
+							!character.currency &&
+							!character.spells && (
+								<div className="text-center py-12 text-muted-foreground text-[13px]">
+									Nenhum equipamento registrado ainda.
+								</div>
+							)}
 					</>
 				)}
 
@@ -429,7 +474,9 @@ function CharacterSheetPage() {
 					<SheetSection title="Anotações">
 						{character.notes ? (
 							<div className="rounded-lg border border-border bg-card-elevated/40 p-4">
-								<p className="text-[13px] text-foreground/90 whitespace-pre-wrap">{character.notes}</p>
+								<p className="text-[13px] text-foreground/90 whitespace-pre-wrap">
+									{character.notes}
+								</p>
 							</div>
 						) : (
 							<div className="text-center py-12 text-muted-foreground text-[13px]">
@@ -440,7 +487,11 @@ function CharacterSheetPage() {
 				)}
 
 				{activeTab === "editar" && (
-					<InlineEditTab character={character} update={update} config={config} />
+					<InlineEditTab
+						character={character}
+						update={update}
+						config={config}
+					/>
 				)}
 			</div>
 		</div>
@@ -463,7 +514,9 @@ function QuickStat({
 	bgColor: string;
 }) {
 	return (
-		<div className={`flex flex-col items-center gap-0.5 rounded-lg ${bgColor} py-2.5 ring-1 ring-border`}>
+		<div
+			className={`flex flex-col items-center gap-0.5 rounded-lg ${bgColor} py-2.5 ring-1 ring-border`}
+		>
 			<span className={`font-mono text-base font-bold ${color} leading-none`}>
 				{value}
 			</span>
@@ -711,7 +764,9 @@ function InlineEditTab({
 						<Button
 							variant="ghost"
 							size="sm"
-							onClick={() => update({ level: Math.max(1, character.level - 1) })}
+							onClick={() =>
+								update({ level: Math.max(1, character.level - 1) })
+							}
 							className="h-8 w-8 p-0"
 						>
 							<ChevronDown className="h-4 w-4" />
@@ -748,7 +803,11 @@ function InlineEditTab({
 			<AccordionSection
 				icon={<Star className="h-4 w-4" />}
 				title="Proficiências em Perícias"
-				badge={character.skills ? `${character.skills.split(",").length} ativas` : undefined}
+				badge={
+					character.skills
+						? `${character.skills.split(",").length} ativas`
+						: undefined
+				}
 			>
 				<EditField
 					label="Perícias"
@@ -760,10 +819,7 @@ function InlineEditTab({
 			</AccordionSection>
 
 			{/* Speed */}
-			<AccordionSection
-				icon={<Zap className="h-4 w-4" />}
-				title="Deslocamento"
-			>
+			<AccordionSection icon={<Zap className="h-4 w-4" />} title="Deslocamento">
 				<EditField
 					label={`Deslocamento (${config.speedUnit})`}
 					value={character.speed}
@@ -789,7 +845,11 @@ function InlineEditTab({
 			<AccordionSection
 				icon={<Globe className="h-4 w-4" />}
 				title="Idiomas"
-				badge={character.languages ? String(character.languages.split(",").length) : undefined}
+				badge={
+					character.languages
+						? String(character.languages.split(",").length)
+						: undefined
+				}
 			>
 				<EditField
 					label="Idiomas"
@@ -814,10 +874,7 @@ function InlineEditTab({
 			</AccordionSection>
 
 			{/* Notes */}
-			<AccordionSection
-				icon={<Edit className="h-4 w-4" />}
-				title="Notas"
-			>
+			<AccordionSection icon={<Edit className="h-4 w-4" />} title="Notas">
 				<EditField
 					label="Anotações"
 					value={character.notes}

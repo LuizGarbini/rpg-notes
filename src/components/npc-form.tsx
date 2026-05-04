@@ -1,8 +1,9 @@
 import { Pencil, Plus } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import type { Npc } from "@/lib/store";
 import { npcDefaults, useRPGStore } from "@/lib/store";
+import { ImageUploader } from "./image-uploader";
 import { Button } from "./ui/button";
 import {
 	Dialog,
@@ -13,7 +14,6 @@ import {
 	DialogTrigger,
 } from "./ui/dialog";
 import { Field, FormSection, FormTabs } from "./ui/form-tabs";
-import { ImageUploader } from "./image-uploader";
 import { Input } from "./ui/input";
 import { Select } from "./ui/select";
 import { Textarea } from "./ui/textarea";
@@ -77,7 +77,12 @@ interface NpcFormDialogProps {
 	onOpenChange?: (open: boolean) => void;
 }
 
-function NpcFormDialog({ npc, trigger, open: openProp, onOpenChange }: NpcFormDialogProps) {
+function NpcFormDialog({
+	npc,
+	trigger,
+	open: openProp,
+	onOpenChange,
+}: NpcFormDialogProps) {
 	const isEdit = !!npc;
 	const [internalOpen, setInternalOpen] = useState(false);
 	const open = openProp ?? internalOpen;
@@ -87,9 +92,10 @@ function NpcFormDialog({ npc, trigger, open: openProp, onOpenChange }: NpcFormDi
 	const addNpc = useRPGStore((state) => state.addNpc);
 	const updateNpc = useRPGStore((state) => state.updateNpc);
 
-	const { register, handleSubmit, reset, control, setValue } = useForm<NpcFormValues>({
-		defaultValues: { ...npcDefaults, ...(npc ?? {}) },
-	});
+	const { register, handleSubmit, reset, control, setValue } =
+		useForm<NpcFormValues>({
+			defaultValues: { ...npcDefaults, ...(npc ?? {}) },
+		});
 
 	const imageUrl = useWatch({ control, name: "imageUrl" });
 
@@ -110,7 +116,10 @@ function NpcFormDialog({ npc, trigger, open: openProp, onOpenChange }: NpcFormDi
 		<Dialog open={open} onOpenChange={setOpen}>
 			{trigger && <DialogTrigger render={trigger as React.ReactElement} />}
 			<DialogContent className="!max-w-2xl max-h-[92vh] overflow-hidden p-0">
-				<form onSubmit={handleSubmit(onSubmit)} className="flex max-h-[92vh] flex-col">
+				<form
+					onSubmit={handleSubmit(onSubmit)}
+					className="flex max-h-[92vh] flex-col"
+				>
 					<DialogHeader className="border-b border-border px-6 pt-6 pb-4">
 						<DialogTitle className="font-display text-lg">
 							{isEdit ? `Editar: ${npc?.name || "NPC"}` : "Novo NPC"}
@@ -128,7 +137,9 @@ function NpcFormDialog({ npc, trigger, open: openProp, onOpenChange }: NpcFormDi
 							<FormSection title="Identidade">
 								<ImageUploader
 									value={imageUrl ?? ""}
-									onChange={(url) => setValue("imageUrl", url, { shouldDirty: true })}
+									onChange={(url) =>
+										setValue("imageUrl", url, { shouldDirty: true })
+									}
 									label="Retrato"
 									folder="npcs"
 									size="md"
@@ -160,7 +171,10 @@ function NpcFormDialog({ npc, trigger, open: openProp, onOpenChange }: NpcFormDi
 										/>
 									</Field>
 									<Field label="Tendência">
-										<Input placeholder="Ex: Neutro" {...register("alignment")} />
+										<Input
+											placeholder="Ex: Neutro"
+											{...register("alignment")}
+										/>
 									</Field>
 									<Field label="Disposição">
 										<Select {...register("disposition")}>
@@ -197,16 +211,35 @@ function NpcFormDialog({ npc, trigger, open: openProp, onOpenChange }: NpcFormDi
 						{tab === "personality" && (
 							<FormSection title="Personalidade & Aparência">
 								<Field label="Aparência">
-									<Textarea rows={3} placeholder="Como ele se parece?" {...register("appearance")} />
+									<Textarea
+										rows={3}
+										placeholder="Como ele se parece?"
+										{...register("appearance")}
+									/>
 								</Field>
-								<Field label="Tiques / Maneirismos" hint="Voz, sotaque, gestos...">
-									<Textarea rows={2} placeholder="Sempre coça o queixo antes de mentir." {...register("mannerisms")} />
+								<Field
+									label="Tiques / Maneirismos"
+									hint="Voz, sotaque, gestos..."
+								>
+									<Textarea
+										rows={2}
+										placeholder="Sempre coça o queixo antes de mentir."
+										{...register("mannerisms")}
+									/>
 								</Field>
 								<Field label="Motivações">
-									<Textarea rows={2} placeholder="O que ele quer? Por quê?" {...register("motivations")} />
+									<Textarea
+										rows={2}
+										placeholder="O que ele quer? Por quê?"
+										{...register("motivations")}
+									/>
 								</Field>
 								<Field label="Relacionamentos">
-									<Textarea rows={2} placeholder="Quem ele conhece?" {...register("relationships")} />
+									<Textarea
+										rows={2}
+										placeholder="Quem ele conhece?"
+										{...register("relationships")}
+									/>
 								</Field>
 							</FormSection>
 						)}
@@ -217,7 +250,11 @@ function NpcFormDialog({ npc, trigger, open: openProp, onOpenChange }: NpcFormDi
 								description="Apenas o Mestre vê — informações reveladas conforme a campanha."
 							>
 								<Field label="Segredos">
-									<Textarea rows={6} placeholder="Verdades ocultas, traições, planos..." {...register("secrets")} />
+									<Textarea
+										rows={6}
+										placeholder="Verdades ocultas, traições, planos..."
+										{...register("secrets")}
+									/>
 								</Field>
 							</FormSection>
 						)}
@@ -230,7 +267,9 @@ function NpcFormDialog({ npc, trigger, open: openProp, onOpenChange }: NpcFormDi
 								<Field label="Stats / Atributos">
 									<Textarea
 										rows={8}
-										placeholder={"FOR 14 (+2)  DES 12 (+1)  CON 14 (+2)\nINT 10 (+0)  SAB 11 (+0)  CAR 16 (+3)\nCA 15 — HP 27 — Ataques: ..."}
+										placeholder={
+											"FOR 14 (+2)  DES 12 (+1)  CON 14 (+2)\nINT 10 (+0)  SAB 11 (+0)  CAR 16 (+3)\nCA 15 — HP 27 — Ataques: ..."
+										}
 										{...register("stats")}
 										className="font-mono text-[12px]"
 									/>
@@ -249,7 +288,12 @@ function NpcFormDialog({ npc, trigger, open: openProp, onOpenChange }: NpcFormDi
 							NPC está vivo
 						</label>
 						<div className="flex items-center gap-2">
-							<Button type="button" variant="ghost" size="sm" onClick={() => setOpen(false)}>
+							<Button
+								type="button"
+								variant="ghost"
+								size="sm"
+								onClick={() => setOpen(false)}
+							>
 								Cancelar
 							</Button>
 							<Button type="submit" size="sm">

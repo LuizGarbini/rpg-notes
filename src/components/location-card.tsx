@@ -86,7 +86,11 @@ export function LocationCard({ location }: LocationCardProps) {
 
 					<div className="mt-3 grid grid-cols-2 gap-1.5 text-[10px]">
 						{location.climate && (
-							<MiniInfo Icon={Mountain} label="Clima" value={location.climate} />
+							<MiniInfo
+								Icon={Mountain}
+								label="Clima"
+								value={location.climate}
+							/>
 						)}
 						{location.population && (
 							<MiniInfo Icon={Users} label="Pop." value={location.population} />

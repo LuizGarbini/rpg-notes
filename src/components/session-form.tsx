@@ -1,5 +1,5 @@
 import { Pencil, Plus } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import type { Session } from "@/lib/store";
 import { sessionDefaults, useRPGStore } from "@/lib/store";
@@ -46,7 +46,12 @@ interface SessionEditButtonProps {
 	trigger?: ReactNode;
 }
 
-export function SessionEditButton({ session, open, onOpenChange, trigger }: SessionEditButtonProps) {
+export function SessionEditButton({
+	session,
+	open,
+	onOpenChange,
+	trigger,
+}: SessionEditButtonProps) {
 	return (
 		<SessionFormDialog
 			session={session}
@@ -71,7 +76,12 @@ interface SessionFormDialogProps {
 	onOpenChange?: (open: boolean) => void;
 }
 
-function SessionFormDialog({ session, trigger, open: openProp, onOpenChange }: SessionFormDialogProps) {
+function SessionFormDialog({
+	session,
+	trigger,
+	open: openProp,
+	onOpenChange,
+}: SessionFormDialogProps) {
 	const isEdit = !!session;
 	const [internalOpen, setInternalOpen] = useState(false);
 	const open = openProp ?? internalOpen;
@@ -102,7 +112,10 @@ function SessionFormDialog({ session, trigger, open: openProp, onOpenChange }: S
 		<Dialog open={open} onOpenChange={setOpen}>
 			{trigger && <DialogTrigger render={trigger as React.ReactElement} />}
 			<DialogContent className="!max-w-2xl max-h-[92vh] overflow-hidden p-0">
-				<form onSubmit={handleSubmit(onSubmit)} className="flex max-h-[92vh] flex-col">
+				<form
+					onSubmit={handleSubmit(onSubmit)}
+					className="flex max-h-[92vh] flex-col"
+				>
 					<DialogHeader className="border-b border-border px-6 pt-6 pb-4">
 						<DialogTitle className="font-display text-lg">
 							{isEdit ? `Editar: ${session?.title || "Sessão"}` : "Nova Sessão"}
@@ -119,7 +132,11 @@ function SessionFormDialog({ session, trigger, open: openProp, onOpenChange }: S
 						{tab === "basic" && (
 							<FormSection title="Informações Gerais">
 								<div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-									<Field label="Título" htmlFor="title" className="sm:col-span-2">
+									<Field
+										label="Título"
+										htmlFor="title"
+										className="sm:col-span-2"
+									>
 										<Input
 											id="title"
 											placeholder="Ex: A Caverna dos Goblins"
@@ -127,22 +144,38 @@ function SessionFormDialog({ session, trigger, open: openProp, onOpenChange }: S
 										/>
 									</Field>
 									<Field label="Sessão #">
-										<Input type="number" min={1} {...register("number", { valueAsNumber: true })} />
+										<Input
+											type="number"
+											min={1}
+											{...register("number", { valueAsNumber: true })}
+										/>
 									</Field>
 									<Field label="Data real">
 										<Input placeholder="Ex: 12/04/2026" {...register("date")} />
 									</Field>
 									<Field label="Data in-game">
-										<Input placeholder="Ex: 15 de Mirtul" {...register("inGameDate")} />
+										<Input
+											placeholder="Ex: 15 de Mirtul"
+											{...register("inGameDate")}
+										/>
 									</Field>
 									<Field label="Duração">
 										<Input placeholder="Ex: 4h" {...register("duration")} />
 									</Field>
-									<Field label="Local de partida (in-game)" className="sm:col-span-2">
-										<Input placeholder="Onde a sessão começou" {...register("location")} />
+									<Field
+										label="Local de partida (in-game)"
+										className="sm:col-span-2"
+									>
+										<Input
+											placeholder="Onde a sessão começou"
+											{...register("location")}
+										/>
 									</Field>
 									<Field label="Tom / Humor da sessão">
-										<Input placeholder="Ex: tenso, cômico..." {...register("mood")} />
+										<Input
+											placeholder="Ex: tenso, cômico..."
+											{...register("mood")}
+										/>
 									</Field>
 								</div>
 								<Field label="Resumo geral">
@@ -158,13 +191,25 @@ function SessionFormDialog({ session, trigger, open: openProp, onOpenChange }: S
 						{tab === "people" && (
 							<FormSection title="Quem & Onde">
 								<Field label="Jogadores presentes" hint="Separe por vírgula">
-									<Textarea rows={2} placeholder="Aragorn (Lucas), Lyra (Maria)..." {...register("attendees")} />
+									<Textarea
+										rows={2}
+										placeholder="Aragorn (Lucas), Lyra (Maria)..."
+										{...register("attendees")}
+									/>
 								</Field>
 								<Field label="NPCs envolvidos">
-									<Textarea rows={3} placeholder="NPCs com quem o grupo interagiu" {...register("npcsPresent")} />
+									<Textarea
+										rows={3}
+										placeholder="NPCs com quem o grupo interagiu"
+										{...register("npcsPresent")}
+									/>
 								</Field>
 								<Field label="Locais visitados">
-									<Textarea rows={3} placeholder="Cidades, masmorras, regiões..." {...register("locationsVisited")} />
+									<Textarea
+										rows={3}
+										placeholder="Cidades, masmorras, regiões..."
+										{...register("locationsVisited")}
+									/>
 								</Field>
 							</FormSection>
 						)}
@@ -172,13 +217,25 @@ function SessionFormDialog({ session, trigger, open: openProp, onOpenChange }: S
 						{tab === "events" && (
 							<FormSection title="Acontecimentos">
 								<Field label="Eventos chave">
-									<Textarea rows={5} placeholder="Decisões, descobertas, combates..." {...register("keyEvents")} />
+									<Textarea
+										rows={5}
+										placeholder="Decisões, descobertas, combates..."
+										{...register("keyEvents")}
+									/>
 								</Field>
 								<Field label="Combates / Eventos táticos">
-									<Textarea rows={4} placeholder="Inimigos enfrentados..." {...register("combatLog")} />
+									<Textarea
+										rows={4}
+										placeholder="Inimigos enfrentados..."
+										{...register("combatLog")}
+									/>
 								</Field>
 								<Field label="Cliffhanger / Como terminou">
-									<Textarea rows={2} placeholder="A sessão terminou com..." {...register("cliffhanger")} />
+									<Textarea
+										rows={2}
+										placeholder="A sessão terminou com..."
+										{...register("cliffhanger")}
+									/>
 								</Field>
 							</FormSection>
 						)}
@@ -186,10 +243,17 @@ function SessionFormDialog({ session, trigger, open: openProp, onOpenChange }: S
 						{tab === "rewards" && (
 							<FormSection title="Recompensas">
 								<Field label="Loot / Itens conquistados">
-									<Textarea rows={4} placeholder="Espada +1, 200 PO..." {...register("loot")} />
+									<Textarea
+										rows={4}
+										placeholder="Espada +1, 200 PO..."
+										{...register("loot")}
+									/>
 								</Field>
 								<Field label="XP concedido">
-									<Input placeholder="Ex: 750 XP por personagem" {...register("xpAwarded")} />
+									<Input
+										placeholder="Ex: 750 XP por personagem"
+										{...register("xpAwarded")}
+									/>
 								</Field>
 							</FormSection>
 						)}
@@ -200,14 +264,23 @@ function SessionFormDialog({ session, trigger, open: openProp, onOpenChange }: S
 								description="Visíveis apenas para você — planos futuros, segredos."
 							>
 								<Field label="Notas do Mestre">
-									<Textarea rows={10} placeholder="Próximos passos do vilão..." {...register("dmNotes")} />
+									<Textarea
+										rows={10}
+										placeholder="Próximos passos do vilão..."
+										{...register("dmNotes")}
+									/>
 								</Field>
 							</FormSection>
 						)}
 					</div>
 
 					<div className="flex items-center justify-end gap-2 border-t border-border bg-card-elevated/40 px-6 py-3">
-						<Button type="button" variant="ghost" size="sm" onClick={() => setOpen(false)}>
+						<Button
+							type="button"
+							variant="ghost"
+							size="sm"
+							onClick={() => setOpen(false)}
+						>
 							Cancelar
 						</Button>
 						<Button type="submit" size="sm">

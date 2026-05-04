@@ -10,7 +10,11 @@ import { cn } from "@/lib/utils";
  * próprio SO. Forçamos `color-scheme: dark` no select pra que o popup
  * nativo respeite o tema.
  */
-function Select({ className, children, ...props }: React.ComponentProps<"select">) {
+function Select({
+	className,
+	children,
+	...props
+}: React.ComponentProps<"select">) {
 	return (
 		<select
 			data-slot="select"
@@ -24,7 +28,12 @@ function Select({ className, children, ...props }: React.ComponentProps<"select"
 			{/* Forçamos cores nas options — em alguns navegadores o estilo do
 			   <option> é ignorado, mas onde funciona melhora a legibilidade. */}
 			{React.Children.map(children, (child) => {
-				if (!React.isValidElement<React.OptionHTMLAttributes<HTMLOptionElement>>(child)) return child;
+				if (
+					!React.isValidElement<React.OptionHTMLAttributes<HTMLOptionElement>>(
+						child,
+					)
+				)
+					return child;
 				if (child.type !== "option") return child;
 				return React.cloneElement(child, {
 					...child.props,

@@ -124,14 +124,24 @@ export function CharacterCard({ character }: CharacterCardProps) {
 
 				{/* Quick stats */}
 				<div className="mt-3 grid grid-cols-3 gap-1.5 text-center">
-					<MiniStat Icon={Shield} color="text-blue-300" label="CA" value={character.armorClass} />
+					<MiniStat
+						Icon={Shield}
+						color="text-blue-300"
+						label="CA"
+						value={character.armorClass}
+					/>
 					<MiniStat
 						Icon={Zap}
 						color="text-amber-300"
 						label="INI"
 						value={formatModifier(character.initiative)}
 					/>
-					<MiniStat Icon={Sparkles} color="text-violet-300" label="XP" value={character.xp} />
+					<MiniStat
+						Icon={Sparkles}
+						color="text-violet-300"
+						label="XP"
+						value={character.xp}
+					/>
 				</div>
 
 				{/* Abilities row */}

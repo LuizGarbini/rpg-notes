@@ -2,11 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { FileText } from "lucide-react";
 import { useState } from "react";
 import { CharacterCard } from "@/components/character-card";
+import { CharacterForm } from "@/components/character-form";
 import { EmptyState } from "@/components/empty-state";
 import { ListLayout } from "@/components/list-layout";
 import { PageHeader } from "@/components/page-header";
 import { useRPGStore } from "@/lib/store";
-import { CharacterForm } from "@/components/character-form";
 
 export const Route = createFileRoute("/sheets/")({
 	component: RouteComponent,
