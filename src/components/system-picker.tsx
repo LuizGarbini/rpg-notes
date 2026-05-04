@@ -1,6 +1,8 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Search } from "lucide-react";
+import { useState } from "react";
 import type { RpgSystem } from "@/lib/store";
 import { SYSTEM_LIST } from "@/lib/systems";
+import { Input } from "./ui/input";
 
 interface SystemPickerProps {
 	value?: RpgSystem;
@@ -8,27 +10,38 @@ interface SystemPickerProps {
 }
 
 /**
- * Etapa inicial da criação de personagem: o usuário escolhe o sistema
- * para que o formulário renderize os campos corretos.
- *
- * Os mesmos templates são úteis depois para "duplicar" um personagem
- * trocando de sistema, importar fichas externas etc.
+ * Seletor de template / sistema de RPG.
+ * Agora com busca para facilitar a navegação em 35+ sistemas.
  */
 export function SystemPicker({ value, onSelect }: SystemPickerProps) {
+	const [search, setSearch] = useState("");
+
+	const filtered = SYSTEM_LIST.filter((s) => {
+		const q = search.toLowerCase();
+		return (
+			s.label.toLowerCase().includes(q) ||
+			s.tagline.toLowerCase().includes(q) ||
+			s.description.toLowerCase().includes(q)
+		);
+	});
+
 	return (
 		<div className="space-y-3">
-			<div>
-				<h3 className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground heading-rule">
-					Escolha o sistema
-				</h3>
-				<p className="mt-2 text-[12px] text-muted-foreground">
-					O formulário se adapta ao sistema escolhido — atributos, perícias e
-					seções específicas mudam conforme a escolha.
-				</p>
+			{/* Search */}
+			<div className="relative">
+				<Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+				<Input
+					placeholder="Buscar sistema..."
+					value={search}
+					onChange={(e) => setSearch(e.target.value)}
+					className="pl-8 h-8 text-[13px]"
+					autoFocus
+				/>
 			</div>
 
-			<div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
-				{SYSTEM_LIST.map((s) => {
+			{/* Grid */}
+			<div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 max-h-[50vh] overflow-y-auto pr-1">
+				{filtered.map((s) => {
 					const Icon = s.Icon;
 					const active = value === s.value;
 					return (
@@ -43,33 +56,38 @@ export function SystemPicker({ value, onSelect }: SystemPickerProps) {
 							}`}
 						>
 							<div
-								className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-linear-to-br ${s.bgAccent} ring-1 ring-border ${s.accent}`}
+								className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-linear-to-br ${s.bgAccent} ring-1 ring-border ${s.accent}`}
 							>
 								<Icon className="h-4 w-4" strokeWidth={1.6} />
 							</div>
 							<div className="min-w-0 flex-1">
 								<div className="flex items-center justify-between gap-2">
-									<h4 className="font-display text-[13px] font-bold text-foreground">
+									<h4 className="font-display text-[12px] font-bold text-foreground leading-tight">
 										{s.label}
 									</h4>
 									<ArrowRight
-										className={`h-3.5 w-3.5 shrink-0 transition-all ${
+										className={`h-3 w-3 shrink-0 transition-all ${
 											active
 												? "text-primary translate-x-0.5"
 												: "text-muted-foreground/50 group-hover:translate-x-0.5 group-hover:text-foreground"
 										}`}
 									/>
 								</div>
-								<p className="mt-0.5 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+								<p className="mt-0.5 text-[9px] font-medium uppercase tracking-wider text-muted-foreground">
 									{s.tagline}
 								</p>
-								<p className="mt-1.5 line-clamp-2 text-[11px] leading-snug text-muted-foreground">
+								<p className="mt-1 line-clamp-2 text-[10px] leading-snug text-muted-foreground">
 									{s.description}
 								</p>
 							</div>
 						</button>
 					);
 				})}
+				{filtered.length === 0 && (
+					<p className="col-span-full py-8 text-center text-[12px] text-muted-foreground">
+						Nenhum sistema encontrado para "{search}"
+					</p>
+				)}
 			</div>
 		</div>
 	);

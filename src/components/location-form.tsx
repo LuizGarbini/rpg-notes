@@ -1,8 +1,9 @@
 import { Pencil, Plus } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import type { GameLocation } from "@/lib/store";
 import { locationDefaults, useRPGStore } from "@/lib/store";
+import { ImageUploader } from "./image-uploader";
 import { Button } from "./ui/button";
 import {
 	Dialog,
@@ -13,7 +14,6 @@ import {
 	DialogTrigger,
 } from "./ui/dialog";
 import { Field, FormSection, FormTabs } from "./ui/form-tabs";
-import { ImageUploader } from "./image-uploader";
 import { Input } from "./ui/input";
 import { Select } from "./ui/select";
 import { Textarea } from "./ui/textarea";
@@ -46,7 +46,12 @@ interface LocationEditButtonProps {
 	trigger?: ReactNode;
 }
 
-export function LocationEditButton({ location, open, onOpenChange, trigger }: LocationEditButtonProps) {
+export function LocationEditButton({
+	location,
+	open,
+	onOpenChange,
+	trigger,
+}: LocationEditButtonProps) {
 	return (
 		<LocationFormDialog
 			location={location}
@@ -71,7 +76,12 @@ interface LocationFormDialogProps {
 	onOpenChange?: (open: boolean) => void;
 }
 
-function LocationFormDialog({ location, trigger, open: openProp, onOpenChange }: LocationFormDialogProps) {
+function LocationFormDialog({
+	location,
+	trigger,
+	open: openProp,
+	onOpenChange,
+}: LocationFormDialogProps) {
 	const isEdit = !!location;
 	const [internalOpen, setInternalOpen] = useState(false);
 	const open = openProp ?? internalOpen;
@@ -81,9 +91,10 @@ function LocationFormDialog({ location, trigger, open: openProp, onOpenChange }:
 	const addLocation = useRPGStore((state) => state.addLocation);
 	const updateLocation = useRPGStore((state) => state.updateLocation);
 
-	const { register, handleSubmit, reset, control, setValue } = useForm<LocationFormValues>({
-		defaultValues: { ...locationDefaults, ...(location ?? {}) },
-	});
+	const { register, handleSubmit, reset, control, setValue } =
+		useForm<LocationFormValues>({
+			defaultValues: { ...locationDefaults, ...(location ?? {}) },
+		});
 
 	const imageUrl = useWatch({ control, name: "imageUrl" });
 
@@ -104,7 +115,10 @@ function LocationFormDialog({ location, trigger, open: openProp, onOpenChange }:
 		<Dialog open={open} onOpenChange={setOpen}>
 			{trigger && <DialogTrigger render={trigger as React.ReactElement} />}
 			<DialogContent className="!max-w-2xl max-h-[92vh] overflow-hidden p-0">
-				<form onSubmit={handleSubmit(onSubmit)} className="flex max-h-[92vh] flex-col">
+				<form
+					onSubmit={handleSubmit(onSubmit)}
+					className="flex max-h-[92vh] flex-col"
+				>
 					<DialogHeader className="border-b border-border px-6 pt-6 pb-4">
 						<DialogTitle className="font-display text-lg">
 							{isEdit ? `Editar: ${location?.name || "Local"}` : "Novo Local"}
@@ -122,7 +136,9 @@ function LocationFormDialog({ location, trigger, open: openProp, onOpenChange }:
 							<FormSection title="Identificação">
 								<ImageUploader
 									value={imageUrl ?? ""}
-									onChange={(url) => setValue("imageUrl", url, { shouldDirty: true })}
+									onChange={(url) =>
+										setValue("imageUrl", url, { shouldDirty: true })
+									}
 									label="Imagem"
 									folder="locations"
 									size="md"
@@ -136,13 +152,22 @@ function LocationFormDialog({ location, trigger, open: openProp, onOpenChange }:
 										/>
 									</Field>
 									<Field label="Tipo">
-										<Input placeholder="Ex: Cidade, Caverna..." {...register("type")} />
+										<Input
+											placeholder="Ex: Cidade, Caverna..."
+											{...register("type")}
+										/>
 									</Field>
 									<Field label="Região">
-										<Input placeholder="Ex: Reino de Tethyr" {...register("region")} />
+										<Input
+											placeholder="Ex: Reino de Tethyr"
+											{...register("region")}
+										/>
 									</Field>
 									<Field label="Local pai" hint="Sub-localidade?">
-										<Input placeholder="Ex: dentro de Cidade Livre" {...register("parentLocation")} />
+										<Input
+											placeholder="Ex: dentro de Cidade Livre"
+											{...register("parentLocation")}
+										/>
 									</Field>
 									<Field label="Nível de perigo">
 										<Select {...register("dangerLevel")}>
@@ -154,14 +179,24 @@ function LocationFormDialog({ location, trigger, open: openProp, onOpenChange }:
 										</Select>
 									</Field>
 									<Field label="Clima">
-										<Input placeholder="Ex: Temperado" {...register("climate")} />
+										<Input
+											placeholder="Ex: Temperado"
+											{...register("climate")}
+										/>
 									</Field>
 									<Field label="Terreno">
-										<Input placeholder="Ex: Floresta densa" {...register("terrain")} />
+										<Input
+											placeholder="Ex: Floresta densa"
+											{...register("terrain")}
+										/>
 									</Field>
 								</div>
 								<Field label="Descrição">
-									<Textarea rows={3} placeholder="Como o local se parece à primeira vista?" {...register("description")} />
+									<Textarea
+										rows={3}
+										placeholder="Como o local se parece à primeira vista?"
+										{...register("description")}
+									/>
 								</Field>
 							</FormSection>
 						)}
@@ -170,23 +205,43 @@ function LocationFormDialog({ location, trigger, open: openProp, onOpenChange }:
 							<FormSection title="Sociedade & Política">
 								<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
 									<Field label="População">
-										<Input placeholder="Ex: ~5.000" {...register("population")} />
+										<Input
+											placeholder="Ex: ~5.000"
+											{...register("population")}
+										/>
 									</Field>
 									<Field label="Governo">
-										<Input placeholder="Conselho, Rei..." {...register("government")} />
+										<Input
+											placeholder="Conselho, Rei..."
+											{...register("government")}
+										/>
 									</Field>
 									<Field label="Economia">
-										<Input placeholder="Comércio, mineração..." {...register("economy")} />
+										<Input
+											placeholder="Comércio, mineração..."
+											{...register("economy")}
+										/>
 									</Field>
 									<Field label="Habitantes notáveis">
-										<Input placeholder="Personalidades importantes" {...register("notableInhabitants")} />
+										<Input
+											placeholder="Personalidades importantes"
+											{...register("notableInhabitants")}
+										/>
 									</Field>
 								</div>
 								<Field label="Pontos de interesse">
-									<Textarea rows={4} placeholder="Templos, mercados, masmorras..." {...register("keyFeatures")} />
+									<Textarea
+										rows={4}
+										placeholder="Templos, mercados, masmorras..."
+										{...register("keyFeatures")}
+									/>
 								</Field>
 								<Field label="Ganchos de aventura">
-									<Textarea rows={3} placeholder="Quests que podem surgir aqui." {...register("hooks")} />
+									<Textarea
+										rows={3}
+										placeholder="Quests que podem surgir aqui."
+										{...register("hooks")}
+									/>
 								</Field>
 							</FormSection>
 						)}
@@ -194,7 +249,11 @@ function LocationFormDialog({ location, trigger, open: openProp, onOpenChange }:
 						{tab === "history" && (
 							<FormSection title="História & Mapa">
 								<Field label="História do local">
-									<Textarea rows={6} placeholder="Origens, eventos marcantes..." {...register("history")} />
+									<Textarea
+										rows={6}
+										placeholder="Origens, eventos marcantes..."
+										{...register("history")}
+									/>
 								</Field>
 								<Field label="URL do mapa (opcional)">
 									<Input placeholder="https://..." {...register("mapUrl")} />
@@ -213,7 +272,12 @@ function LocationFormDialog({ location, trigger, open: openProp, onOpenChange }:
 							O grupo já visitou
 						</label>
 						<div className="flex items-center gap-2">
-							<Button type="button" variant="ghost" size="sm" onClick={() => setOpen(false)}>
+							<Button
+								type="button"
+								variant="ghost"
+								size="sm"
+								onClick={() => setOpen(false)}
+							>
 								Cancelar
 							</Button>
 							<Button type="submit" size="sm">

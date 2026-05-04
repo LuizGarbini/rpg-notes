@@ -10,7 +10,10 @@ interface NpcCardProps {
 }
 
 const dispositionStyles: Record<string, { label: string; tone: string }> = {
-	hostile: { label: "Hostil", tone: "text-rose-300 bg-rose-500/10 ring-rose-500/20" },
+	hostile: {
+		label: "Hostil",
+		tone: "text-rose-300 bg-rose-500/10 ring-rose-500/20",
+	},
 	unfriendly: {
 		label: "Antipático",
 		tone: "text-orange-300 bg-orange-500/10 ring-orange-500/20",
@@ -48,7 +51,8 @@ export function NpcCard({ npc }: NpcCardProps) {
 		.join("")
 		.toUpperCase();
 
-	const disposition = dispositionStyles[npc.disposition] ?? dispositionStyles.neutral;
+	const disposition =
+		dispositionStyles[npc.disposition] ?? dispositionStyles.neutral;
 
 	return (
 		<>

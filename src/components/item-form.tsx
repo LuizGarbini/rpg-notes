@@ -1,8 +1,9 @@
 import { Pencil, Plus } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import type { Item } from "@/lib/store";
 import { itemDefaults, useRPGStore } from "@/lib/store";
+import { ImageUploader } from "./image-uploader";
 import { Button } from "./ui/button";
 import {
 	Dialog,
@@ -13,7 +14,6 @@ import {
 	DialogTrigger,
 } from "./ui/dialog";
 import { Field, FormSection } from "./ui/form-tabs";
-import { ImageUploader } from "./image-uploader";
 import { Input } from "./ui/input";
 import { Select } from "./ui/select";
 import { Textarea } from "./ui/textarea";
@@ -40,7 +40,12 @@ interface ItemEditButtonProps {
 	trigger?: ReactNode;
 }
 
-export function ItemEditButton({ item, open, onOpenChange, trigger }: ItemEditButtonProps) {
+export function ItemEditButton({
+	item,
+	open,
+	onOpenChange,
+	trigger,
+}: ItemEditButtonProps) {
 	return (
 		<ItemFormDialog
 			item={item}
@@ -65,7 +70,12 @@ interface ItemFormDialogProps {
 	onOpenChange?: (open: boolean) => void;
 }
 
-function ItemFormDialog({ item, trigger, open: openProp, onOpenChange }: ItemFormDialogProps) {
+function ItemFormDialog({
+	item,
+	trigger,
+	open: openProp,
+	onOpenChange,
+}: ItemFormDialogProps) {
 	const isEdit = !!item;
 	const [internalOpen, setInternalOpen] = useState(false);
 	const open = openProp ?? internalOpen;
@@ -74,9 +84,10 @@ function ItemFormDialog({ item, trigger, open: openProp, onOpenChange }: ItemFor
 	const addItem = useRPGStore((state) => state.addItem);
 	const updateItem = useRPGStore((state) => state.updateItem);
 
-	const { register, handleSubmit, reset, control, setValue } = useForm<ItemFormValues>({
-		defaultValues: { ...itemDefaults, ...(item ?? {}) },
-	});
+	const { register, handleSubmit, reset, control, setValue } =
+		useForm<ItemFormValues>({
+			defaultValues: { ...itemDefaults, ...(item ?? {}) },
+		});
 
 	const imageUrl = useWatch({ control, name: "imageUrl" });
 
@@ -94,7 +105,10 @@ function ItemFormDialog({ item, trigger, open: openProp, onOpenChange }: ItemFor
 		<Dialog open={open} onOpenChange={setOpen}>
 			{trigger && <DialogTrigger render={trigger as React.ReactElement} />}
 			<DialogContent className="!max-w-2xl max-h-[92vh] overflow-hidden p-0">
-				<form onSubmit={handleSubmit(onSubmit)} className="flex max-h-[92vh] flex-col">
+				<form
+					onSubmit={handleSubmit(onSubmit)}
+					className="flex max-h-[92vh] flex-col"
+				>
 					<DialogHeader className="border-b border-border px-6 pt-6 pb-4">
 						<DialogTitle className="font-display text-lg">
 							{isEdit ? `Editar: ${item?.name || "Item"}` : "Novo Item"}
@@ -108,7 +122,9 @@ function ItemFormDialog({ item, trigger, open: openProp, onOpenChange }: ItemFor
 						<FormSection title="Identificação">
 							<ImageUploader
 								value={imageUrl ?? ""}
-								onChange={(url) => setValue("imageUrl", url, { shouldDirty: true })}
+								onChange={(url) =>
+									setValue("imageUrl", url, { shouldDirty: true })
+								}
 								label="Ilustração"
 								folder="items"
 								size="md"
@@ -122,10 +138,16 @@ function ItemFormDialog({ item, trigger, open: openProp, onOpenChange }: ItemFor
 									/>
 								</Field>
 								<Field label="Tipo">
-									<Input placeholder="Arma, Armadura, Poção..." {...register("type")} />
+									<Input
+										placeholder="Arma, Armadura, Poção..."
+										{...register("type")}
+									/>
 								</Field>
 								<Field label="Subtipo">
-									<Input placeholder="Ex: espada longa, escudo..." {...register("subtype")} />
+									<Input
+										placeholder="Ex: espada longa, escudo..."
+										{...register("subtype")}
+									/>
 								</Field>
 								<Field label="Raridade">
 									<Select {...register("rarity")}>
@@ -163,17 +185,26 @@ function ItemFormDialog({ item, trigger, open: openProp, onOpenChange }: ItemFor
 								/>
 							</Field>
 							<Field label="Propriedades" hint="Ex: Versátil (1d10), Alcance">
-								<Input placeholder="Versátil, Alcance..." {...register("properties")} />
+								<Input
+									placeholder="Versátil, Alcance..."
+									{...register("properties")}
+								/>
 							</Field>
 						</FormSection>
 
 						<FormSection title="Posse & Sintonização">
 							<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
 								<Field label="Pertence a">
-									<Input placeholder="Personagem ou local" {...register("owner")} />
+									<Input
+										placeholder="Personagem ou local"
+										{...register("owner")}
+									/>
 								</Field>
 								<Field label="Sintonizado com">
-									<Input placeholder="Quem está sintonizado" {...register("attunedTo")} />
+									<Input
+										placeholder="Quem está sintonizado"
+										{...register("attunedTo")}
+									/>
 								</Field>
 							</div>
 							<div className="flex flex-wrap items-center gap-4">
@@ -198,13 +229,22 @@ function ItemFormDialog({ item, trigger, open: openProp, onOpenChange }: ItemFor
 
 						<FormSection title="Descrição">
 							<Field label="Descrição / Lore">
-								<Textarea rows={4} placeholder="Forjada nas profundezas de..." {...register("description")} />
+								<Textarea
+									rows={4}
+									placeholder="Forjada nas profundezas de..."
+									{...register("description")}
+								/>
 							</Field>
 						</FormSection>
 					</div>
 
 					<div className="flex items-center justify-end gap-2 border-t border-border bg-card-elevated/40 px-6 py-3">
-						<Button type="button" variant="ghost" size="sm" onClick={() => setOpen(false)}>
+						<Button
+							type="button"
+							variant="ghost"
+							size="sm"
+							onClick={() => setOpen(false)}
+						>
 							Cancelar
 						</Button>
 						<Button type="submit" size="sm">

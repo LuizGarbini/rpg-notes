@@ -46,7 +46,11 @@ interface FormSectionProps {
 	children: React.ReactNode;
 }
 
-export function FormSection({ title, description, children }: FormSectionProps) {
+export function FormSection({
+	title,
+	description,
+	children,
+}: FormSectionProps) {
 	return (
 		<section className="space-y-3">
 			<div>
@@ -54,7 +58,9 @@ export function FormSection({ title, description, children }: FormSectionProps) 
 					{title}
 				</h4>
 				{description && (
-					<p className="mt-2 text-[12px] text-muted-foreground">{description}</p>
+					<p className="mt-2 text-[12px] text-muted-foreground">
+						{description}
+					</p>
 				)}
 			</div>
 			<div className="space-y-3">{children}</div>
@@ -70,7 +76,13 @@ interface FieldProps {
 	children: React.ReactNode;
 }
 
-export function Field({ label, htmlFor, hint, className, children }: FieldProps) {
+export function Field({
+	label,
+	htmlFor,
+	hint,
+	className,
+	children,
+}: FieldProps) {
 	return (
 		<div className={cn("flex flex-col gap-1.5", className)}>
 			<label

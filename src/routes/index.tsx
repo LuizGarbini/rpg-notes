@@ -1,267 +1,222 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
-	ArrowUpRight,
 	BookOpen,
 	MapIcon,
 	Package,
 	ScrollText,
+	Shield,
+	Sparkles,
+	Swords,
 	User,
 	Users,
 } from "lucide-react";
-import { ActivityFeed } from "@/components/activity-feed";
-import { useRPGStore } from "@/lib/store";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
-	component: Dashboard,
+	component: LandingPage,
 });
 
-const sections = [
+/* ─── Features ─── */
+
+const features = [
 	{
-		to: "/characters",
-		title: "Personagens",
-		description: "Heróis da campanha",
 		Icon: User,
-		accent: "text-violet-300",
-		key: "characters" as const,
+		title: "Personagens",
+		desc: "Fichas completas e detalhadas",
+		color: "text-violet-400",
 	},
 	{
-		to: "/npcs",
-		title: "NPCs",
-		description: "Aliados, inimigos e mistérios",
-		Icon: Users,
-		accent: "text-fuchsia-300",
-		key: "npcs" as const,
-	},
-	{
-		to: "/sessions",
-		title: "Sessões",
-		description: "Crônicas das aventuras",
 		Icon: ScrollText,
-		accent: "text-amber-300",
-		key: "sessions" as const,
+		title: "Sessões",
+		desc: "Crônicas da sua aventura",
+		color: "text-amber-400",
 	},
 	{
-		to: "/items",
-		title: "Itens",
-		description: "Tesouros e relíquias",
-		Icon: Package,
-		accent: "text-emerald-300",
-		key: "items" as const,
+		Icon: Users,
+		title: "NPCs",
+		desc: "Aliados, vilões e mistérios",
+		color: "text-fuchsia-400",
 	},
 	{
-		to: "/locations",
-		title: "Locais",
-		description: "Reinos e fronteiras",
 		Icon: MapIcon,
-		accent: "text-rose-300",
-		key: "locations" as const,
+		title: "Locais",
+		desc: "Mapeie reinos e fronteiras",
+		color: "text-rose-400",
 	},
 	{
-		to: "/lore",
-		title: "Lore",
-		description: "História e conhecimento",
+		Icon: Package,
+		title: "Itens",
+		desc: "Tesouros e relíquias arcanas",
+		color: "text-emerald-400",
+	},
+	{
 		Icon: BookOpen,
-		accent: "text-indigo-300",
-		key: "lores" as const,
+		title: "Lore",
+		desc: "Todo o saber do mundo",
+		color: "text-indigo-400",
 	},
 ];
 
-function Dashboard() {
-	const characters = useRPGStore((s) => s.characters);
-	const npcs = useRPGStore((s) => s.npcs);
-	const sessions = useRPGStore((s) => s.sessions);
-	const items = useRPGStore((s) => s.items);
-	const locations = useRPGStore((s) => s.locations);
-	const lores = useRPGStore((s) => s.lores);
+/* ─── Page ─── */
 
-	const counts = {
-		characters: characters.length,
-		npcs: npcs.length,
-		sessions: sessions.length,
-		items: items.length,
-		locations: locations.length,
-		lores: lores.length,
-	};
-
-	const totalEntries = Object.values(counts).reduce((a, b) => a + b, 0);
-
-	const lastSession = [...sessions].sort(
-		(a, b) => b.createdAt - a.createdAt,
-	)[0];
-
+function LandingPage() {
 	return (
-		<div className="w-full">
-			{/* Compact header */}
-			<header className="border-b border-border/70 px-6 py-5">
-				<div className="flex items-end justify-between gap-6">
-					<div>
-						<div className="text-[10px] font-semibold uppercase tracking-[0.25em] text-muted-foreground">
-							Visão Geral
+		<div className="relative min-h-screen overflow-hidden">
+			{/* Background effects */}
+			<div className="pointer-events-none fixed inset-0 -z-20 arcane-grid opacity-[0.05]" />
+			<div
+				className="pointer-events-none fixed inset-0 -z-10"
+				style={{
+					background: `
+						radial-gradient(ellipse 800px 500px at 20% 20%, oklch(0.66 0.20 290 / 0.08), transparent 60%),
+						radial-gradient(ellipse 600px 400px at 80% 80%, oklch(0.55 0.20 320 / 0.06), transparent 60%),
+						radial-gradient(ellipse 400px 300px at 50% 50%, oklch(0.60 0.18 285 / 0.04), transparent 70%)
+					`,
+				}}
+			/>
+
+			{/* Floating particles */}
+			<div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+				{[...Array(6)].map((_, i) => (
+					<div
+						key={i}
+						className="absolute h-1 w-1 rounded-full bg-primary/30"
+						style={{
+							left: `${15 + i * 15}%`,
+							top: `${20 + (i % 3) * 25}%`,
+							animation: `glow-pulse ${3 + i * 0.7}s ease-in-out infinite`,
+							animationDelay: `${i * 0.5}s`,
+						}}
+					/>
+				))}
+			</div>
+
+			{/* Navbar */}
+			<header className="sticky top-0 z-50 border-b border-border/50 bg-background/70 backdrop-blur-xl">
+				<div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
+					<div className="flex items-center gap-2.5">
+						<div className="relative flex h-8 w-8 items-center justify-center rounded-md bg-primary/15 ring-1 ring-primary/30">
+							<Swords className="h-4 w-4 text-primary" strokeWidth={1.6} />
 						</div>
-						<h1 className="mt-1 font-display text-2xl font-bold tracking-tight">
-							<span className="text-gradient-primary">Dashboard</span>
-						</h1>
+						<div className="flex flex-col leading-none">
+							<span className="font-display text-[13px] font-bold tracking-[0.18em] text-foreground">
+								RPG NOTES
+							</span>
+							<span className="mt-0.5 text-[9px] uppercase tracking-[0.25em] text-muted-foreground">
+								Grimoire
+							</span>
+						</div>
 					</div>
-					<div className="hidden items-center gap-1.5 text-[11px] text-muted-foreground sm:flex">
-						<span className="inline-block h-1.5 w-1.5 rounded-full bg-primary" />
-						{totalEntries} {totalEntries === 1 ? "registro" : "registros"} no grimório
+					<div className="flex items-center gap-2">
+						<Link to="/auth">
+							<Button variant="ghost" size="sm">
+								Entrar
+							</Button>
+						</Link>
+						<Link to="/auth">
+							<Button size="sm">
+								<Sparkles className="h-3.5 w-3.5" />
+								Criar Conta
+							</Button>
+						</Link>
 					</div>
 				</div>
 			</header>
 
-			<div className="space-y-6 px-6 py-6">
-				{/* Stat row */}
-				<div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-6">
-					{sections.map((s) => (
-						<StatPill
-							key={s.to}
-							to={s.to}
-							label={s.title}
-							value={counts[s.key]}
-							Icon={s.Icon}
-							iconColor={s.accent}
-						/>
-					))}
+			{/* Hero */}
+			<section className="relative mx-auto max-w-6xl px-6 pt-20 pb-16 text-center lg:pt-28 lg:pb-20">
+				<div className="relative inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-[11px] font-medium text-primary mb-6">
+					<Shield className="h-3 w-3" />
+					Seu grimório digital de RPG
 				</div>
+				<h1 className="font-display text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+					<span className="text-gradient-primary">Organize</span>{" "}
+					<span className="text-foreground">suas</span>
+					<br />
+					<span className="text-foreground">campanhas de RPG</span>
+				</h1>
+				<p className="mx-auto mt-5 max-w-xl text-base text-muted-foreground leading-relaxed sm:text-lg">
+					Registre personagens, sessões, lore, itens e tudo que faz parte da sua
+					aventura — tudo em um só lugar, bonito e organizado.
+				</p>
+				<div className="mt-8 flex items-center justify-center gap-3">
+					<Link to="/auth">
+						<Button size="lg" className="gap-2 px-6">
+							<Sparkles className="h-4 w-4" />
+							Começar Agora
+						</Button>
+					</Link>
+					<Button
+						variant="outline"
+						size="lg"
+						className="px-6"
+						onClick={() =>
+							document
+								.getElementById("features")
+								?.scrollIntoView({ behavior: "smooth" })
+						}
+					>
+						Explorar
+					</Button>
+				</div>
+			</section>
 
-				{/* Section header */}
-				<div className="flex items-center gap-3 pt-2">
-					<h2 className="text-[10px] font-semibold uppercase tracking-[0.25em] text-muted-foreground heading-rule">
-						Coleções
+			{/* Features */}
+			<section id="features" className="mx-auto max-w-5xl px-6 py-16">
+				<div className="text-center mb-10">
+					<h2 className="text-[10px] font-semibold uppercase tracking-[0.25em] text-muted-foreground heading-rule mx-auto w-fit">
+						Funcionalidades
 					</h2>
 				</div>
-
-				<div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-					{sections.map((s) => (
-						<DashboardCard
-							key={s.to}
-							to={s.to}
-							title={s.title}
-							description={s.description}
-							Icon={s.Icon}
-							iconColor={s.accent}
-							count={counts[s.key]}
-						/>
+				<div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+					{features.map((f) => (
+						<div
+							key={f.title}
+							className="group rounded-lg border border-border bg-card-elevated p-4 text-center transition-all hover:border-border-hover hover:-translate-y-0.5"
+						>
+							<div
+								className={`mx-auto mb-2.5 flex h-10 w-10 items-center justify-center rounded-md bg-background/60 ring-1 ring-border ${f.color}`}
+							>
+								<f.Icon className="h-4.5 w-4.5" strokeWidth={1.6} />
+							</div>
+							<h3 className="text-[13px] font-semibold text-foreground">
+								{f.title}
+							</h3>
+							<p className="mt-0.5 text-[11px] text-muted-foreground">
+								{f.desc}
+							</p>
+						</div>
 					))}
 				</div>
+			</section>
 
-				{/* Two-column: last session + activity feed */}
-				<div className="grid grid-cols-1 gap-6 pt-2 lg:grid-cols-3">
-					<div className="lg:col-span-2">
-						<ActivityFeed limit={10} />
+			{/* CTA */}
+			<section className="mx-auto max-w-2xl px-6 py-16 text-center">
+				<div className="panel corner-mark p-8 sm:p-12">
+					<h2 className="font-display text-2xl font-bold text-foreground sm:text-3xl">
+						Pronto para a{" "}
+						<span className="text-gradient-primary">aventura</span>?
+					</h2>
+					<p className="mt-3 text-[13px] text-muted-foreground leading-relaxed">
+						Crie sua conta gratuitamente e comece a documentar sua campanha
+						agora mesmo.
+					</p>
+					<div className="mt-6">
+						<Link to="/auth">
+							<Button size="lg" className="gap-2 px-8">
+								<Sparkles className="h-4 w-4" />
+								Criar Conta Grátis
+							</Button>
+						</Link>
 					</div>
-					<aside className="space-y-2.5">
-						<h2 className="text-[10px] font-semibold uppercase tracking-[0.25em] text-muted-foreground heading-rule">
-							Última sessão
-						</h2>
-						{lastSession ? (
-							<Link
-								to="/sessions"
-								className="group block rounded-lg border border-border bg-card-elevated p-4 transition-colors hover:border-border-hover"
-							>
-								<div className="flex items-start justify-between gap-3">
-									<div className="min-w-0 flex-1">
-										<div className="flex items-center gap-2">
-											<ScrollText
-												className="h-3.5 w-3.5 text-amber-400"
-												strokeWidth={1.7}
-											/>
-											<span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-												{lastSession.date || "sem data"}
-											</span>
-										</div>
-										<h3 className="font-display mt-1 text-base font-bold text-foreground">
-											{lastSession.title || "Sem título"}
-										</h3>
-										{lastSession.summary && (
-											<p className="mt-1.5 line-clamp-3 text-[12px] text-muted-foreground">
-												{lastSession.summary}
-											</p>
-										)}
-									</div>
-									<ArrowUpRight className="h-4 w-4 shrink-0 text-muted-foreground transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-primary" />
-								</div>
-							</Link>
-						) : (
-							<div className="rounded-lg border border-dashed border-border px-4 py-6 text-center text-[12px] text-muted-foreground">
-								Nenhuma sessão registrada ainda.
-							</div>
-						)}
-					</aside>
 				</div>
+			</section>
 
-			</div>
+			{/* Footer */}
+			<footer className="border-t border-border/50 py-8 text-center text-[11px] text-muted-foreground">
+				<span className="font-display tracking-wider">RPG NOTES</span> — Seu
+				grimório digital
+			</footer>
 		</div>
-	);
-}
-
-interface StatPillProps {
-	to: string;
-	label: string;
-	value: number;
-	Icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
-	iconColor: string;
-}
-
-function StatPill({ to, label, value, Icon, iconColor }: StatPillProps) {
-	return (
-		<Link
-			to={to}
-			className="group flex items-center justify-between rounded-md border border-border bg-card-elevated px-3 py-2.5 transition-colors hover:border-border-hover"
-		>
-			<div className="flex flex-col">
-				<span className="text-[9px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-					{label}
-				</span>
-				<span className="font-display text-lg font-bold leading-none text-foreground">
-					{value}
-				</span>
-			</div>
-			<Icon className={`h-4 w-4 ${iconColor}`} strokeWidth={1.7} />
-		</Link>
-	);
-}
-
-interface DashboardCardProps {
-	to: string;
-	title: string;
-	description: string;
-	Icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
-	iconColor: string;
-	count: number;
-}
-
-function DashboardCard({
-	to,
-	title,
-	description,
-	Icon,
-	iconColor,
-	count,
-}: DashboardCardProps) {
-	return (
-		<Link
-			to={to}
-			className="group relative flex items-center justify-between gap-3 rounded-lg border border-border bg-card-elevated p-4 transition-colors hover:border-border-hover"
-		>
-			<div className="flex items-center gap-3 min-w-0">
-				<div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-background/60 ring-1 ring-border ${iconColor}`}>
-					<Icon className="h-4 w-4" strokeWidth={1.7} />
-				</div>
-				<div className="min-w-0">
-					<div className="flex items-center gap-2">
-						<h3 className="text-[14px] font-semibold text-foreground transition-colors group-hover:text-primary">
-							{title}
-						</h3>
-						<span className="rounded px-1.5 py-0.5 text-[10px] font-bold tabular-nums text-muted-foreground ring-1 ring-border">
-							{count}
-						</span>
-					</div>
-					<p className="mt-0.5 truncate text-[12px] text-muted-foreground">{description}</p>
-				</div>
-			</div>
-
-			<ArrowUpRight className="h-4 w-4 shrink-0 text-muted-foreground transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-primary" />
-		</Link>
 	);
 }

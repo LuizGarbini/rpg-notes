@@ -55,7 +55,7 @@ export function isSupabaseConfigured(): boolean {
  * O motivo de ser lazy + null-safe é que toda a UI já pode chamar
  * `getSupabase()?.from('characters').select()` sem quebrar quando offline.
  */
-let _client: unknown = null;
+const _client: unknown = null;
 
 export async function getSupabase(): Promise<unknown> {
 	const config = getSupabaseConfig();

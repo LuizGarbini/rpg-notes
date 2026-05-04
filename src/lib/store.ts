@@ -5,12 +5,44 @@ import { persist } from "zustand/middleware";
 //  Sistemas suportados
 // =====================================================
 export const RPG_SYSTEMS = [
-	{ value: "dnd5e", label: "D&D 5ª Edição" },
-	{ value: "tormenta20", label: "Tormenta 20" },
-	{ value: "pathfinder", label: "Pathfinder 2e" },
-	{ value: "coc", label: "Call of Cthulhu" },
+	{ value: "dnd5e", label: "D&D 5ª Edição (2014)" },
+	{ value: "dnd2024", label: "D&D 2024" },
 	{ value: "vampire", label: "Vampiro: A Máscara" },
+	{ value: "coc", label: "Call of Cthulhu 7e" },
+	{ value: "tormenta20", label: "Tormenta 20" },
 	{ value: "ordem", label: "Ordem Paranormal" },
+	{ value: "contosloop", label: "Contos do Loop" },
+	{ value: "mausritter", label: "Mausritter" },
+	{ value: "daggerheart", label: "Daggerheart" },
+	{ value: "cyberpunkred", label: "Cyberpunk RED" },
+	{ value: "fallout2d20", label: "Fallout RPG (2d20)" },
+	{ value: "wilderfeast", label: "Wilderfeast" },
+	{ value: "gothrpg", label: "Guerra dos Tronos RPG" },
+	{ value: "cosmere", label: "Cosmere RPG" },
+	{ value: "hogwarts", label: "Hogwarts: Um RPG (PbtA)" },
+	{ value: "avatarlegends", label: "Avatar Legends" },
+	{ value: "3det", label: "3DeT Victory" },
+	{ value: "assassinscreed", label: "Assassin's Creed RPG" },
+	{ value: "corespring", label: "Corespring RPG" },
+	{ value: "corespringnpc", label: "Corespring — Ameaça (NPC)" },
+	{ value: "melodiaperdida", label: "Melodia Perdida" },
+	{ value: "olddragon2e", label: "Old Dragon 2e" },
+	{ value: "skyfall", label: "Skyfall RPG" },
+	{ value: "symbaroum", label: "Symbaroum" },
+	{ value: "ronin", label: "Ronin RPG (Puro Osso)" },
+	{ value: "duna", label: "Duna: Aventuras no Imperium" },
+	{ value: "stalker", label: "STALKER RPG 2ª Edição" },
+	{ value: "fissura", label: "Fissura RPG" },
+	{ value: "meltedlands", label: "Melted Lands" },
+	{ value: "savageworlds", label: "Savage Worlds SWADE" },
+	{ value: "sacramento", label: "Sacramento RPG" },
+	{ value: "somdasseis", label: "O Som das Seis" },
+	{ value: "fabulaultima", label: "Fabula Ultima" },
+	{ value: "ashesoftomorrow", label: "Ashes of Tomorrow" },
+	{ value: "l5r5e", label: "Legend of the Five Rings 5e" },
+	{ value: "weirdwizard", label: "Shadow of the Weird Wizard" },
+	{ value: "demonlord", label: "Shadow of the Demon Lord" },
+	{ value: "pathfinder", label: "Pathfinder 2e" },
 	{ value: "generic", label: "Genérico / Outro" },
 ] as const;
 
@@ -27,7 +59,10 @@ export type EntityKind =
 	| "location"
 	| "lore";
 
-export const ENTITY_LABELS: Record<EntityKind, { singular: string; plural: string }> = {
+export const ENTITY_LABELS: Record<
+	EntityKind,
+	{ singular: string; plural: string }
+> = {
 	character: { singular: "Personagem", plural: "Personagens" },
 	npc: { singular: "NPC", plural: "NPCs" },
 	session: { singular: "Sessão", plural: "Sessões" },
@@ -435,7 +470,9 @@ export const loreDefaults: Omit<Lore, "id" | "createdAt"> = {
 // =====================================================
 interface RPGState {
 	characters: Character[];
-	addCharacter: (character: Partial<Omit<Character, "id" | "createdAt">>) => Character;
+	addCharacter: (
+		character: Partial<Omit<Character, "id" | "createdAt">>,
+	) => Character;
 	updateCharacter: (id: string, character: Partial<Character>) => void;
 	removeCharacter: (id: string) => void;
 
@@ -509,7 +546,10 @@ export const useRPGStore = create<RPGState>()(
 			// ----- Characters -----
 			characters: [],
 			addCharacter: (character) => {
-				const created = generateEntry(characterDefaults, character) as Character;
+				const created = generateEntry(
+					characterDefaults,
+					character,
+				) as Character;
 				set((state) => ({
 					characters: [...state.characters, created],
 					activityLog: pushLog(state.activityLog, {
@@ -695,7 +735,10 @@ export const useRPGStore = create<RPGState>()(
 			// ----- Locations -----
 			locations: [],
 			addLocation: (location) => {
-				const created = generateEntry(locationDefaults, location) as GameLocation;
+				const created = generateEntry(
+					locationDefaults,
+					location,
+				) as GameLocation;
 				set((state) => ({
 					locations: [...state.locations, created],
 					activityLog: pushLog(state.activityLog, {
@@ -713,9 +756,7 @@ export const useRPGStore = create<RPGState>()(
 					if (!existing) return state;
 					const updated = { ...existing, ...location, updatedAt: Date.now() };
 					return {
-						locations: state.locations.map((l) =>
-							l.id === id ? updated : l,
-						),
+						locations: state.locations.map((l) => (l.id === id ? updated : l)),
 						activityLog: pushLog(state.activityLog, {
 							action: "update",
 							entityKind: "location",
@@ -813,17 +854,26 @@ export const useRPGStore = create<RPGState>()(
 						...characterDefaults,
 						...c,
 					})) as Character[],
-					npcs: (old.npcs ?? []).map((n) => ({ ...npcDefaults, ...n })) as Npc[],
+					npcs: (old.npcs ?? []).map((n) => ({
+						...npcDefaults,
+						...n,
+					})) as Npc[],
 					sessions: (old.sessions ?? []).map((s) => ({
 						...sessionDefaults,
 						...s,
 					})) as Session[],
-					items: (old.items ?? []).map((i) => ({ ...itemDefaults, ...i })) as Item[],
+					items: (old.items ?? []).map((i) => ({
+						...itemDefaults,
+						...i,
+					})) as Item[],
 					locations: (old.locations ?? []).map((l) => ({
 						...locationDefaults,
 						...l,
 					})) as GameLocation[],
-					lores: (old.lores ?? []).map((l) => ({ ...loreDefaults, ...l })) as Lore[],
+					lores: (old.lores ?? []).map((l) => ({
+						...loreDefaults,
+						...l,
+					})) as Lore[],
 					activityLog: old.activityLog ?? [],
 				} as RPGState;
 			},

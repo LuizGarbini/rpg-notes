@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import {
 	BookOpen,
+	FileText,
 	House,
 	Map as MapIcon,
 	Package,
@@ -10,8 +11,9 @@ import {
 } from "lucide-react";
 
 const navItems = [
-	{ to: "/", label: "Dashboard", Icon: House },
+	{ to: "/dashboard", label: "Dashboard", Icon: House },
 	{ to: "/characters", label: "Personagens", Icon: User },
+	{ to: "/sheets", label: "Fichas", Icon: FileText },
 	{ to: "/npcs", label: "NPCs", Icon: Users },
 	{ to: "/sessions", label: "Sessões", Icon: ScrollText },
 	{ to: "/items", label: "Itens", Icon: Package },
@@ -59,10 +61,9 @@ export function Sidebar() {
 							<Link
 								key={to}
 								to={to}
-								activeOptions={{ exact: to === "/" }}
+								activeOptions={{ exact: to === "/dashboard" }}
 								activeProps={{
-									className:
-										"bg-primary/10 text-primary",
+									className: "bg-primary/10 text-primary",
 								}}
 								inactiveProps={{
 									className:

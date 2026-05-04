@@ -9,7 +9,10 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SheetsIndexRouteImport } from './routes/sheets/index'
 import { Route as SessionsIndexRouteImport } from './routes/sessions/index'
 import { Route as NpcsIndexRouteImport } from './routes/npcs/index'
 import { Route as LoreIndexRouteImport } from './routes/lore/index'
@@ -18,9 +21,24 @@ import { Route as ItemsIndexRouteImport } from './routes/items/index'
 import { Route as CharactersIndexRouteImport } from './routes/characters/index'
 import { Route as SheetsCharacterIdRouteImport } from './routes/sheets/$characterId'
 
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SheetsIndexRoute = SheetsIndexRouteImport.update({
+  id: '/sheets/',
+  path: '/sheets/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SessionsIndexRoute = SessionsIndexRouteImport.update({
@@ -61,6 +79,8 @@ const SheetsCharacterIdRoute = SheetsCharacterIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/dashboard': typeof DashboardRoute
   '/sheets/$characterId': typeof SheetsCharacterIdRoute
   '/characters': typeof CharactersIndexRoute
   '/items': typeof ItemsIndexRoute
@@ -68,9 +88,12 @@ export interface FileRoutesByFullPath {
   '/lore': typeof LoreIndexRoute
   '/npcs': typeof NpcsIndexRoute
   '/sessions': typeof SessionsIndexRoute
+  '/sheets': typeof SheetsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/dashboard': typeof DashboardRoute
   '/sheets/$characterId': typeof SheetsCharacterIdRoute
   '/characters': typeof CharactersIndexRoute
   '/items': typeof ItemsIndexRoute
@@ -78,10 +101,13 @@ export interface FileRoutesByTo {
   '/lore': typeof LoreIndexRoute
   '/npcs': typeof NpcsIndexRoute
   '/sessions': typeof SessionsIndexRoute
+  '/sheets': typeof SheetsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
+  '/dashboard': typeof DashboardRoute
   '/sheets/$characterId': typeof SheetsCharacterIdRoute
   '/characters/': typeof CharactersIndexRoute
   '/items/': typeof ItemsIndexRoute
@@ -89,11 +115,14 @@ export interface FileRoutesById {
   '/lore/': typeof LoreIndexRoute
   '/npcs/': typeof NpcsIndexRoute
   '/sessions/': typeof SessionsIndexRoute
+  '/sheets/': typeof SheetsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/auth'
+    | '/dashboard'
     | '/sheets/$characterId'
     | '/characters'
     | '/items'
@@ -101,9 +130,12 @@ export interface FileRouteTypes {
     | '/lore'
     | '/npcs'
     | '/sessions'
+    | '/sheets'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/auth'
+    | '/dashboard'
     | '/sheets/$characterId'
     | '/characters'
     | '/items'
@@ -111,9 +143,12 @@ export interface FileRouteTypes {
     | '/lore'
     | '/npcs'
     | '/sessions'
+    | '/sheets'
   id:
     | '__root__'
     | '/'
+    | '/auth'
+    | '/dashboard'
     | '/sheets/$characterId'
     | '/characters/'
     | '/items/'
@@ -121,10 +156,13 @@ export interface FileRouteTypes {
     | '/lore/'
     | '/npcs/'
     | '/sessions/'
+    | '/sheets/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthRoute: typeof AuthRoute
+  DashboardRoute: typeof DashboardRoute
   SheetsCharacterIdRoute: typeof SheetsCharacterIdRoute
   CharactersIndexRoute: typeof CharactersIndexRoute
   ItemsIndexRoute: typeof ItemsIndexRoute
@@ -132,15 +170,37 @@ export interface RootRouteChildren {
   LoreIndexRoute: typeof LoreIndexRoute
   NpcsIndexRoute: typeof NpcsIndexRoute
   SessionsIndexRoute: typeof SessionsIndexRoute
+  SheetsIndexRoute: typeof SheetsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sheets/': {
+      id: '/sheets/'
+      path: '/sheets'
+      fullPath: '/sheets'
+      preLoaderRoute: typeof SheetsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sessions/': {
@@ -197,6 +257,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthRoute: AuthRoute,
+  DashboardRoute: DashboardRoute,
   SheetsCharacterIdRoute: SheetsCharacterIdRoute,
   CharactersIndexRoute: CharactersIndexRoute,
   ItemsIndexRoute: ItemsIndexRoute,
@@ -204,6 +266,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoreIndexRoute: LoreIndexRoute,
   NpcsIndexRoute: NpcsIndexRoute,
   SessionsIndexRoute: SessionsIndexRoute,
+  SheetsIndexRoute: SheetsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,8 +1,9 @@
 import { Pencil, Plus } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import type { Lore } from "@/lib/store";
 import { loreDefaults, useRPGStore } from "@/lib/store";
+import { ImageUploader } from "./image-uploader";
 import { Button } from "./ui/button";
 import {
 	Dialog,
@@ -13,7 +14,6 @@ import {
 	DialogTrigger,
 } from "./ui/dialog";
 import { Field, FormSection } from "./ui/form-tabs";
-import { ImageUploader } from "./image-uploader";
 import { Input } from "./ui/input";
 import { Select } from "./ui/select";
 import { Textarea } from "./ui/textarea";
@@ -40,7 +40,12 @@ interface LoreEditButtonProps {
 	trigger?: ReactNode;
 }
 
-export function LoreEditButton({ lore, open, onOpenChange, trigger }: LoreEditButtonProps) {
+export function LoreEditButton({
+	lore,
+	open,
+	onOpenChange,
+	trigger,
+}: LoreEditButtonProps) {
 	return (
 		<LoreFormDialog
 			lore={lore}
@@ -65,7 +70,12 @@ interface LoreFormDialogProps {
 	onOpenChange?: (open: boolean) => void;
 }
 
-function LoreFormDialog({ lore, trigger, open: openProp, onOpenChange }: LoreFormDialogProps) {
+function LoreFormDialog({
+	lore,
+	trigger,
+	open: openProp,
+	onOpenChange,
+}: LoreFormDialogProps) {
 	const isEdit = !!lore;
 	const [internalOpen, setInternalOpen] = useState(false);
 	const open = openProp ?? internalOpen;
@@ -74,9 +84,10 @@ function LoreFormDialog({ lore, trigger, open: openProp, onOpenChange }: LoreFor
 	const addLore = useRPGStore((state) => state.addLore);
 	const updateLore = useRPGStore((state) => state.updateLore);
 
-	const { register, handleSubmit, reset, control, setValue } = useForm<LoreFormValues>({
-		defaultValues: { ...loreDefaults, ...(lore ?? {}) },
-	});
+	const { register, handleSubmit, reset, control, setValue } =
+		useForm<LoreFormValues>({
+			defaultValues: { ...loreDefaults, ...(lore ?? {}) },
+		});
 
 	const imageUrl = useWatch({ control, name: "imageUrl" });
 
@@ -94,7 +105,10 @@ function LoreFormDialog({ lore, trigger, open: openProp, onOpenChange }: LoreFor
 		<Dialog open={open} onOpenChange={setOpen}>
 			{trigger && <DialogTrigger render={trigger as React.ReactElement} />}
 			<DialogContent className="!max-w-2xl max-h-[92vh] overflow-hidden p-0">
-				<form onSubmit={handleSubmit(onSubmit)} className="flex max-h-[92vh] flex-col">
+				<form
+					onSubmit={handleSubmit(onSubmit)}
+					className="flex max-h-[92vh] flex-col"
+				>
 					<DialogHeader className="border-b border-border px-6 pt-6 pb-4">
 						<DialogTitle className="font-display text-lg">
 							{isEdit ? `Editar: ${lore?.title || "Lore"}` : "Novo Lore"}
@@ -108,7 +122,9 @@ function LoreFormDialog({ lore, trigger, open: openProp, onOpenChange }: LoreFor
 						<FormSection title="Identificação">
 							<ImageUploader
 								value={imageUrl ?? ""}
-								onChange={(url) => setValue("imageUrl", url, { shouldDirty: true })}
+								onChange={(url) =>
+									setValue("imageUrl", url, { shouldDirty: true })
+								}
 								label="Ilustração"
 								folder="lore"
 								size="md"
@@ -122,7 +138,10 @@ function LoreFormDialog({ lore, trigger, open: openProp, onOpenChange }: LoreFor
 									/>
 								</Field>
 								<Field label="Categoria">
-									<Input placeholder="História, Religião, Magia..." {...register("category")} />
+									<Input
+										placeholder="História, Religião, Magia..."
+										{...register("category")}
+									/>
 								</Field>
 								<Field label="Era / Período">
 									<Input placeholder="Ex: Era Glacial" {...register("era")} />
@@ -136,11 +155,20 @@ function LoreFormDialog({ lore, trigger, open: openProp, onOpenChange }: LoreFor
 									</Select>
 								</Field>
 								<Field label="Fonte / Referência">
-									<Input placeholder="Ex: livro X, NPC Y..." {...register("source")} />
+									<Input
+										placeholder="Ex: livro X, NPC Y..."
+										{...register("source")}
+									/>
 								</Field>
 							</div>
-							<Field label="Tags" hint="Separe por vírgula. Ex: divindade, profecia">
-								<Input placeholder="Ex: profecia, magia antiga" {...register("tags")} />
+							<Field
+								label="Tags"
+								hint="Separe por vírgula. Ex: divindade, profecia"
+							>
+								<Input
+									placeholder="Ex: profecia, magia antiga"
+									{...register("tags")}
+								/>
 							</Field>
 						</FormSection>
 
@@ -153,13 +181,23 @@ function LoreFormDialog({ lore, trigger, open: openProp, onOpenChange }: LoreFor
 								/>
 							</Field>
 							<Field label="Conhecido por">
-								<Input placeholder="Sábios, eruditos do reino X..." {...register("knownBy")} />
+								<Input
+									placeholder="Sábios, eruditos do reino X..."
+									{...register("knownBy")}
+								/>
 							</Field>
 							<Field label="Entidades relacionadas">
-								<Input placeholder="NPCs, lugares, itens conectados..." {...register("relatedEntities")} />
+								<Input
+									placeholder="NPCs, lugares, itens conectados..."
+									{...register("relatedEntities")}
+								/>
 							</Field>
 							<Field label="Notas privadas do Mestre">
-								<Textarea rows={3} placeholder="O que está por trás..." {...register("notes")} />
+								<Textarea
+									rows={3}
+									placeholder="O que está por trás..."
+									{...register("notes")}
+								/>
 							</Field>
 							<label className="flex items-center gap-2 text-[12px] text-muted-foreground">
 								<input
@@ -173,7 +211,12 @@ function LoreFormDialog({ lore, trigger, open: openProp, onOpenChange }: LoreFor
 					</div>
 
 					<div className="flex items-center justify-end gap-2 border-t border-border bg-card-elevated/40 px-6 py-3">
-						<Button type="button" variant="ghost" size="sm" onClick={() => setOpen(false)}>
+						<Button
+							type="button"
+							variant="ghost"
+							size="sm"
+							onClick={() => setOpen(false)}
+						>
 							Cancelar
 						</Button>
 						<Button type="submit" size="sm">

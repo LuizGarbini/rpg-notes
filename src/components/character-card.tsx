@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { Heart, Shield, Sparkles, User, Zap } from "lucide-react";
 import { useState } from "react";
 import {
@@ -34,141 +35,153 @@ export function CharacterCard({ character }: CharacterCardProps) {
 	const hasImage = !!character.imageUrl;
 
 	return (
-		<>
-			<div className="group relative flex flex-col overflow-hidden rounded-xl border border-border bg-card-elevated transition-colors hover:border-border-hover">
-				<EntityActions
-					onEdit={() => setEditOpen(true)}
-					onDelete={() => removeCharacter(character.id)}
-					entityName={character.characterName || "Sem nome"}
-					entityKindLabel="personagem"
-				/>
+		<Link
+			to="/sheets/$characterId"
+			params={{ characterId: character.id }}
+			className="group relative flex flex-col overflow-hidden rounded-xl border border-border bg-card-elevated transition-colors hover:border-border-hover cursor-pointer"
+		>
+			<EntityActions
+				onEdit={() => setEditOpen(true)}
+				onDelete={() => removeCharacter(character.id)}
+				entityName={character.characterName || "Sem nome"}
+				entityKindLabel="personagem"
+			/>
 
-				{/* Banner com imagem ou padrão */}
-				<div className="relative h-28 w-full shrink-0 overflow-hidden bg-linear-to-br from-primary/15 via-fuchsia-500/10 to-transparent">
-					{hasImage ? (
-						<img
-							src={character.imageUrl}
-							alt={character.characterName}
-							className="h-full w-full object-cover opacity-90 transition-transform duration-500 group-hover:scale-105"
-						/>
-					) : (
-						<div className="flex h-full w-full items-center justify-center text-primary/30">
-							<User className="h-12 w-12" strokeWidth={1.4} />
-						</div>
-					)}
-					<div className="absolute inset-x-0 bottom-0 h-12 bg-linear-to-t from-card to-transparent" />
-					<div className="absolute right-2 bottom-2 flex h-8 min-w-8 items-center justify-center rounded-md bg-background/85 px-1.5 backdrop-blur ring-1 ring-border">
-						<span className="text-[8px] font-semibold uppercase tracking-wider text-muted-foreground">
-							Lv
+			{/* Banner com imagem ou padrão */}
+			<div className="relative h-28 w-full shrink-0 overflow-hidden bg-linear-to-br from-primary/15 via-fuchsia-500/10 to-transparent">
+				{hasImage ? (
+					<img
+						src={character.imageUrl}
+						alt={character.characterName}
+						className="h-full w-full object-cover opacity-90 transition-transform duration-500 group-hover:scale-105"
+					/>
+				) : (
+					<div className="flex h-full w-full items-center justify-center text-primary/30">
+						<User className="h-12 w-12" strokeWidth={1.4} />
+					</div>
+				)}
+				<div className="absolute inset-x-0 bottom-0 h-12 bg-linear-to-t from-card to-transparent" />
+				<div className="absolute right-2 bottom-2 flex h-8 min-w-8 items-center justify-center rounded-md bg-background/85 px-1.5 backdrop-blur ring-1 ring-border">
+					<span className="text-[8px] font-semibold uppercase tracking-wider text-muted-foreground">
+						Lv
+					</span>
+					<span className="ml-1 font-display text-[13px] font-extrabold leading-none text-foreground">
+						{character.level}
+					</span>
+				</div>
+			</div>
+
+			<div className="flex flex-1 flex-col p-4">
+				<div className="min-w-0">
+					<h3 className="font-display truncate text-[15px] font-bold leading-tight text-foreground">
+						{character.characterName || "Sem nome"}
+					</h3>
+					<div className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[11px] text-muted-foreground">
+						{character.race && <span>{character.race}</span>}
+						{character.class && (
+							<>
+								<span className="text-primary/40">·</span>
+								<span>{character.class}</span>
+							</>
+						)}
+						{character.subclass && (
+							<>
+								<span className="text-primary/40">·</span>
+								<span className="truncate">{character.subclass}</span>
+							</>
+						)}
+					</div>
+					<div className="mt-1.5 flex items-center gap-1.5">
+						<span className="rounded bg-primary/10 px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-wider text-primary ring-1 ring-primary/15">
+							{systemLabel(character.system)}
 						</span>
-						<span className="ml-1 font-display text-[13px] font-extrabold leading-none text-foreground">
-							{character.level}
-						</span>
+						{character.alignment && (
+							<span className="text-[10px] text-muted-foreground/80">
+								{character.alignment}
+							</span>
+						)}
 					</div>
 				</div>
 
-				<div className="flex flex-1 flex-col p-4">
-					<div className="min-w-0">
-						<h3 className="font-display truncate text-[15px] font-bold leading-tight text-foreground">
-							{character.characterName || "Sem nome"}
-						</h3>
-						<div className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[11px] text-muted-foreground">
-							{character.race && <span>{character.race}</span>}
-							{character.class && (
-								<>
-									<span className="text-primary/40">·</span>
-									<span>{character.class}</span>
-								</>
-							)}
-							{character.subclass && (
-								<>
-									<span className="text-primary/40">·</span>
-									<span className="truncate">{character.subclass}</span>
-								</>
-							)}
-						</div>
-						<div className="mt-1.5 flex items-center gap-1.5">
-							<span className="rounded bg-primary/10 px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-wider text-primary ring-1 ring-primary/15">
-								{systemLabel(character.system)}
-							</span>
-							{character.alignment && (
-								<span className="text-[10px] text-muted-foreground/80">
-									{character.alignment}
-								</span>
-							)}
-						</div>
+				{/* HP */}
+				<div className="mt-3">
+					<div className="mb-1 flex items-center justify-between text-[10px] uppercase tracking-wider text-muted-foreground">
+						<span className="flex items-center gap-1">
+							<Heart className="h-2.5 w-2.5 text-rose-400" />
+							HP
+						</span>
+						<span className="font-mono tabular-nums text-foreground/80">
+							{character.health}/{character.healthMax}
+						</span>
 					</div>
+					<div className="relative h-1.5 overflow-hidden rounded-full bg-muted">
+						<div
+							className="absolute inset-y-0 left-0 rounded-full bg-rose-400 transition-all duration-500"
+							style={{ width: `${hpPercent}%` }}
+						/>
+					</div>
+				</div>
 
-					{/* HP */}
-					<div className="mt-3">
-						<div className="mb-1 flex items-center justify-between text-[10px] uppercase tracking-wider text-muted-foreground">
-							<span className="flex items-center gap-1">
-								<Heart className="h-2.5 w-2.5 text-rose-400" />
-								HP
-							</span>
-							<span className="font-mono tabular-nums text-foreground/80">
-								{character.health}/{character.healthMax}
-							</span>
-						</div>
-						<div className="relative h-1.5 overflow-hidden rounded-full bg-muted">
+				{/* Quick stats */}
+				<div className="mt-3 grid grid-cols-3 gap-1.5 text-center">
+					<MiniStat
+						Icon={Shield}
+						color="text-blue-300"
+						label="CA"
+						value={character.armorClass}
+					/>
+					<MiniStat
+						Icon={Zap}
+						color="text-amber-300"
+						label="INI"
+						value={formatModifier(character.initiative)}
+					/>
+					<MiniStat
+						Icon={Sparkles}
+						color="text-violet-300"
+						label="XP"
+						value={character.xp}
+					/>
+				</div>
+
+				{/* Abilities row */}
+				<div className="mt-3 grid grid-cols-6 gap-1 border-t border-border/60 pt-3">
+					{abilities.map((a) => {
+						const mod = abilityModifier(a.value);
+						return (
 							<div
-								className="absolute inset-y-0 left-0 rounded-full bg-rose-400 transition-all duration-500"
-								style={{ width: `${hpPercent}%` }}
-							/>
-						</div>
-					</div>
-
-					{/* Quick stats */}
-					<div className="mt-3 grid grid-cols-3 gap-1.5 text-center">
-						<MiniStat Icon={Shield} color="text-blue-300" label="CA" value={character.armorClass} />
-						<MiniStat
-							Icon={Zap}
-							color="text-amber-300"
-							label="INI"
-							value={formatModifier(character.initiative)}
-						/>
-						<MiniStat Icon={Sparkles} color="text-violet-300" label="XP" value={character.xp} />
-					</div>
-
-					{/* Abilities row */}
-					<div className="mt-3 grid grid-cols-6 gap-1 border-t border-border/60 pt-3">
-						{abilities.map((a) => {
-							const mod = abilityModifier(a.value);
-							return (
-								<div
-									key={a.label}
-									className="flex flex-col items-center"
-									title={`${a.label} ${a.value}`}
-								>
-									<span className="text-[8px] font-semibold uppercase tracking-wider text-muted-foreground">
-										{a.label}
-									</span>
-									<span className="font-mono text-[11px] font-bold tabular-nums text-foreground">
-										{a.value}
-									</span>
-									<span className="font-mono text-[9px] tabular-nums text-primary">
-										{formatModifier(mod)}
-									</span>
-								</div>
-							);
-						})}
-					</div>
-
-					{character.background && (
-						<p className="mt-3 line-clamp-2 border-t border-border/60 pt-2.5 text-[11px] italic text-muted-foreground">
-							“{character.background}”
-						</p>
-					)}
+								key={a.label}
+								className="flex flex-col items-center"
+								title={`${a.label} ${a.value}`}
+							>
+								<span className="text-[8px] font-semibold uppercase tracking-wider text-muted-foreground">
+									{a.label}
+								</span>
+								<span className="font-mono text-[11px] font-bold tabular-nums text-foreground">
+									{a.value}
+								</span>
+								<span className="font-mono text-[9px] tabular-nums text-primary">
+									{formatModifier(mod)}
+								</span>
+							</div>
+						);
+					})}
 				</div>
+
+				{character.background && (
+					<p className="mt-3 line-clamp-2 border-t border-border/60 pt-2.5 text-[11px] italic text-muted-foreground">
+						"{character.background}"
+					</p>
+				)}
 			</div>
 
 			<CharacterEditButton
 				character={character}
 				open={editOpen}
 				onOpenChange={setEditOpen}
-				trigger={null}
+				trigger={<span className="hidden" />}
 			/>
-		</>
+		</Link>
 	);
 }
 
