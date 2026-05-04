@@ -1,3 +1,4 @@
+import type { LucideIcon } from "lucide-react";
 import {
 	BookOpen,
 	History,
@@ -10,7 +11,6 @@ import {
 	User,
 	Users,
 } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
 import {
 	type ActivityAction,
 	ENTITY_LABELS,

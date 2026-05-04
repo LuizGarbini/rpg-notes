@@ -59,7 +59,10 @@ export type EntityKind =
 	| "location"
 	| "lore";
 
-export const ENTITY_LABELS: Record<EntityKind, { singular: string; plural: string }> = {
+export const ENTITY_LABELS: Record<
+	EntityKind,
+	{ singular: string; plural: string }
+> = {
 	character: { singular: "Personagem", plural: "Personagens" },
 	npc: { singular: "NPC", plural: "NPCs" },
 	session: { singular: "Sessão", plural: "Sessões" },
@@ -467,7 +470,9 @@ export const loreDefaults: Omit<Lore, "id" | "createdAt"> = {
 // =====================================================
 interface RPGState {
 	characters: Character[];
-	addCharacter: (character: Partial<Omit<Character, "id" | "createdAt">>) => Character;
+	addCharacter: (
+		character: Partial<Omit<Character, "id" | "createdAt">>,
+	) => Character;
 	updateCharacter: (id: string, character: Partial<Character>) => void;
 	removeCharacter: (id: string) => void;
 
@@ -541,7 +546,10 @@ export const useRPGStore = create<RPGState>()(
 			// ----- Characters -----
 			characters: [],
 			addCharacter: (character) => {
-				const created = generateEntry(characterDefaults, character) as Character;
+				const created = generateEntry(
+					characterDefaults,
+					character,
+				) as Character;
 				set((state) => ({
 					characters: [...state.characters, created],
 					activityLog: pushLog(state.activityLog, {
@@ -727,7 +735,10 @@ export const useRPGStore = create<RPGState>()(
 			// ----- Locations -----
 			locations: [],
 			addLocation: (location) => {
-				const created = generateEntry(locationDefaults, location) as GameLocation;
+				const created = generateEntry(
+					locationDefaults,
+					location,
+				) as GameLocation;
 				set((state) => ({
 					locations: [...state.locations, created],
 					activityLog: pushLog(state.activityLog, {
@@ -745,9 +756,7 @@ export const useRPGStore = create<RPGState>()(
 					if (!existing) return state;
 					const updated = { ...existing, ...location, updatedAt: Date.now() };
 					return {
-						locations: state.locations.map((l) =>
-							l.id === id ? updated : l,
-						),
+						locations: state.locations.map((l) => (l.id === id ? updated : l)),
 						activityLog: pushLog(state.activityLog, {
 							action: "update",
 							entityKind: "location",
@@ -845,17 +854,26 @@ export const useRPGStore = create<RPGState>()(
 						...characterDefaults,
 						...c,
 					})) as Character[],
-					npcs: (old.npcs ?? []).map((n) => ({ ...npcDefaults, ...n })) as Npc[],
+					npcs: (old.npcs ?? []).map((n) => ({
+						...npcDefaults,
+						...n,
+					})) as Npc[],
 					sessions: (old.sessions ?? []).map((s) => ({
 						...sessionDefaults,
 						...s,
 					})) as Session[],
-					items: (old.items ?? []).map((i) => ({ ...itemDefaults, ...i })) as Item[],
+					items: (old.items ?? []).map((i) => ({
+						...itemDefaults,
+						...i,
+					})) as Item[],
 					locations: (old.locations ?? []).map((l) => ({
 						...locationDefaults,
 						...l,
 					})) as GameLocation[],
-					lores: (old.lores ?? []).map((l) => ({ ...loreDefaults, ...l })) as Lore[],
+					lores: (old.lores ?? []).map((l) => ({
+						...loreDefaults,
+						...l,
+					})) as Lore[],
 					activityLog: old.activityLog ?? [],
 				} as RPGState;
 			},

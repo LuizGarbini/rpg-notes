@@ -9,7 +9,10 @@ interface LoreCardProps {
 	lore: Lore;
 }
 
-const importanceStyles: Record<string, { tone: string; ring: string; label: string }> = {
+const importanceStyles: Record<
+	string,
+	{ tone: string; ring: string; label: string }
+> = {
 	minor: {
 		tone: "text-muted-foreground",
 		ring: "ring-border",
@@ -36,7 +39,8 @@ export function LoreCard({ lore }: LoreCardProps) {
 	const removeLore = useRPGStore((s) => s.removeLore);
 	const [editOpen, setEditOpen] = useState(false);
 
-	const importance = importanceStyles[lore.importance] ?? importanceStyles.supporting;
+	const importance =
+		importanceStyles[lore.importance] ?? importanceStyles.supporting;
 	const tags = lore.tags
 		? lore.tags
 				.split(",")

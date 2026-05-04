@@ -1,5 +1,5 @@
 import { ArrowLeft, FileText, Pencil, Plus } from "lucide-react";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { type ReactNode, useEffect, useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import {
 	abilityModifier,
@@ -10,6 +10,8 @@ import {
 	useRPGStore,
 } from "@/lib/store";
 import { type CharacterSection, SYSTEM_CONFIG } from "@/lib/systems";
+import { ImageUploader } from "./image-uploader";
+import { SystemPicker } from "./system-picker";
 import { Button } from "./ui/button";
 import {
 	Dialog,
@@ -20,10 +22,8 @@ import {
 	DialogTrigger,
 } from "./ui/dialog";
 import { Field, FormSection, FormTabs } from "./ui/form-tabs";
-import { ImageUploader } from "./image-uploader";
 import { Input } from "./ui/input";
 import { Select } from "./ui/select";
-import { SystemPicker } from "./system-picker";
 import { Textarea } from "./ui/textarea";
 
 // =====================================================
@@ -31,7 +31,9 @@ import { Textarea } from "./ui/textarea";
 // =====================================================
 type CharacterFormValues = Omit<Character, "id" | "createdAt" | "updatedAt">;
 
-function buildDefaults(overrides?: Partial<CharacterFormValues>): CharacterFormValues {
+function buildDefaults(
+	overrides?: Partial<CharacterFormValues>,
+): CharacterFormValues {
 	return { ...characterDefaults, ...overrides };
 }
 
@@ -124,7 +126,8 @@ function CharacterFormDialog({
 	const updateCharacter = useRPGStore((s) => s.updateCharacter);
 
 	const [step, setStep] = useState<DialogStep>(isEdit ? "form" : "intro");
-	const [activeSection, setActiveSection] = useState<CharacterSection>("identity");
+	const [activeSection, setActiveSection] =
+		useState<CharacterSection>("identity");
 
 	const form = useForm<CharacterFormValues>({
 		defaultValues: buildDefaults(character ?? undefined),
@@ -356,9 +359,7 @@ function CharacterFormDialog({
 						config={config}
 					/>
 				)}
-				{activeSection === "sanity" && (
-					<SanitySection register={register} />
-				)}
+				{activeSection === "sanity" && <SanitySection register={register} />}
 				{activeSection === "combat" && (
 					<CombatSection register={register} config={config} />
 				)}
@@ -368,9 +369,7 @@ function CharacterFormDialog({
 				{activeSection === "magic" && config.showSpells && (
 					<MagicSection register={register} />
 				)}
-				{activeSection === "notes" && (
-					<NotesSection register={register} />
-				)}
+				{activeSection === "notes" && <NotesSection register={register} />}
 			</div>
 
 			<div className="flex items-center justify-between gap-2 border-t border-border bg-card-elevated/40 px-6 py-3">
@@ -459,15 +458,15 @@ function IdentitySection({
 						<Input placeholder="Guerreiro, Mago..." {...register("class")} />
 					</Field>
 					<Field label="Subclasse / Caminho">
-						<Input
-							placeholder="Domínio da Vida..."
-							{...register("subclass")}
-						/>
+						<Input placeholder="Domínio da Vida..." {...register("subclass")} />
 					</Field>
 				</div>
 				<div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
 					<Field label="Antecedente / Background">
-						<Input placeholder="Charlatão, Sábio..." {...register("background")} />
+						<Input
+							placeholder="Charlatão, Sábio..."
+							{...register("background")}
+						/>
 					</Field>
 					<Field label="Nível">
 						<Input
@@ -490,9 +489,7 @@ function IdentitySection({
 			<FormSection title="Aparência">
 				<ImageUploader
 					value={imageUrl ?? ""}
-					onChange={(url) =>
-						setValue("imageUrl", url, { shouldDirty: true })
-					}
+					onChange={(url) => setValue("imageUrl", url, { shouldDirty: true })}
 					label="Avatar do personagem"
 					folder="characters"
 					size="lg"
@@ -542,7 +539,12 @@ function AbilitiesSection({
 		label: string;
 		name: keyof Pick<
 			CharacterFormValues,
-			"strength" | "dexterity" | "constitution" | "intelligence" | "wisdom" | "charisma"
+			| "strength"
+			| "dexterity"
+			| "constitution"
+			| "intelligence"
+			| "wisdom"
+			| "charisma"
 		>;
 	}> = [
 		{ label: config.abilityLabels[0], name: "strength" },
@@ -577,14 +579,20 @@ function AbilitiesSection({
 			</FormSection>
 
 			<FormSection title="Proficiências">
-				<Field label="Salvaguardas proficientes" hint="Separe por vírgula. Ex: FOR, CON">
+				<Field
+					label="Salvaguardas proficientes"
+					hint="Separe por vírgula. Ex: FOR, CON"
+				>
 					<Input placeholder="FOR, DES..." {...register("savingThrows")} />
 				</Field>
 				<Field
 					label="Perícias treinadas"
 					hint="Ex: Atletismo, Furtividade, Persuasão"
 				>
-					<Input placeholder="Atletismo, Furtividade..." {...register("skills")} />
+					<Input
+						placeholder="Atletismo, Furtividade..."
+						{...register("skills")}
+					/>
 				</Field>
 				<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
 					<Field label="Idiomas">
@@ -610,7 +618,10 @@ function SanitySection({ register }: { register: RegisterFn }) {
 		>
 			<div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
 				<Field label="Poder (POW)">
-					<Input type="number" {...register("power", { valueAsNumber: true })} />
+					<Input
+						type="number"
+						{...register("power", { valueAsNumber: true })}
+					/>
 				</Field>
 				<Field label="Tamanho (SIZ)">
 					<Input type="number" {...register("size", { valueAsNumber: true })} />
@@ -622,7 +633,10 @@ function SanitySection({ register }: { register: RegisterFn }) {
 					/>
 				</Field>
 				<Field label="Sanidade Atual">
-					<Input type="number" {...register("sanity", { valueAsNumber: true })} />
+					<Input
+						type="number"
+						{...register("sanity", { valueAsNumber: true })}
+					/>
 				</Field>
 				<Field label="Sanidade Máxima">
 					<Input
@@ -646,7 +660,10 @@ function CombatSection({
 		<FormSection title="Status de Combate">
 			<div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
 				<Field label="HP Atual">
-					<Input type="number" {...register("health", { valueAsNumber: true })} />
+					<Input
+						type="number"
+						{...register("health", { valueAsNumber: true })}
+					/>
 				</Field>
 				<Field label="HP Máximo">
 					<Input
@@ -761,7 +778,10 @@ function MagicSection({ register }: { register: RegisterFn }) {
 						className="sm:col-span-2"
 						hint="Ex: Nv1: 4 / Nv2: 3"
 					>
-						<Input placeholder="Nv1: 4 / Nv2: 3..." {...register("spellSlots")} />
+						<Input
+							placeholder="Nv1: 4 / Nv2: 3..."
+							{...register("spellSlots")}
+						/>
 					</Field>
 				</div>
 				<Field label="Magias preparadas / conhecidas">
@@ -810,7 +830,12 @@ interface AbilityFieldProps {
 	label: string;
 	name: keyof Pick<
 		CharacterFormValues,
-		"strength" | "dexterity" | "constitution" | "intelligence" | "wisdom" | "charisma"
+		| "strength"
+		| "dexterity"
+		| "constitution"
+		| "intelligence"
+		| "wisdom"
+		| "charisma"
 	>;
 	register: RegisterFn;
 	control: ControlFn;

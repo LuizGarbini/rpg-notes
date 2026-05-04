@@ -1,4 +1,4 @@
-import { clsx, type ClassValue } from "clsx";
+import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -9,7 +9,10 @@ export function cn(...inputs: ClassValue[]) {
  * Tempo relativo curto em PT-BR ("há 2min", "há 3h", "ontem", "12/03").
  * Útil para o activity log.
  */
-export function formatRelativeTime(timestamp: number, now: number = Date.now()): string {
+export function formatRelativeTime(
+	timestamp: number,
+	now: number = Date.now(),
+): string {
 	const diff = Math.max(0, now - timestamp);
 	const seconds = Math.floor(diff / 1000);
 	const minutes = Math.floor(seconds / 60);

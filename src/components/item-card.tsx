@@ -9,14 +9,25 @@ interface ItemCardProps {
 	item: Item;
 }
 
-const rarityStyles: Record<string, { tone: string; ring: string; glow: string }> = {
-	comum: { tone: "text-slate-300", ring: "ring-border", glow: "from-slate-500/10" },
+const rarityStyles: Record<
+	string,
+	{ tone: string; ring: string; glow: string }
+> = {
+	comum: {
+		tone: "text-slate-300",
+		ring: "ring-border",
+		glow: "from-slate-500/10",
+	},
 	incomum: {
 		tone: "text-emerald-300",
 		ring: "ring-emerald-500/30",
 		glow: "from-emerald-500/15",
 	},
-	raro: { tone: "text-blue-300", ring: "ring-blue-500/30", glow: "from-blue-500/15" },
+	raro: {
+		tone: "text-blue-300",
+		ring: "ring-blue-500/30",
+		glow: "from-blue-500/15",
+	},
 	"muito raro": {
 		tone: "text-fuchsia-300",
 		ring: "ring-fuchsia-500/30",
@@ -113,7 +124,9 @@ export function ItemCard({ item }: ItemCardProps) {
 					{item.weight && (
 						<MiniInfo Icon={Weight} label="Peso" value={item.weight} />
 					)}
-					{item.value && <MiniInfo Icon={Coins} label="Valor" value={item.value} />}
+					{item.value && (
+						<MiniInfo Icon={Coins} label="Valor" value={item.value} />
+					)}
 					{item.charges && (
 						<MiniInfo Icon={Gem} label="Cargas" value={item.charges} />
 					)}
