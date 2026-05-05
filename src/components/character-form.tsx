@@ -10,9 +10,6 @@ import {
 	useRPGStore,
 } from "@/lib/store";
 import { type CharacterSection, SYSTEM_CONFIG } from "@/lib/systems";
-import { ArrowLeft, Pencil, Plus } from "lucide-react";
-import { type ReactNode, useEffect, useMemo, useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
 import { ImageUploader } from "./image-uploader";
 import { SystemPicker } from "./system-picker";
 import { Button } from "./ui/button";
