@@ -1,7 +1,6 @@
 import {
 	Bell,
 	CheckCircle2,
-	Command,
 	CreditCard,
 	Info,
 	LogOut,
