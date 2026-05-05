@@ -2,8 +2,8 @@ import {
 	Bell,
 	CheckCircle2,
 	CreditCard,
-	Info,
 	House,
+	Info,
 	LogOut,
 	PanelLeftClose,
 	PanelLeftOpen,
@@ -11,6 +11,9 @@ import {
 	Settings,
 	User,
 } from "lucide-react";
+import { useAuth } from "@/lib/auth";
+import { cn } from "@/lib/utils";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button, buttonVariants } from "./ui/button";
 import {
 	DropdownMenu,
@@ -22,9 +25,6 @@ import {
 	DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { cn } from "@/lib/utils";
-import { useAuth } from "@/lib/auth";
 
 interface AppHeaderProps {
 	isSidebarOpen: boolean;
@@ -33,7 +33,11 @@ interface AppHeaderProps {
 
 export function AppHeader({ isSidebarOpen, onToggleSidebar }: AppHeaderProps) {
 	const { user, signOut } = useAuth();
-	const userName = (user?.user_metadata?.name as string) || "Aventureiro";
+	const metadataName = user?.user_metadata?.name;
+	const userName =
+		typeof metadataName === "string" && metadataName.trim()
+			? metadataName
+			: "Aventureiro";
 	const userEmail = user?.email || "grimoire@rpg.notes";
 	const initials = userName
 		.split(" ")
@@ -57,21 +61,23 @@ export function AppHeader({ isSidebarOpen, onToggleSidebar }: AppHeaderProps) {
 					)}
 				</Button>
 
-				<div className="hidden h-4 w-[1px] bg-border/40 sm:block" />
+				<div className="hidden h-4 w-px bg-border/40 sm:block" />
 				<div className="hidden items-center gap-2 px-2 sm:flex">
 					<House className="h-3.5 w-3.5 text-muted-foreground" />
-					<span className="text-[13px] font-medium text-foreground">Dashboard</span>
+					<span className="text-[13px] font-medium text-foreground">
+						Dashboard
+					</span>
 				</div>
 
 				<div className="hidden flex-1 items-center justify-center md:flex">
 					<div className="relative w-full max-w-sm">
-					<Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-					<div className="flex h-9 w-full items-center gap-2 rounded-md border border-input bg-background/50 px-8 text-[13px] text-muted-foreground transition-all focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/30">
-						<span>Pesquisar no Grimório...</span>
-						<kbd className="pointer-events-none ml-auto hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
-							<span className="text-xs">⌘</span>K
-						</kbd>
-					</div>
+						<Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+						<div className="flex h-9 w-full items-center gap-2 rounded-md border border-input bg-background/50 px-8 text-[13px] text-muted-foreground transition-all focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/30">
+							<span>Pesquisar no Grimório...</span>
+							<kbd className="pointer-events-none ml-auto hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
+								<span className="text-xs">⌘</span>K
+							</kbd>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -92,7 +98,10 @@ export function AppHeader({ isSidebarOpen, onToggleSidebar }: AppHeaderProps) {
 							<span className="text-xs font-bold uppercase tracking-wider text-foreground">
 								Notificações
 							</span>
-							<button className="text-[10px] font-bold text-primary hover:underline">
+							<button
+								type="button"
+								className="text-[10px] font-bold text-primary hover:underline"
+							>
 								Marcar todas como lidas
 							</button>
 						</div>
@@ -113,7 +122,7 @@ export function AppHeader({ isSidebarOpen, onToggleSidebar }: AppHeaderProps) {
 					</PopoverContent>
 				</Popover>
 
-				<div className="h-4 w-[1px] bg-border/40 mx-1" />
+				<div className="h-4 w-px bg-border/40 mx-1" />
 
 				<DropdownMenu>
 					<DropdownMenuTrigger
@@ -167,14 +176,7 @@ export function AppHeader({ isSidebarOpen, onToggleSidebar }: AppHeaderProps) {
 						<DropdownMenuSeparator className="bg-border/50" />
 						<DropdownMenuItem
 							variant="destructive"
-							onSelect={() => {
-								console.log("Logout selecionado via onSelect");
-								signOut();
-							}}
-							onClick={() => {
-								console.log("Logout clicado via onClick");
-								signOut();
-							}}
+							onSelect={() => void signOut()}
 							className="gap-2 text-xs font-bold cursor-pointer"
 						>
 							<LogOut className="h-3.5 w-3.5" />
@@ -192,7 +194,12 @@ function NotificationItem({
 	time,
 	title,
 	description,
-}: { icon: React.ReactNode; time: string; title: string; description: string }) {
+}: {
+	icon: React.ReactNode;
+	time: string;
+	title: string;
+	description: string;
+}) {
 	return (
 		<div className="flex gap-3 border-b border-border/40 p-3 transition-colors hover:bg-muted/30">
 			<div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-background/50 ring-1 ring-border/60">
