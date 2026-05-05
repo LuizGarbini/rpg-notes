@@ -37,7 +37,7 @@ export function Sidebar({ isOpen }: SidebarProps) {
 
 	return (
 		<aside
-			className={`relative flex h-full shrink-0 flex-col overflow-hidden rounded-xl border border-border/60 bg-sidebar/40 shadow-2xl shadow-black/20 backdrop-blur-xl transition-all duration-300 ease-in-out ${
+			className={`flex h-full shrink-0 flex-col overflow-hidden bg-transparent transition-all duration-300 ease-in-out ${
 				isOpen ? "w-[240px]" : "w-[64px]"
 			}`}
 		>
