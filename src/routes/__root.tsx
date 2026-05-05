@@ -4,12 +4,12 @@ import {
 	useLocation,
 	useNavigate,
 } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Sidebar } from "@/components/sidebar";
+import { AppHeader } from "@/components/app-header";
+import { NotFound } from "@/components/not-found";
 import { AuthProvider, useAuth } from "@/lib/auth";
 import { useRPGStore } from "@/lib/store";
-// import { TanStackDevtools } from "@tanstack/react-devtools";
-// import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 
 export const Route = createRootRoute({
 	component: RootLayout,
@@ -28,7 +28,6 @@ function RootContent() {
 	const location = useLocation();
 	const isLanding = location.pathname === "/";
 	const isAuth = location.pathname === "/auth";
-	const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
 	if (isLanding || isAuth) {
 		return <Outlet />;
@@ -44,6 +43,7 @@ function ProtectedLayout() {
 	const clearLocalData = useRPGStore((s) => s.clearLocalData);
 	const isLoadingRemote = useRPGStore((s) => s.isLoadingRemote);
 	const syncError = useRPGStore((s) => s.syncError);
+	const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
 	useEffect(() => {
 		if (loading) return;
@@ -66,28 +66,23 @@ function ProtectedLayout() {
 	return (
 		<div className="relative flex min-h-screen">
 			<div className="pointer-events-none fixed inset-0 -z-10 arcane-grid opacity-[0.07]" />
-			<Sidebar />
-			<main className="relative z-10 flex-1">
-				{(isLoadingRemote || syncError) && (
-					<div className="border-b border-border bg-card-elevated/60 px-6 py-2 text-[12px] text-muted-foreground">
-						{syncError
-							? `Falha ao sincronizar: ${syncError}`
-							: "Sincronizando dados do Supabase..."}
-					</div>
-				)}
-				<Outlet />
-			</main>
-			{/* <TanStackDevtools
-				config={{
-					position: "bottom-right",
-				}}
-				plugins={[
-					{
-						name: "Tanstack Router",
-						render: <TanStackRouterDevtoolsPanel />,
-					},
-				]}
-			/> */}
+			<Sidebar isOpen={isSidebarOpen} />
+			<div className="flex flex-1 flex-col">
+				<AppHeader
+					isSidebarOpen={isSidebarOpen}
+					onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+				/>
+				<main className="relative z-10 flex-1">
+					{(isLoadingRemote || syncError) && (
+						<div className="border-b border-border bg-card-elevated/60 px-6 py-2 text-[12px] text-muted-foreground">
+							{syncError
+								? `Falha ao sincronizar: ${syncError}`
+								: "Sincronizando dados do Supabase..."}
+						</div>
+					)}
+					<Outlet />
+				</main>
+			</div>
 		</div>
 	);
 }
