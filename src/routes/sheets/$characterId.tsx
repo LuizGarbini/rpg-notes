@@ -1,3 +1,14 @@
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+	abilityModifier,
+	type Character,
+	formatModifier,
+	systemLabel,
+	useRPGStore,
+} from "@/lib/store";
+import { SYSTEM_CONFIG, type SystemConfig } from "@/lib/systems";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
 	ArrowLeft,
@@ -67,7 +78,7 @@ function CharacterSheetPage() {
 				<h2 className="font-display text-lg text-muted-foreground">
 					Personagem não encontrado
 				</h2>
-				<Link to="/sheets">
+				<Link to="/characters">
 					<Button variant="ghost" size="sm">
 						<ArrowLeft className="h-3.5 w-3.5" />
 						Voltar para Fichas

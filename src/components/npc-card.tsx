@@ -55,7 +55,7 @@ export function NpcCard({ npc }: NpcCardProps) {
 		dispositionStyles[npc.disposition] ?? dispositionStyles.neutral;
 
 	return (
-		<>
+		<div className="flex flex-col">
 			<div className="group relative flex flex-col rounded-xl border border-border bg-card-elevated p-4 transition-colors hover:border-border-hover">
 				<EntityActions
 					onEdit={() => setEditOpen(true)}
@@ -131,6 +131,6 @@ export function NpcCard({ npc }: NpcCardProps) {
 				onOpenChange={setEditOpen}
 				trigger={null}
 			/>
-		</>
+		</div>
 	);
 }

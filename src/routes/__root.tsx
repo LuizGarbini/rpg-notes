@@ -13,6 +13,7 @@ import { useRPGStore } from "@/lib/store";
 
 export const Route = createRootRoute({
 	component: RootLayout,
+	notFoundComponent: NotFound,
 });
 
 function RootLayout() {
@@ -27,6 +28,7 @@ function RootContent() {
 	const location = useLocation();
 	const isLanding = location.pathname === "/";
 	const isAuth = location.pathname === "/auth";
+	const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
 	if (isLanding || isAuth) {
 		return <Outlet />;

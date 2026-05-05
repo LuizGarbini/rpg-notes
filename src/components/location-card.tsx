@@ -30,7 +30,7 @@ export function LocationCard({ location }: LocationCardProps) {
 	const hasImage = !!location.imageUrl;
 
 	return (
-		<>
+		<div className="flex flex-col">
 			<div
 				className={`group relative flex flex-col overflow-hidden rounded-xl border border-border bg-card-elevated transition-colors hover:border-border-hover ${danger.ring}`}
 			>
@@ -111,7 +111,7 @@ export function LocationCard({ location }: LocationCardProps) {
 				onOpenChange={setEditOpen}
 				trigger={null}
 			/>
-		</>
+		</div>
 	);
 }
 

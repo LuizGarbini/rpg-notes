@@ -90,27 +90,20 @@ function Dashboard() {
 	)[0];
 
 	return (
-		<div className="w-full">
-			{/* Compact header */}
-			<header className="border-b border-border/70 px-6 py-5">
-				<div className="flex items-end justify-between gap-6">
-					<div>
-						<div className="text-[10px] font-semibold uppercase tracking-[0.25em] text-muted-foreground">
-							Visão Geral
-						</div>
-						<h1 className="mt-1 font-display text-2xl font-bold tracking-tight">
-							<span className="text-gradient-primary">Dashboard</span>
-						</h1>
-					</div>
-					<div className="hidden items-center gap-1.5 text-[11px] text-muted-foreground sm:flex">
-						<span className="inline-block h-1.5 w-1.5 rounded-full bg-primary" />
-						{totalEntries} {totalEntries === 1 ? "registro" : "registros"} no
-						grimório
-					</div>
+		<div className="w-full space-y-8 px-6 py-8">
+			{/* Welcome banner */}
+			<div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-linear-to-br from-primary/10 via-background to-background p-8 ring-1 ring-primary/10">
+				<div className="relative z-10">
+					<h1 className="font-display text-3xl font-bold tracking-tight text-foreground">
+						Bem-vindo ao seu <span className="text-gradient-primary">Grimório</span>
+					</h1>
+					<p className="mt-2 max-w-lg text-[15px] leading-relaxed text-muted-foreground">
+						Você tem {totalEntries} registros documentados nesta campanha.
+						Continue sua jornada épica.
+					</p>
 				</div>
-			</header>
-
-			<div className="space-y-6 px-6 py-6">
+				<div className="absolute -right-8 -top-8 h-48 w-48 rounded-full bg-primary/10 blur-3xl" />
+			</div>
 				{/* Stat row */}
 				<div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-6">
 					{sections.map((s) => (
@@ -191,7 +184,6 @@ function Dashboard() {
 					</aside>
 				</div>
 			</div>
-		</div>
 	);
 }
 

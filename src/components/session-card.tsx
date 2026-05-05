@@ -14,7 +14,7 @@ export function SessionCard({ session }: SessionCardProps) {
 	const [editOpen, setEditOpen] = useState(false);
 
 	return (
-		<>
+		<div className="flex flex-col">
 			<div className="group relative flex flex-col rounded-xl border border-border bg-card-elevated p-4 transition-colors hover:border-border-hover">
 				<EntityActions
 					onEdit={() => setEditOpen(true)}
@@ -95,6 +95,6 @@ export function SessionCard({ session }: SessionCardProps) {
 				onOpenChange={setEditOpen}
 				trigger={null}
 			/>
-		</>
+		</div>
 	);
 }
