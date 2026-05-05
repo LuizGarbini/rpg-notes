@@ -1,3 +1,4 @@
+import { useNavigate } from "@tanstack/react-router";
 import {
 	Bell,
 	CheckCircle2,
@@ -11,7 +12,10 @@ import {
 	Settings,
 	User,
 } from "lucide-react";
+import { type ReactNode, useState } from "react";
+import { useToast } from "@/components/ui/toast";
 import { useAuth } from "@/lib/auth";
+import { useRPGStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button, buttonVariants } from "./ui/button";
@@ -33,6 +37,10 @@ interface AppHeaderProps {
 
 export function AppHeader({ isSidebarOpen, onToggleSidebar }: AppHeaderProps) {
 	const { user, signOut } = useAuth();
+	const clearLocalData = useRPGStore((state) => state.clearLocalData);
+	const navigate = useNavigate();
+	const toast = useToast();
+	const [isSigningOut, setIsSigningOut] = useState(false);
 	const metadataName = user?.user_metadata?.name;
 	const userName =
 		typeof metadataName === "string" && metadataName.trim()
@@ -45,6 +53,29 @@ export function AppHeader({ isSidebarOpen, onToggleSidebar }: AppHeaderProps) {
 		.join("")
 		.toUpperCase()
 		.slice(0, 2);
+
+	async function handleSignOut() {
+		if (isSigningOut) return;
+		setIsSigningOut(true);
+		const error = await signOut();
+		setIsSigningOut(false);
+
+		if (error) {
+			toast.error({
+				title: "Não foi possível sair",
+				description: error,
+			});
+			return;
+		}
+
+		clearLocalData();
+		toast.success({
+			title: "Sessão encerrada",
+			description: "Você saiu do seu grimório com segurança.",
+		});
+		await navigate({ to: "/auth", replace: true });
+	}
+
 	return (
 		<header className="sticky top-0 z-50 flex h-14 w-full items-center justify-between border-b border-border/40 bg-background/20 px-6 backdrop-blur-md">
 			<div className="flex flex-1 items-center gap-4">
@@ -176,11 +207,12 @@ export function AppHeader({ isSidebarOpen, onToggleSidebar }: AppHeaderProps) {
 						<DropdownMenuSeparator className="bg-border/50" />
 						<DropdownMenuItem
 							variant="destructive"
-							onSelect={() => void signOut()}
+							onClick={() => void handleSignOut()}
+							disabled={isSigningOut}
 							className="gap-2 text-xs font-bold cursor-pointer"
 						>
 							<LogOut className="h-3.5 w-3.5" />
-							<span>Sair do Grimório</span>
+							<span>{isSigningOut ? "Saindo..." : "Sair do Grimório"}</span>
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
@@ -195,7 +227,7 @@ function NotificationItem({
 	title,
 	description,
 }: {
-	icon: React.ReactNode;
+	icon: ReactNode;
 	time: string;
 	title: string;
 	description: string;

@@ -19,7 +19,7 @@ interface AuthContextValue {
 		email: string,
 		password: string,
 	) => Promise<string | null>;
-	signOut: () => Promise<void>;
+	signOut: () => Promise<string | null>;
 	resetPassword: (email: string) => Promise<string | null>;
 	updatePassword: (password: string) => Promise<string | null>;
 }
@@ -83,8 +83,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 				return error?.message ?? null;
 			},
 			signOut: async () => {
-				if (!supabase) return;
-				await supabase.auth.signOut();
+				if (!supabase) {
+					setSession(null);
+					return null;
+				}
+				const { error } = await supabase.auth.signOut();
+				if (error) return error.message;
+				setSession(null);
+				return null;
 			},
 			resetPassword: async (email) => {
 				if (!supabase) return "Supabase não está configurado.";
