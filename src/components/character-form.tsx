@@ -1,3 +1,6 @@
+import { ArrowLeft, FileText, Pencil, Plus } from "lucide-react";
+import { useEffect, useId, useMemo, useState, type ReactNode } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import {
 	abilityModifier,
 	type Character,
@@ -125,9 +128,11 @@ function CharacterFormDialog({
 	const addCharacter = useRPGStore((s) => s.addCharacter);
 	const updateCharacter = useRPGStore((s) => s.updateCharacter);
 
-	const [step, setStep] = useState<DialogStep>(isEdit ? "form" : "system");
-	const [activeSection, setActiveSection] =
-		useState<CharacterSection>("identity");
+	const [step, setStep] = useState<DialogStep>(isEdit ? "form" : "intro");
+	const [activeSection, setActiveSection] = useState<CharacterSection>("identity");
+	const introNameId = useId();
+	const systemSelectId = useId();
+	const playerNameId = useId();
 
 	const form = useForm<CharacterFormValues>({
 		defaultValues: buildDefaults(character ?? undefined),
