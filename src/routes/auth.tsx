@@ -1,12 +1,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, Eye, EyeOff, Swords } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/auth")({
 	component: AuthPage,
@@ -34,10 +35,20 @@ const registerSchema = z
 type LoginValues = z.infer<typeof loginSchema>;
 type RegisterValues = z.infer<typeof registerSchema>;
 
+const AUTH_PARTICLES = [0, 1, 2, 3, 4];
+
 /* ─── Page ─── */
 
 function AuthPage() {
 	const [mode, setMode] = useState<"login" | "register">("login");
+	const { session, loading } = useAuth();
+	const navigate = useNavigate();
+
+	useEffect(() => {
+		if (!loading && session) {
+			void navigate({ to: "/dashboard", replace: true });
+		}
+	}, [loading, navigate, session]);
 
 	return (
 		<div className="relative flex min-h-screen items-center justify-center overflow-hidden px-4">
@@ -55,9 +66,9 @@ function AuthPage() {
 
 			{/* Floating particles */}
 			<div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-				{[...Array(5)].map((_, i) => (
+				{AUTH_PARTICLES.map((i) => (
 					<div
-						key={i}
+						key={`auth-particle-${i}`}
 						className="absolute h-1 w-1 rounded-full bg-primary/30"
 						style={{
 							left: `${10 + i * 20}%`,
@@ -133,7 +144,11 @@ function AuthPage() {
 
 function LoginForm() {
 	const navigate = useNavigate();
+	const { signIn } = useAuth();
 	const [showPw, setShowPw] = useState(false);
+	const [authError, setAuthError] = useState<string | null>(null);
+	const emailId = useId();
+	const passwordId = useId();
 
 	const {
 		register,
@@ -143,8 +158,13 @@ function LoginForm() {
 		resolver: zodResolver(loginSchema),
 	});
 
-	function onSubmit(data: LoginValues) {
-		console.log("Login:", data);
+	async function onSubmit(data: LoginValues) {
+		setAuthError(null);
+		const error = await signIn(data.email, data.password);
+		if (error) {
+			setAuthError(error);
+			return;
+		}
 		navigate({ to: "/dashboard" });
 	}
 
@@ -160,9 +180,9 @@ function LoginForm() {
 			</div>
 
 			<div className="space-y-1.5">
-				<Label htmlFor="login-email">Email</Label>
+				<Label htmlFor={emailId}>Email</Label>
 				<Input
-					id="login-email"
+					id={emailId}
 					type="email"
 					placeholder="seu@email.com"
 					{...register("email")}
@@ -174,10 +194,10 @@ function LoginForm() {
 			</div>
 
 			<div className="space-y-1.5">
-				<Label htmlFor="login-password">Senha</Label>
+				<Label htmlFor={passwordId}>Senha</Label>
 				<div className="relative">
 					<Input
-						id="login-password"
+						id={passwordId}
 						type={showPw ? "text" : "password"}
 						placeholder="••••••••"
 						{...register("password")}
@@ -202,6 +222,7 @@ function LoginForm() {
 					</p>
 				)}
 			</div>
+			{authError && <p className="text-[12px] text-destructive">{authError}</p>}
 
 			<div className="flex justify-end">
 				<button
@@ -228,8 +249,14 @@ function LoginForm() {
 
 function RegisterForm() {
 	const navigate = useNavigate();
+	const { signUp } = useAuth();
 	const [showPw, setShowPw] = useState(false);
 	const [showConfirm, setShowConfirm] = useState(false);
+	const [authError, setAuthError] = useState<string | null>(null);
+	const nameId = useId();
+	const emailId = useId();
+	const passwordId = useId();
+	const confirmPasswordId = useId();
 
 	const {
 		register,
@@ -239,8 +266,13 @@ function RegisterForm() {
 		resolver: zodResolver(registerSchema),
 	});
 
-	function onSubmit(data: RegisterValues) {
-		console.log("Register:", data);
+	async function onSubmit(data: RegisterValues) {
+		setAuthError(null);
+		const error = await signUp(data.name, data.email, data.password);
+		if (error) {
+			setAuthError(error);
+			return;
+		}
 		navigate({ to: "/dashboard" });
 	}
 
@@ -256,9 +288,9 @@ function RegisterForm() {
 			</div>
 
 			<div className="space-y-1.5">
-				<Label htmlFor="register-name">Nome</Label>
+				<Label htmlFor={nameId}>Nome</Label>
 				<Input
-					id="register-name"
+					id={nameId}
 					placeholder="Seu nome de aventureiro"
 					{...register("name")}
 					aria-invalid={!!errors.name}
@@ -269,9 +301,9 @@ function RegisterForm() {
 			</div>
 
 			<div className="space-y-1.5">
-				<Label htmlFor="register-email">Email</Label>
+				<Label htmlFor={emailId}>Email</Label>
 				<Input
-					id="register-email"
+					id={emailId}
 					type="email"
 					placeholder="seu@email.com"
 					{...register("email")}
@@ -283,10 +315,10 @@ function RegisterForm() {
 			</div>
 
 			<div className="space-y-1.5">
-				<Label htmlFor="register-password">Senha</Label>
+				<Label htmlFor={passwordId}>Senha</Label>
 				<div className="relative">
 					<Input
-						id="register-password"
+						id={passwordId}
 						type={showPw ? "text" : "password"}
 						placeholder="Mínimo 6 caracteres"
 						{...register("password")}
@@ -313,10 +345,10 @@ function RegisterForm() {
 			</div>
 
 			<div className="space-y-1.5">
-				<Label htmlFor="register-confirm">Confirmar Senha</Label>
+				<Label htmlFor={confirmPasswordId}>Confirmar Senha</Label>
 				<div className="relative">
 					<Input
-						id="register-confirm"
+						id={confirmPasswordId}
 						type={showConfirm ? "text" : "password"}
 						placeholder="Repita a senha"
 						{...register("confirmPassword")}
@@ -341,6 +373,7 @@ function RegisterForm() {
 					</p>
 				)}
 			</div>
+			{authError && <p className="text-[12px] text-destructive">{authError}</p>}
 
 			<Button
 				type="submit"

@@ -5,6 +5,7 @@ import {
 	FileText,
 	HelpCircle,
 	House,
+	LogOut,
 	Map as MapIcon,
 	MessageSquareText,
 	Package,
@@ -13,7 +14,8 @@ import {
 	User,
 	Users,
 } from "lucide-react";
-import { SidebarNav } from "./sidebar-nav";
+import { useAuth } from "@/lib/auth";
+import { useRPGStore } from "@/lib/store";
 
 const grimoireItems = [
 	{ to: "/dashboard", label: "Dashboard", Icon: House },
@@ -29,12 +31,24 @@ const worldItems = [
 	{ to: "/lore", label: "Lore", Icon: BookOpen },
 ];
 
-interface SidebarProps {
-	isOpen: boolean;
-}
+export function Sidebar() {
+	const { user, signOut } = useAuth();
+	const clearLocalData = useRPGStore((s) => s.clearLocalData);
+	const displayName =
+		(typeof user?.user_metadata.name === "string" && user.user_metadata.name) ||
+		user?.email ||
+		"Aventureiro";
+	const initials = displayName
+		.split(" ")
+		.map((part) => part[0])
+		.join("")
+		.slice(0, 2)
+		.toUpperCase();
 
-export function Sidebar({ isOpen }: SidebarProps) {
-	const isCollapsed = !isOpen;
+	async function handleSignOut() {
+		clearLocalData();
+		await signOut();
+	}
 
 	return (
 		<aside
@@ -92,48 +106,29 @@ export function Sidebar({ isOpen }: SidebarProps) {
 					<SidebarNav title="Mundo" isCollapsed={isCollapsed} items={worldItems} />
 				</div>
 
-				{/* Footer / Pro Card */}
-				<div className="mt-auto space-y-4 p-3">
-					{!isCollapsed ? (
-						<div className="rounded-xl border border-primary/20 bg-primary/5 p-3 ring-1 ring-primary/10">
-							<div className="flex items-center gap-2 text-[11px] font-bold text-primary">
-								<div className="h-1.5 w-1.5 rounded-full bg-primary" />
-								Plano Pro
-							</div>
-							<p className="mt-1 text-[11px] font-medium leading-normal text-foreground/90">
-								Libere recursos exclusivos e limite ilimitado de fichas.
-							</p>
-							<button className="mt-2.5 w-full rounded-md bg-primary px-2 py-1.5 text-[11px] font-bold text-primary-foreground transition-opacity hover:opacity-90">
-								Adquirir Plano Pro
-							</button>
+				{/* User */}
+				<div className="border-t border-sidebar-border px-3 py-3">
+					<div className="flex items-center gap-2.5">
+						<div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary/15 text-[10px] font-bold text-primary ring-1 ring-primary/25">
+							{initials || "RN"}
 						</div>
-					) : (
-						<div className="flex justify-center">
-							<div className="h-2 w-2 rounded-full bg-primary animate-pulse" title="Assinar Pro" />
+						<div className="flex min-w-0 flex-1 flex-col leading-tight">
+							<span className="truncate text-[12px] font-semibold text-foreground">
+								{displayName}
+							</span>
+							<span className="truncate text-[10px] text-muted-foreground">
+								{user?.email ?? "Sessão ativa"}
+							</span>
 						</div>
-					)}
-
-					<div className="space-y-0.5 border-t border-border/60 pt-3">
-						<Link
-							to="/help"
-							title="Central de Ajuda"
-							className={`flex items-center gap-2 rounded-md text-[12px] font-medium text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground ${
-								isCollapsed ? "justify-center p-2" : "px-3 py-1.5"
-							}`}
+						<button
+							type="button"
+							onClick={handleSignOut}
+							className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+							title="Sair"
+							aria-label="Sair"
 						>
-							<HelpCircle className="h-4 w-4" />
-							{!isCollapsed && <span>Central de Ajuda</span>}
-						</Link>
-						<Link
-							to="/docs"
-							title="Feedback"
-							className={`flex items-center gap-2 rounded-md text-[12px] font-medium text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground ${
-								isCollapsed ? "justify-center p-2" : "px-3 py-1.5"
-							}`}
-						>
-							<MessageSquareText className="h-4 w-4" />
-							{!isCollapsed && <span>Feedback</span>}
-						</Link>
+							<LogOut className="h-3.5 w-3.5" />
+						</button>
 					</div>
 				</div>
 			</div>

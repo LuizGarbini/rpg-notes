@@ -1,5 +1,11 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import {
+	createRemoteActivity,
+	createRemoteEntity,
+	deleteRemoteEntity,
+	loadRemoteState,
+	updateRemoteEntity,
+} from "./remote-store";
 
 // =====================================================
 //  Sistemas suportados
@@ -469,6 +475,11 @@ export const loreDefaults: Omit<Lore, "id" | "createdAt"> = {
 //  Store
 // =====================================================
 interface RPGState {
+	isLoadingRemote: boolean;
+	syncError: string | null;
+	loadRemoteData: () => Promise<void>;
+	clearLocalData: () => void;
+
 	characters: Character[];
 	addCharacter: (
 		character: Partial<Omit<Character, "id" | "createdAt">>,
@@ -530,6 +541,14 @@ function pushLog(
 	return [next, ...log].slice(0, MAX_ACTIVITY);
 }
 
+function remoteErrorMessage(error: unknown): string {
+	if (error instanceof Error) return error.message;
+	if (typeof error === "object" && error && "message" in error) {
+		return String((error as { message: unknown }).message);
+	}
+	return "Falha ao sincronizar com o Supabase.";
+}
+
 // Pega um nome amigável de qualquer entidade (vários campos possíveis)
 function entityNameOf(e: object, fallback = "Sem nome"): string {
 	const o = e as Record<string, unknown>;
@@ -540,346 +559,451 @@ function entityNameOf(e: object, fallback = "Sem nome"): string {
 	return fallback;
 }
 
-export const useRPGStore = create<RPGState>()(
-	persist(
-		(set, get) => ({
-			// ----- Characters -----
+export const useRPGStore = create<RPGState>()((set) => ({
+	isLoadingRemote: false,
+	syncError: null,
+	loadRemoteData: async () => {
+		set({ isLoadingRemote: true, syncError: null });
+		try {
+			const remote = await loadRemoteState();
+			set({
+				characters: remote.characters.map((c) => ({
+					...characterDefaults,
+					...(c as Partial<Character>),
+				})) as Character[],
+				npcs: remote.npcs.map((n) => ({
+					...npcDefaults,
+					...(n as Partial<Npc>),
+				})) as Npc[],
+				sessions: remote.sessions.map((s) => ({
+					...sessionDefaults,
+					...(s as Partial<Session>),
+				})) as Session[],
+				items: remote.items.map((i) => ({
+					...itemDefaults,
+					...(i as Partial<Item>),
+				})) as Item[],
+				locations: remote.locations.map((l) => ({
+					...locationDefaults,
+					...(l as Partial<GameLocation>),
+				})) as GameLocation[],
+				lores: remote.lores.map((l) => ({
+					...loreDefaults,
+					...(l as Partial<Lore>),
+				})) as Lore[],
+				activityLog: remote.activityLog as ActivityEntry[],
+				isLoadingRemote: false,
+			});
+		} catch (error) {
+			set({ isLoadingRemote: false, syncError: remoteErrorMessage(error) });
+		}
+	},
+	clearLocalData: () =>
+		set({
 			characters: [],
-			addCharacter: (character) => {
-				const created = generateEntry(
-					characterDefaults,
-					character,
-				) as Character;
-				set((state) => ({
-					characters: [...state.characters, created],
-					activityLog: pushLog(state.activityLog, {
-						action: "create",
-						entityKind: "character",
-						entityId: created.id,
-						entityName: entityNameOf(created),
-					}),
-				}));
-				return created;
-			},
-			updateCharacter: (id, character) =>
-				set((state) => {
-					const existing = state.characters.find((c) => c.id === id);
-					if (!existing) return state;
-					const updated = { ...existing, ...character, updatedAt: Date.now() };
-					return {
-						characters: state.characters.map((c) =>
-							c.id === id ? updated : c,
-						),
-						activityLog: pushLog(state.activityLog, {
-							action: "update",
-							entityKind: "character",
-							entityId: id,
-							entityName: entityNameOf(updated),
-						}),
-					};
-				}),
-			removeCharacter: (id) =>
-				set((state) => {
-					const existing = state.characters.find((c) => c.id === id);
-					return {
-						characters: state.characters.filter((c) => c.id !== id),
-						activityLog: existing
-							? pushLog(state.activityLog, {
-									action: "delete",
-									entityKind: "character",
-									entityId: id,
-									entityName: entityNameOf(existing),
-								})
-							: state.activityLog,
-					};
-				}),
-
-			// ----- NPCs -----
 			npcs: [],
-			addNpc: (npc) => {
-				const created = generateEntry(npcDefaults, npc) as Npc;
-				set((state) => ({
-					npcs: [...state.npcs, created],
-					activityLog: pushLog(state.activityLog, {
-						action: "create",
-						entityKind: "npc",
-						entityId: created.id,
-						entityName: entityNameOf(created),
-					}),
-				}));
-				return created;
-			},
-			updateNpc: (id, npc) =>
-				set((state) => {
-					const existing = state.npcs.find((n) => n.id === id);
-					if (!existing) return state;
-					const updated = { ...existing, ...npc, updatedAt: Date.now() };
-					return {
-						npcs: state.npcs.map((n) => (n.id === id ? updated : n)),
-						activityLog: pushLog(state.activityLog, {
-							action: "update",
-							entityKind: "npc",
-							entityId: id,
-							entityName: entityNameOf(updated),
-						}),
-					};
-				}),
-			removeNpc: (id) =>
-				set((state) => {
-					const existing = state.npcs.find((n) => n.id === id);
-					return {
-						npcs: state.npcs.filter((c) => c.id !== id),
-						activityLog: existing
-							? pushLog(state.activityLog, {
-									action: "delete",
-									entityKind: "npc",
-									entityId: id,
-									entityName: entityNameOf(existing),
-								})
-							: state.activityLog,
-					};
-				}),
-
-			// ----- Sessions -----
 			sessions: [],
-			addSession: (session) => {
-				const created = generateEntry(sessionDefaults, session) as Session;
-				set((state) => ({
-					sessions: [...state.sessions, created],
-					activityLog: pushLog(state.activityLog, {
-						action: "create",
-						entityKind: "session",
-						entityId: created.id,
-						entityName: entityNameOf(created),
-					}),
-				}));
-				return created;
-			},
-			updateSession: (id, session) =>
-				set((state) => {
-					const existing = state.sessions.find((s) => s.id === id);
-					if (!existing) return state;
-					const updated = { ...existing, ...session, updatedAt: Date.now() };
-					return {
-						sessions: state.sessions.map((s) => (s.id === id ? updated : s)),
-						activityLog: pushLog(state.activityLog, {
-							action: "update",
-							entityKind: "session",
-							entityId: id,
-							entityName: entityNameOf(updated),
-						}),
-					};
-				}),
-			removeSession: (id) =>
-				set((state) => {
-					const existing = state.sessions.find((s) => s.id === id);
-					return {
-						sessions: state.sessions.filter((c) => c.id !== id),
-						activityLog: existing
-							? pushLog(state.activityLog, {
-									action: "delete",
-									entityKind: "session",
-									entityId: id,
-									entityName: entityNameOf(existing),
-								})
-							: state.activityLog,
-					};
-				}),
-
-			// ----- Items -----
 			items: [],
-			addItem: (item) => {
-				const created = generateEntry(itemDefaults, item) as Item;
-				set((state) => ({
-					items: [...state.items, created],
-					activityLog: pushLog(state.activityLog, {
-						action: "create",
-						entityKind: "item",
-						entityId: created.id,
-						entityName: entityNameOf(created),
-					}),
-				}));
-				return created;
-			},
-			updateItem: (id, item) =>
-				set((state) => {
-					const existing = state.items.find((i) => i.id === id);
-					if (!existing) return state;
-					const updated = { ...existing, ...item, updatedAt: Date.now() };
-					return {
-						items: state.items.map((i) => (i.id === id ? updated : i)),
-						activityLog: pushLog(state.activityLog, {
-							action: "update",
-							entityKind: "item",
-							entityId: id,
-							entityName: entityNameOf(updated),
-						}),
-					};
-				}),
-			removeItem: (id) =>
-				set((state) => {
-					const existing = state.items.find((i) => i.id === id);
-					return {
-						items: state.items.filter((c) => c.id !== id),
-						activityLog: existing
-							? pushLog(state.activityLog, {
-									action: "delete",
-									entityKind: "item",
-									entityId: id,
-									entityName: entityNameOf(existing),
-								})
-							: state.activityLog,
-					};
-				}),
-
-			// ----- Locations -----
 			locations: [],
-			addLocation: (location) => {
-				const created = generateEntry(
-					locationDefaults,
-					location,
-				) as GameLocation;
-				set((state) => ({
-					locations: [...state.locations, created],
-					activityLog: pushLog(state.activityLog, {
-						action: "create",
-						entityKind: "location",
-						entityId: created.id,
-						entityName: entityNameOf(created),
-					}),
-				}));
-				return created;
-			},
-			updateLocation: (id, location) =>
-				set((state) => {
-					const existing = state.locations.find((l) => l.id === id);
-					if (!existing) return state;
-					const updated = { ...existing, ...location, updatedAt: Date.now() };
-					return {
-						locations: state.locations.map((l) => (l.id === id ? updated : l)),
-						activityLog: pushLog(state.activityLog, {
-							action: "update",
-							entityKind: "location",
-							entityId: id,
-							entityName: entityNameOf(updated),
-						}),
-					};
-				}),
-			removeLocation: (id) =>
-				set((state) => {
-					const existing = state.locations.find((l) => l.id === id);
-					return {
-						locations: state.locations.filter((c) => c.id !== id),
-						activityLog: existing
-							? pushLog(state.activityLog, {
-									action: "delete",
-									entityKind: "location",
-									entityId: id,
-									entityName: entityNameOf(existing),
-								})
-							: state.activityLog,
-					};
-				}),
-
-			// ----- Lores -----
 			lores: [],
-			addLore: (lore) => {
-				const created = generateEntry(loreDefaults, lore) as Lore;
-				set((state) => ({
-					lores: [...state.lores, created],
-					activityLog: pushLog(state.activityLog, {
-						action: "create",
-						entityKind: "lore",
-						entityId: created.id,
-						entityName: entityNameOf(created),
-					}),
-				}));
-				return created;
-			},
-			updateLore: (id, lore) =>
-				set((state) => {
-					const existing = state.lores.find((l) => l.id === id);
-					if (!existing) return state;
-					const updated = { ...existing, ...lore, updatedAt: Date.now() };
-					return {
-						lores: state.lores.map((l) => (l.id === id ? updated : l)),
-						activityLog: pushLog(state.activityLog, {
-							action: "update",
-							entityKind: "lore",
-							entityId: id,
-							entityName: entityNameOf(updated),
-						}),
-					};
-				}),
-			removeLore: (id) =>
-				set((state) => {
-					const existing = state.lores.find((l) => l.id === id);
-					return {
-						lores: state.lores.filter((c) => c.id !== id),
-						activityLog: existing
-							? pushLog(state.activityLog, {
-									action: "delete",
-									entityKind: "lore",
-									entityId: id,
-									entityName: entityNameOf(existing),
-								})
-							: state.activityLog,
-					};
-				}),
-
-			// ----- Activity Log -----
 			activityLog: [],
-			clearActivity: () => set({ activityLog: [] }),
-
-			// expose for typings only
-			_getState: () => get(),
+			syncError: null,
 		}),
-		{
-			name: "rpg-storage",
-			version: 3,
-			migrate: (persistedState: unknown, version) => {
-				if (!persistedState || typeof persistedState !== "object") {
-					return persistedState as RPGState;
-				}
-				const old = persistedState as Partial<RPGState>;
 
-				if (version < 2) {
-					// v1 -> v2 já feita anteriormente; mantemos backfill defensivo
-				}
-
-				// v2 -> v3: garante activityLog e campos novos (lore.imageUrl)
+	// ----- Characters -----
+	characters: [],
+	addCharacter: (character) => {
+		const created = generateEntry(characterDefaults, character) as Character;
+		const log = {
+			action: "create" as const,
+			entityKind: "character" as const,
+			entityId: created.id,
+			entityName: entityNameOf(created),
+		};
+		set((state) => ({
+			characters: [...state.characters, created],
+			activityLog: pushLog(state.activityLog, log),
+			syncError: null,
+		}));
+		void Promise.all([
+			createRemoteEntity("character", created),
+			createRemoteActivity(log),
+		]).catch((error) => set({ syncError: remoteErrorMessage(error) }));
+		return created;
+	},
+	updateCharacter: (id, character) =>
+		set((state) => {
+			const existing = state.characters.find((c) => c.id === id);
+			if (!existing) return state;
+			const updated = { ...existing, ...character, updatedAt: Date.now() };
+			const log = {
+				action: "update" as const,
+				entityKind: "character" as const,
+				entityId: id,
+				entityName: entityNameOf(updated),
+			};
+			void Promise.all([
+				updateRemoteEntity("character", updated),
+				createRemoteActivity(log),
+			]).catch((error) => set({ syncError: remoteErrorMessage(error) }));
+			return {
+				characters: state.characters.map((c) => (c.id === id ? updated : c)),
+				activityLog: pushLog(state.activityLog, log),
+				syncError: null,
+			};
+		}),
+	removeCharacter: (id) =>
+		set((state) => {
+			const existing = state.characters.find((c) => c.id === id);
+			if (existing) {
+				const log = {
+					action: "delete" as const,
+					entityKind: "character" as const,
+					entityId: id,
+					entityName: entityNameOf(existing),
+				};
+				void Promise.all([
+					deleteRemoteEntity("character", id),
+					createRemoteActivity(log),
+				]).catch((error) => set({ syncError: remoteErrorMessage(error) }));
 				return {
-					...old,
-					characters: (old.characters ?? []).map((c) => ({
-						...characterDefaults,
-						...c,
-					})) as Character[],
-					npcs: (old.npcs ?? []).map((n) => ({
-						...npcDefaults,
-						...n,
-					})) as Npc[],
-					sessions: (old.sessions ?? []).map((s) => ({
-						...sessionDefaults,
-						...s,
-					})) as Session[],
-					items: (old.items ?? []).map((i) => ({
-						...itemDefaults,
-						...i,
-					})) as Item[],
-					locations: (old.locations ?? []).map((l) => ({
-						...locationDefaults,
-						...l,
-					})) as GameLocation[],
-					lores: (old.lores ?? []).map((l) => ({
-						...loreDefaults,
-						...l,
-					})) as Lore[],
-					activityLog: old.activityLog ?? [],
-				} as RPGState;
-			},
-		},
-	),
-);
+					characters: state.characters.filter((c) => c.id !== id),
+					activityLog: pushLog(state.activityLog, log),
+					syncError: null,
+				};
+			}
+			return state;
+		}),
+
+	// ----- NPCs -----
+	npcs: [],
+	addNpc: (npc) => {
+		const created = generateEntry(npcDefaults, npc) as Npc;
+		const log = {
+			action: "create" as const,
+			entityKind: "npc" as const,
+			entityId: created.id,
+			entityName: entityNameOf(created),
+		};
+		set((state) => ({
+			npcs: [...state.npcs, created],
+			activityLog: pushLog(state.activityLog, log),
+			syncError: null,
+		}));
+		void Promise.all([
+			createRemoteEntity("npc", created),
+			createRemoteActivity(log),
+		]).catch((error) => set({ syncError: remoteErrorMessage(error) }));
+		return created;
+	},
+	updateNpc: (id, npc) =>
+		set((state) => {
+			const existing = state.npcs.find((n) => n.id === id);
+			if (!existing) return state;
+			const updated = { ...existing, ...npc, updatedAt: Date.now() };
+			const log = {
+				action: "update" as const,
+				entityKind: "npc" as const,
+				entityId: id,
+				entityName: entityNameOf(updated),
+			};
+			void Promise.all([
+				updateRemoteEntity("npc", updated),
+				createRemoteActivity(log),
+			]).catch((error) => set({ syncError: remoteErrorMessage(error) }));
+			return {
+				npcs: state.npcs.map((n) => (n.id === id ? updated : n)),
+				activityLog: pushLog(state.activityLog, log),
+				syncError: null,
+			};
+		}),
+	removeNpc: (id) =>
+		set((state) => {
+			const existing = state.npcs.find((n) => n.id === id);
+			if (existing) {
+				const log = {
+					action: "delete" as const,
+					entityKind: "npc" as const,
+					entityId: id,
+					entityName: entityNameOf(existing),
+				};
+				void Promise.all([
+					deleteRemoteEntity("npc", id),
+					createRemoteActivity(log),
+				]).catch((error) => set({ syncError: remoteErrorMessage(error) }));
+				return {
+					npcs: state.npcs.filter((n) => n.id !== id),
+					activityLog: pushLog(state.activityLog, log),
+					syncError: null,
+				};
+			}
+			return state;
+		}),
+
+	// ----- Sessions -----
+	sessions: [],
+	addSession: (session) => {
+		const created = generateEntry(sessionDefaults, session) as Session;
+		const log = {
+			action: "create" as const,
+			entityKind: "session" as const,
+			entityId: created.id,
+			entityName: entityNameOf(created),
+		};
+		set((state) => ({
+			sessions: [...state.sessions, created],
+			activityLog: pushLog(state.activityLog, log),
+			syncError: null,
+		}));
+		void Promise.all([
+			createRemoteEntity("session", created),
+			createRemoteActivity(log),
+		]).catch((error) => set({ syncError: remoteErrorMessage(error) }));
+		return created;
+	},
+	updateSession: (id, session) =>
+		set((state) => {
+			const existing = state.sessions.find((s) => s.id === id);
+			if (!existing) return state;
+			const updated = { ...existing, ...session, updatedAt: Date.now() };
+			const log = {
+				action: "update" as const,
+				entityKind: "session" as const,
+				entityId: id,
+				entityName: entityNameOf(updated),
+			};
+			void Promise.all([
+				updateRemoteEntity("session", updated),
+				createRemoteActivity(log),
+			]).catch((error) => set({ syncError: remoteErrorMessage(error) }));
+			return {
+				sessions: state.sessions.map((s) => (s.id === id ? updated : s)),
+				activityLog: pushLog(state.activityLog, log),
+				syncError: null,
+			};
+		}),
+	removeSession: (id) =>
+		set((state) => {
+			const existing = state.sessions.find((s) => s.id === id);
+			if (existing) {
+				const log = {
+					action: "delete" as const,
+					entityKind: "session" as const,
+					entityId: id,
+					entityName: entityNameOf(existing),
+				};
+				void Promise.all([
+					deleteRemoteEntity("session", id),
+					createRemoteActivity(log),
+				]).catch((error) => set({ syncError: remoteErrorMessage(error) }));
+				return {
+					sessions: state.sessions.filter((s) => s.id !== id),
+					activityLog: pushLog(state.activityLog, log),
+					syncError: null,
+				};
+			}
+			return state;
+		}),
+
+	// ----- Items -----
+	items: [],
+	addItem: (item) => {
+		const created = generateEntry(itemDefaults, item) as Item;
+		const log = {
+			action: "create" as const,
+			entityKind: "item" as const,
+			entityId: created.id,
+			entityName: entityNameOf(created),
+		};
+		set((state) => ({
+			items: [...state.items, created],
+			activityLog: pushLog(state.activityLog, log),
+			syncError: null,
+		}));
+		void Promise.all([
+			createRemoteEntity("item", created),
+			createRemoteActivity(log),
+		]).catch((error) => set({ syncError: remoteErrorMessage(error) }));
+		return created;
+	},
+	updateItem: (id, item) =>
+		set((state) => {
+			const existing = state.items.find((i) => i.id === id);
+			if (!existing) return state;
+			const updated = { ...existing, ...item, updatedAt: Date.now() };
+			const log = {
+				action: "update" as const,
+				entityKind: "item" as const,
+				entityId: id,
+				entityName: entityNameOf(updated),
+			};
+			void Promise.all([
+				updateRemoteEntity("item", updated),
+				createRemoteActivity(log),
+			]).catch((error) => set({ syncError: remoteErrorMessage(error) }));
+			return {
+				items: state.items.map((i) => (i.id === id ? updated : i)),
+				activityLog: pushLog(state.activityLog, log),
+				syncError: null,
+			};
+		}),
+	removeItem: (id) =>
+		set((state) => {
+			const existing = state.items.find((i) => i.id === id);
+			if (existing) {
+				const log = {
+					action: "delete" as const,
+					entityKind: "item" as const,
+					entityId: id,
+					entityName: entityNameOf(existing),
+				};
+				void Promise.all([
+					deleteRemoteEntity("item", id),
+					createRemoteActivity(log),
+				]).catch((error) => set({ syncError: remoteErrorMessage(error) }));
+				return {
+					items: state.items.filter((i) => i.id !== id),
+					activityLog: pushLog(state.activityLog, log),
+					syncError: null,
+				};
+			}
+			return state;
+		}),
+
+	// ----- Locations -----
+	locations: [],
+	addLocation: (location) => {
+		const created = generateEntry(locationDefaults, location) as GameLocation;
+		const log = {
+			action: "create" as const,
+			entityKind: "location" as const,
+			entityId: created.id,
+			entityName: entityNameOf(created),
+		};
+		set((state) => ({
+			locations: [...state.locations, created],
+			activityLog: pushLog(state.activityLog, log),
+			syncError: null,
+		}));
+		void Promise.all([
+			createRemoteEntity("location", created),
+			createRemoteActivity(log),
+		]).catch((error) => set({ syncError: remoteErrorMessage(error) }));
+		return created;
+	},
+	updateLocation: (id, location) =>
+		set((state) => {
+			const existing = state.locations.find((l) => l.id === id);
+			if (!existing) return state;
+			const updated = { ...existing, ...location, updatedAt: Date.now() };
+			const log = {
+				action: "update" as const,
+				entityKind: "location" as const,
+				entityId: id,
+				entityName: entityNameOf(updated),
+			};
+			void Promise.all([
+				updateRemoteEntity("location", updated),
+				createRemoteActivity(log),
+			]).catch((error) => set({ syncError: remoteErrorMessage(error) }));
+			return {
+				locations: state.locations.map((l) => (l.id === id ? updated : l)),
+				activityLog: pushLog(state.activityLog, log),
+				syncError: null,
+			};
+		}),
+	removeLocation: (id) =>
+		set((state) => {
+			const existing = state.locations.find((l) => l.id === id);
+			if (existing) {
+				const log = {
+					action: "delete" as const,
+					entityKind: "location" as const,
+					entityId: id,
+					entityName: entityNameOf(existing),
+				};
+				void Promise.all([
+					deleteRemoteEntity("location", id),
+					createRemoteActivity(log),
+				]).catch((error) => set({ syncError: remoteErrorMessage(error) }));
+				return {
+					locations: state.locations.filter((l) => l.id !== id),
+					activityLog: pushLog(state.activityLog, log),
+					syncError: null,
+				};
+			}
+			return state;
+		}),
+
+	// ----- Lores -----
+	lores: [],
+	addLore: (lore) => {
+		const created = generateEntry(loreDefaults, lore) as Lore;
+		const log = {
+			action: "create" as const,
+			entityKind: "lore" as const,
+			entityId: created.id,
+			entityName: entityNameOf(created),
+		};
+		set((state) => ({
+			lores: [...state.lores, created],
+			activityLog: pushLog(state.activityLog, log),
+			syncError: null,
+		}));
+		void Promise.all([
+			createRemoteEntity("lore", created),
+			createRemoteActivity(log),
+		]).catch((error) => set({ syncError: remoteErrorMessage(error) }));
+		return created;
+	},
+	updateLore: (id, lore) =>
+		set((state) => {
+			const existing = state.lores.find((l) => l.id === id);
+			if (!existing) return state;
+			const updated = { ...existing, ...lore, updatedAt: Date.now() };
+			const log = {
+				action: "update" as const,
+				entityKind: "lore" as const,
+				entityId: id,
+				entityName: entityNameOf(updated),
+			};
+			void Promise.all([
+				updateRemoteEntity("lore", updated),
+				createRemoteActivity(log),
+			]).catch((error) => set({ syncError: remoteErrorMessage(error) }));
+			return {
+				lores: state.lores.map((l) => (l.id === id ? updated : l)),
+				activityLog: pushLog(state.activityLog, log),
+				syncError: null,
+			};
+		}),
+	removeLore: (id) =>
+		set((state) => {
+			const existing = state.lores.find((l) => l.id === id);
+			if (existing) {
+				const log = {
+					action: "delete" as const,
+					entityKind: "lore" as const,
+					entityId: id,
+					entityName: entityNameOf(existing),
+				};
+				void Promise.all([
+					deleteRemoteEntity("lore", id),
+					createRemoteActivity(log),
+				]).catch((error) => set({ syncError: remoteErrorMessage(error) }));
+				return {
+					lores: state.lores.filter((l) => l.id !== id),
+					activityLog: pushLog(state.activityLog, log),
+					syncError: null,
+				};
+			}
+			return state;
+		}),
+
+	// ----- Activity Log -----
+	activityLog: [],
+	clearActivity: () => set({ activityLog: [] }),
+}));
 
 // =====================================================
 //  Helpers
