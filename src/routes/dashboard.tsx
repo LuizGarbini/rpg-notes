@@ -83,29 +83,16 @@ function Dashboard() {
 		lores: lores.length,
 	};
 
-	const totalEntries = Object.values(counts).reduce((a, b) => a + b, 0);
+	// const totalEntries = Object.values(counts).reduce((a, b) => a + b, 0);
 
 	const lastSession = [...sessions].sort(
 		(a, b) => b.createdAt - a.createdAt,
 	)[0];
 
 	return (
-		<div className="w-full space-y-8 px-6 py-8">
-			{/* Welcome banner */}
-			<div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-linear-to-br from-primary/10 via-background to-background p-8 ring-1 ring-primary/10">
-				<div className="relative z-10">
-					<h1 className="font-display text-3xl font-bold tracking-tight text-foreground">
-						Bem-vindo ao seu <span className="text-gradient-primary">Grimório</span>
-					</h1>
-					<p className="mt-2 max-w-lg text-[15px] leading-relaxed text-muted-foreground">
-						Você tem {totalEntries} registros documentados nesta campanha.
-						Continue sua jornada épica.
-					</p>
-				</div>
-				<div className="absolute -right-8 -top-8 h-48 w-48 rounded-full bg-primary/10 blur-3xl" />
-			</div>
-				{/* Stat row */}
-				<div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-6">
+		<div className="w-full space-y-6 px-6 py-8">
+			{/* Stat row */}
+			<div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-6">
 					{sections.map((s) => (
 						<StatPill
 							key={s.to}
