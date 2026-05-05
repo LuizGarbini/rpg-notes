@@ -1,5 +1,5 @@
 import { ArrowLeft, Pencil, Plus } from "lucide-react";
-import { useEffect, useId, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import {
 	abilityModifier,
