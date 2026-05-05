@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { Sidebar } from "@/components/sidebar";
 import { AppHeader } from "@/components/app-header";
 import { NotFound } from "@/components/not-found";
+import { ToastProvider } from "@/components/ui/toast";
 import { AuthProvider, useAuth } from "@/lib/auth";
 import { useRPGStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -19,9 +20,11 @@ export const Route = createRootRoute({
 
 function RootLayout() {
 	return (
-		<AuthProvider>
-			<RootContent />
-		</AuthProvider>
+		<ToastProvider>
+			<AuthProvider>
+				<RootContent />
+			</AuthProvider>
+		</ToastProvider>
 	);
 }
 
@@ -47,10 +50,8 @@ function ProtectedLayout() {
 	const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
 	useEffect(() => {
-		console.log("ProtectedLayout useEffect - session:", !!session, "loading:", loading);
 		if (loading) return;
 		if (!session) {
-			console.log("Sessão não encontrada, redirecionando para /auth...");
 			clearLocalData();
 			void navigate({ to: "/auth", replace: true });
 			return;
@@ -72,15 +73,17 @@ function ProtectedLayout() {
 			
 			{/* Mobile Sidebar Overlay */}
 			{isSidebarOpen && (
-				<div 
-					className="fixed inset-0 z-[90] bg-background/60 backdrop-blur-sm md:hidden"
+				<button
+					type="button"
+					aria-label="Fechar menu lateral"
+					className="fixed inset-0 z-90 bg-background/60 backdrop-blur-sm md:hidden"
 					onClick={() => setIsSidebarOpen(false)}
 				/>
 			)}
 
 			{/* Sidebar Island */}
 			<div className={cn(
-				"fixed inset-y-0 left-0 z-[100] flex flex-col overflow-hidden transition-all duration-300 bg-background md:relative md:z-0 md:flex md:translate-x-0 md:rounded-xl md:border md:border-border/60 md:bg-background/50 md:shadow-2xl md:backdrop-blur-md",
+				"fixed inset-y-0 left-0 z-100 flex flex-col overflow-hidden transition-all duration-300 bg-background md:relative md:z-0 md:flex md:translate-x-0 md:rounded-xl md:border md:border-border/60 md:bg-background/50 md:shadow-2xl md:backdrop-blur-md",
 				isSidebarOpen ? "translate-x-0" : "-translate-x-full"
 			)}>
 				<Sidebar isOpen={isSidebarOpen} />

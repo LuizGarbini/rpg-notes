@@ -83,7 +83,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 				return error?.message ?? null;
 			},
 			signOut: async () => {
-				console.log("Executando supabase.auth.signOut()...");
 				if (!supabase) return;
 				await supabase.auth.signOut();
 			},

@@ -2,11 +2,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowLeft, CheckCircle2, Eye, EyeOff, Swords } from "lucide-react";
 import { useEffect, useId, useState } from "react";
-import { useForm } from "react-hook-form";
+import { type FieldErrors, useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useToast } from "@/components/ui/toast";
 import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/auth")({
@@ -17,14 +18,14 @@ export const Route = createFileRoute("/auth")({
 
 const loginSchema = z.object({
 	email: z.string().min(1, "Email é obrigatório").email("Email inválido"),
-	password: z.string().min(6, "Mínimo de 6 caracteres"),
+	password: z.string().min(8, "Mínimo de 8 caracteres"),
 });
 
 const registerSchema = z
 	.object({
 		name: z.string().min(2, "Mínimo de 2 caracteres"),
 		email: z.string().min(1, "Email é obrigatório").email("Email inválido"),
-		password: z.string().min(6, "Mínimo de 6 caracteres"),
+		password: z.string().min(8, "Mínimo de 8 caracteres"),
 		confirmPassword: z.string().min(1, "Confirme sua senha"),
 	})
 	.refine((data) => data.password === data.confirmPassword, {
@@ -38,7 +39,7 @@ const forgotPasswordSchema = z.object({
 
 const resetPasswordSchema = z
 	.object({
-		password: z.string().min(6, "Mínimo de 6 caracteres"),
+		password: z.string().min(8, "Mínimo de 8 caracteres"),
 		confirmPassword: z.string().min(1, "Confirme sua senha"),
 	})
 	.refine((data) => data.password === data.confirmPassword, {
@@ -52,6 +53,16 @@ type ForgotPasswordValues = z.infer<typeof forgotPasswordSchema>;
 type ResetPasswordValues = z.infer<typeof resetPasswordSchema>;
 
 const AUTH_PARTICLES = [0, 1, 2, 3, 4];
+
+function firstFormError<T extends Record<string, unknown>>(
+	errors: FieldErrors<T>,
+): string {
+	const first = Object.values(errors)[0];
+	const message = first?.message;
+	return typeof message === "string"
+		? message
+		: "Revise os campos destacados e tente novamente.";
+}
 
 /* ─── Page ─── */
 
@@ -178,13 +189,11 @@ function AuthPage() {
 
 /* ─── Login Form ─── */
 
-/* ─── Login Form ─── */
-
 function LoginForm({ onForgot }: { onForgot: () => void }) {
 	const navigate = useNavigate();
 	const { signIn } = useAuth();
+	const toast = useToast();
 	const [showPw, setShowPw] = useState(false);
-	const [authError, setAuthError] = useState<string | null>(null);
 	const emailId = useId();
 	const passwordId = useId();
 
@@ -197,17 +206,30 @@ function LoginForm({ onForgot }: { onForgot: () => void }) {
 	});
 
 	async function onSubmit(data: LoginValues) {
-		setAuthError(null);
 		const error = await signIn(data.email, data.password);
 		if (error) {
-			setAuthError(error);
+			toast.error({
+				title: "Não foi possível entrar",
+				description: error,
+			});
 			return;
 		}
+		toast.success({
+			title: "Login realizado",
+			description: "Bem-vindo de volta ao seu grimório.",
+		});
 		navigate({ to: "/dashboard" });
 	}
 
+	function onInvalid(errors: FieldErrors<LoginValues>) {
+		toast.error({
+			title: "Complete o login",
+			description: firstFormError(errors),
+		});
+	}
+
 	return (
-		<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+		<form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-4">
 			<div className="text-center mb-5">
 				<h2 className="font-display text-lg font-bold text-foreground">
 					Bem-vindo de volta
@@ -260,8 +282,6 @@ function LoginForm({ onForgot }: { onForgot: () => void }) {
 					</p>
 				)}
 			</div>
-			{authError && <p className="text-[12px] text-destructive">{authError}</p>}
-
 			<div className="flex justify-end">
 				<button
 					type="button"
@@ -289,9 +309,9 @@ function LoginForm({ onForgot }: { onForgot: () => void }) {
 function RegisterForm() {
 	const navigate = useNavigate();
 	const { signUp } = useAuth();
+	const toast = useToast();
 	const [showPw, setShowPw] = useState(false);
 	const [showConfirm, setShowConfirm] = useState(false);
-	const [authError, setAuthError] = useState<string | null>(null);
 	const nameId = useId();
 	const emailId = useId();
 	const passwordId = useId();
@@ -306,17 +326,30 @@ function RegisterForm() {
 	});
 
 	async function onSubmit(data: RegisterValues) {
-		setAuthError(null);
 		const error = await signUp(data.name, data.email, data.password);
 		if (error) {
-			setAuthError(error);
+			toast.error({
+				title: "Não foi possível criar a conta",
+				description: error,
+			});
 			return;
 		}
+		toast.success({
+			title: "Conta criada",
+			description: "Seu grimório foi preparado com sucesso.",
+		});
 		navigate({ to: "/dashboard" });
 	}
 
+	function onInvalid(errors: FieldErrors<RegisterValues>) {
+		toast.error({
+			title: "Complete o cadastro",
+			description: firstFormError(errors),
+		});
+	}
+
 	return (
-		<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+		<form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-4">
 			<div className="text-center mb-5">
 				<h2 className="font-display text-lg font-bold text-foreground">
 					Crie seu grimório
@@ -359,7 +392,7 @@ function RegisterForm() {
 					<Input
 						id={passwordId}
 						type={showPw ? "text" : "password"}
-						placeholder="Mínimo 6 caracteres"
+						placeholder="Mínimo 8 caracteres"
 						{...register("password")}
 						aria-invalid={!!errors.password}
 					/>
@@ -412,8 +445,6 @@ function RegisterForm() {
 					</p>
 				)}
 			</div>
-			{authError && <p className="text-[12px] text-destructive">{authError}</p>}
-
 			<Button
 				type="submit"
 				className="w-full"
@@ -447,7 +478,7 @@ function RegisterForm() {
 
 function ForgotPasswordForm() {
 	const { resetPassword } = useAuth();
-	const [authError, setAuthError] = useState<string | null>(null);
+	const toast = useToast();
 	const [success, setSuccess] = useState(false);
 	const emailId = useId();
 
@@ -460,13 +491,26 @@ function ForgotPasswordForm() {
 	});
 
 	async function onSubmit(data: ForgotPasswordValues) {
-		setAuthError(null);
 		const error = await resetPassword(data.email);
 		if (error) {
-			setAuthError(error);
+			toast.error({
+				title: "Não foi possível enviar o link",
+				description: error,
+			});
 			return;
 		}
+		toast.success({
+			title: "Link enviado",
+			description: "Confira sua caixa de entrada para redefinir a senha.",
+		});
 		setSuccess(true);
+	}
+
+	function onInvalid(errors: FieldErrors<ForgotPasswordValues>) {
+		toast.error({
+			title: "Informe seu email",
+			description: firstFormError(errors),
+		});
 	}
 
 	if (success) {
@@ -489,7 +533,7 @@ function ForgotPasswordForm() {
 	}
 
 	return (
-		<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+		<form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-4">
 			<div className="text-center mb-5">
 				<h2 className="font-display text-lg font-bold text-foreground">
 					Recuperar Acesso
@@ -513,8 +557,6 @@ function ForgotPasswordForm() {
 				)}
 			</div>
 
-			{authError && <p className="text-[12px] text-destructive">{authError}</p>}
-
 			<Button
 				type="submit"
 				className="w-full"
@@ -531,9 +573,9 @@ function ForgotPasswordForm() {
 
 function ResetPasswordForm() {
 	const { updatePassword } = useAuth();
+	const toast = useToast();
 	const [showPw, setShowPw] = useState(false);
 	const [showConfirm, setShowConfirm] = useState(false);
-	const [authError, setAuthError] = useState<string | null>(null);
 	const [success, setSuccess] = useState(false);
 	const passwordId = useId();
 	const confirmPasswordId = useId();
@@ -547,15 +589,28 @@ function ResetPasswordForm() {
 	});
 
 	const onSubmit = async (data: ResetPasswordValues) => {
-		setAuthError(null);
 		const errorMsg = await updatePassword(data.password);
 
 		if (errorMsg) {
-			setAuthError(errorMsg);
+			toast.error({
+				title: "Não foi possível redefinir a senha",
+				description: errorMsg,
+			});
 			return;
 		}
+		toast.success({
+			title: "Senha atualizada",
+			description: "Agora você já pode entrar com a nova senha.",
+		});
 		setSuccess(true);
 	};
+
+	function onInvalid(errors: FieldErrors<ResetPasswordValues>) {
+		toast.error({
+			title: "Revise a nova senha",
+			description: firstFormError(errors),
+		});
+	}
 
 	if (success) {
 		return (
@@ -574,7 +629,9 @@ function ResetPasswordForm() {
 				</div>
 				<Button
 					className="w-full"
-					onClick={() => (window.location.href = "/auth")}
+					onClick={() => {
+						window.location.href = "/auth";
+					}}
 				>
 					Ir para o Login
 				</Button>
@@ -583,7 +640,7 @@ function ResetPasswordForm() {
 	}
 
 	return (
-		<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+		<form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-4">
 			<div className="text-center mb-5">
 				<h2 className="font-display text-lg font-bold text-foreground">
 					Nova Senha Arcaica
@@ -652,8 +709,6 @@ function ResetPasswordForm() {
 					</p>
 				)}
 			</div>
-
-			{authError && <p className="text-[12px] text-destructive">{authError}</p>}
 
 			<Button
 				type="submit"

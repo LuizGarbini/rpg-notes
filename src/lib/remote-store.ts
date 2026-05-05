@@ -1,3 +1,9 @@
+import type {
+	Json,
+	Tables,
+	TablesInsert,
+	TablesUpdate,
+} from "./database.types";
 import { getSupabase, SUPABASE_TABLES } from "./supabase";
 
 export type RemoteEntityKind =
@@ -29,83 +35,19 @@ export interface RemoteStateSnapshot {
 	activityLog: RemoteActivityEntry[];
 }
 
-type RemoteRow = {
-	id: string;
-	data: unknown;
-};
+type EntityTable =
+	| "characters"
+	| "npcs"
+	| "sessions"
+	| "items"
+	| "locations"
+	| "lores";
 
-type ActivityRow = {
-	id: string;
-	action: RemoteActivityAction;
-	entity_kind: RemoteEntityKind;
-	entity_id: string;
-	entity_name: string;
-	created_at: string;
-};
-
-const TABLE_BY_KIND: Record<RemoteEntityKind, string> = {
-	character: SUPABASE_TABLES.characters,
-	npc: SUPABASE_TABLES.npcs,
-	session: SUPABASE_TABLES.sessions,
-	item: SUPABASE_TABLES.items,
-	location: SUPABASE_TABLES.locations,
-	lore: SUPABASE_TABLES.lores,
-};
-
-function entityNameOf(entity: Record<string, unknown>): string {
-	for (const key of ["characterName", "name", "title"]) {
-		const value = entity[key];
-		if (typeof value === "string" && value.trim()) return value.trim();
-	}
-	return "Sem nome";
-}
-
-function rowFor(
-	kind: RemoteEntityKind,
-	entity: Record<string, unknown>,
-): Record<string, unknown> {
-	const base = {
-		id: entity.id,
-		name: entityNameOf(entity),
-		data: entity,
-	};
-
-	switch (kind) {
-		case "character":
-			return { ...base, system: entity.system ?? "generic" };
-		case "npc":
-			return { ...base, importance: entity.importance ?? "supporting" };
-		case "session":
-			return {
-				id: entity.id,
-				title: entityNameOf(entity),
-				session_number: entity.number ?? 1,
-				session_date: entity.date ?? "",
-				data: entity,
-			};
-		case "item":
-			return {
-				...base,
-				item_type: entity.type ?? "",
-				rarity: entity.rarity ?? "comum",
-			};
-		case "location":
-			return {
-				...base,
-				location_type: entity.type ?? "",
-				region: entity.region ?? "",
-			};
-		case "lore":
-			return {
-				id: entity.id,
-				title: entityNameOf(entity),
-				category: entity.category ?? "",
-				importance: entity.importance ?? "supporting",
-				is_secret: entity.isSecret ?? false,
-				data: entity,
-			};
-	}
-}
+type EntityRow = Tables<EntityTable>;
+type EntityInsert = TablesInsert<EntityTable>;
+type EntityUpdate = TablesUpdate<EntityTable>;
+type ActivityRow = Tables<"activity_log">;
+type ActivityInsert = TablesInsert<"activity_log">;
 
 function requireSupabase() {
 	const supabase = getSupabase();
@@ -115,42 +57,278 @@ function requireSupabase() {
 	return supabase;
 }
 
-async function selectData(table: string): Promise<unknown[]> {
+function isRecord(value: unknown): value is Record<string, unknown> {
+	return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function toJson(value: Record<string, unknown>): Json {
+	return value as Json;
+}
+
+function stringValue(value: unknown, fallback: string): string {
+	return typeof value === "string" ? value : fallback;
+}
+
+function numberValue(value: unknown, fallback: number): number {
+	return typeof value === "number" ? value : fallback;
+}
+
+function booleanValue(value: unknown, fallback: boolean): boolean {
+	return typeof value === "boolean" ? value : fallback;
+}
+
+function toTimestamp(value?: string | null): number | undefined {
+	if (!value) return undefined;
+	const timestamp = Date.parse(value);
+	return Number.isNaN(timestamp) ? undefined : timestamp;
+}
+
+function fromEntityRow(row: EntityRow): unknown {
+	const data = isRecord(row.data) ? row.data : {};
+	const fallback: Record<string, unknown> = {
+		id: row.id,
+		createdAt: toTimestamp(row.created_at) ?? Date.now(),
+	};
+	const updatedAt = toTimestamp(row.updated_at);
+	if (updatedAt) fallback.updatedAt = updatedAt;
+	return { ...fallback, ...data };
+}
+
+function fromActivityRow(row: ActivityRow): RemoteActivityEntry {
+	return {
+		id: row.id,
+		timestamp: toTimestamp(row.created_at) ?? Date.now(),
+		action: row.action,
+		entityKind: row.entity_kind,
+		entityId: row.entity_id,
+		entityName: row.entity_name,
+	};
+}
+
+function tableFor(kind: RemoteEntityKind): EntityTable {
+	const tables = {
+		character: SUPABASE_TABLES.characters,
+		npc: SUPABASE_TABLES.npcs,
+		session: SUPABASE_TABLES.sessions,
+		item: SUPABASE_TABLES.items,
+		location: SUPABASE_TABLES.locations,
+		lore: SUPABASE_TABLES.lores,
+	} as const;
+	return tables[kind];
+}
+
+function entityName(
+	kind: RemoteEntityKind,
+	entity: Record<string, unknown>,
+): string {
+	if (kind === "character" && typeof entity.characterName === "string") {
+		return entity.characterName;
+	}
+	if (kind === "session" && typeof entity.title === "string") {
+		return entity.title;
+	}
+	if (kind === "lore" && typeof entity.title === "string") {
+		return entity.title;
+	}
+	if (typeof entity.name === "string") {
+		return entity.name;
+	}
+	return "";
+}
+
+function rowFor(
+	kind: RemoteEntityKind,
+	entity: Record<string, unknown>,
+): EntityInsert {
+	const base = {
+		id: stringValue(entity.id, crypto.randomUUID()),
+		data: toJson(entity),
+	};
+
+	switch (kind) {
+		case "character":
+			return {
+				...base,
+				name: entityName(kind, entity),
+				system: stringValue(entity.system, "generic"),
+			};
+		case "npc":
+			return {
+				...base,
+				name: entityName(kind, entity),
+				importance: stringValue(entity.importance, "supporting"),
+			};
+		case "session":
+			return {
+				...base,
+				title: entityName(kind, entity),
+				session_number: numberValue(entity.number, 1),
+				session_date: stringValue(entity.date, ""),
+			};
+		case "item":
+			return {
+				...base,
+				name: entityName(kind, entity),
+				item_type: stringValue(entity.type, ""),
+				rarity: stringValue(entity.rarity, "comum"),
+			};
+		case "location":
+			return {
+				...base,
+				name: entityName(kind, entity),
+				location_type: stringValue(entity.type, ""),
+				region: stringValue(entity.region, ""),
+			};
+		case "lore":
+			return {
+				...base,
+				title: entityName(kind, entity),
+				category: stringValue(entity.category, ""),
+				importance: stringValue(entity.importance, "supporting"),
+				is_secret: booleanValue(entity.isSecret, false),
+			};
+	}
+}
+
+async function insertEntityRow(
+	kind: RemoteEntityKind,
+	row: EntityInsert,
+): Promise<void> {
+	const supabase = requireSupabase();
+
+	switch (kind) {
+		case "character": {
+			const { error } = await supabase
+				.from(SUPABASE_TABLES.characters)
+				.insert(row as TablesInsert<"characters">);
+			if (error) throw error;
+			return;
+		}
+		case "npc": {
+			const { error } = await supabase
+				.from(SUPABASE_TABLES.npcs)
+				.insert(row as TablesInsert<"npcs">);
+			if (error) throw error;
+			return;
+		}
+		case "session": {
+			const { error } = await supabase
+				.from(SUPABASE_TABLES.sessions)
+				.insert(row as TablesInsert<"sessions">);
+			if (error) throw error;
+			return;
+		}
+		case "item": {
+			const { error } = await supabase
+				.from(SUPABASE_TABLES.items)
+				.insert(row as TablesInsert<"items">);
+			if (error) throw error;
+			return;
+		}
+		case "location": {
+			const { error } = await supabase
+				.from(SUPABASE_TABLES.locations)
+				.insert(row as TablesInsert<"locations">);
+			if (error) throw error;
+			return;
+		}
+		case "lore": {
+			const { error } = await supabase
+				.from(SUPABASE_TABLES.lores)
+				.insert(row as TablesInsert<"lores">);
+			if (error) throw error;
+			return;
+		}
+	}
+}
+
+async function updateEntityRow(
+	kind: RemoteEntityKind,
+	id: string,
+	row: EntityUpdate,
+): Promise<void> {
+	const supabase = requireSupabase();
+
+	switch (kind) {
+		case "character": {
+			const { error } = await supabase
+				.from(SUPABASE_TABLES.characters)
+				.update(row as TablesUpdate<"characters">)
+				.eq("id", id);
+			if (error) throw error;
+			return;
+		}
+		case "npc": {
+			const { error } = await supabase
+				.from(SUPABASE_TABLES.npcs)
+				.update(row as TablesUpdate<"npcs">)
+				.eq("id", id);
+			if (error) throw error;
+			return;
+		}
+		case "session": {
+			const { error } = await supabase
+				.from(SUPABASE_TABLES.sessions)
+				.update(row as TablesUpdate<"sessions">)
+				.eq("id", id);
+			if (error) throw error;
+			return;
+		}
+		case "item": {
+			const { error } = await supabase
+				.from(SUPABASE_TABLES.items)
+				.update(row as TablesUpdate<"items">)
+				.eq("id", id);
+			if (error) throw error;
+			return;
+		}
+		case "location": {
+			const { error } = await supabase
+				.from(SUPABASE_TABLES.locations)
+				.update(row as TablesUpdate<"locations">)
+				.eq("id", id);
+			if (error) throw error;
+			return;
+		}
+		case "lore": {
+			const { error } = await supabase
+				.from(SUPABASE_TABLES.lores)
+				.update(row as TablesUpdate<"lores">)
+				.eq("id", id);
+			if (error) throw error;
+			return;
+		}
+	}
+}
+
+async function selectEntities(table: EntityTable): Promise<unknown[]> {
 	const supabase = requireSupabase();
 	const { data, error } = await supabase
 		.from(table)
-		.select("id, data")
+		.select("id,data,created_at,updated_at")
 		.order("updated_at", { ascending: false });
-
 	if (error) throw error;
-	return ((data ?? []) as RemoteRow[]).map((row) => row.data);
+	return ((data ?? []) as EntityRow[]).map(fromEntityRow);
 }
 
 export async function loadRemoteState(): Promise<RemoteStateSnapshot> {
 	const supabase = requireSupabase();
-	const [
-		characters,
-		npcs,
-		sessions,
-		items,
-		locations,
-		lores,
-		activityResult,
-	] = await Promise.all([
-		selectData(SUPABASE_TABLES.characters),
-		selectData(SUPABASE_TABLES.npcs),
-		selectData(SUPABASE_TABLES.sessions),
-		selectData(SUPABASE_TABLES.items),
-		selectData(SUPABASE_TABLES.locations),
-		selectData(SUPABASE_TABLES.lores),
-		supabase
-			.from(SUPABASE_TABLES.activity)
-			.select("id, action, entity_kind, entity_id, entity_name, created_at")
-			.order("created_at", { ascending: false })
-			.limit(200),
-	]);
+	const [characters, npcs, sessions, items, locations, lores, activityRows] =
+		await Promise.all([
+			selectEntities(SUPABASE_TABLES.characters),
+			selectEntities(SUPABASE_TABLES.npcs),
+			selectEntities(SUPABASE_TABLES.sessions),
+			selectEntities(SUPABASE_TABLES.items),
+			selectEntities(SUPABASE_TABLES.locations),
+			selectEntities(SUPABASE_TABLES.lores),
+			supabase
+				.from(SUPABASE_TABLES.activity)
+				.select("id,action,entity_kind,entity_id,entity_name,created_at")
+				.order("created_at", { ascending: false })
+				.limit(200),
+		]);
 
-	if (activityResult.error) throw activityResult.error;
+	if (activityRows.error) throw activityRows.error;
 
 	return {
 		characters,
@@ -159,14 +337,9 @@ export async function loadRemoteState(): Promise<RemoteStateSnapshot> {
 		items,
 		locations,
 		lores,
-		activityLog: ((activityResult.data ?? []) as ActivityRow[]).map((row) => ({
-			id: row.id,
-			timestamp: new Date(row.created_at).getTime(),
-			action: row.action,
-			entityKind: row.entity_kind,
-			entityId: row.entity_id,
-			entityName: row.entity_name,
-		})),
+		activityLog: ((activityRows.data ?? []) as ActivityRow[]).map(
+			fromActivityRow,
+		),
 	};
 }
 
@@ -174,12 +347,8 @@ export async function createRemoteEntity<T extends { id: string }>(
 	kind: RemoteEntityKind,
 	entity: T,
 ): Promise<T> {
-	const supabase = requireSupabase();
-	const { error } = await supabase
-		.from(TABLE_BY_KIND[kind])
-		.insert(rowFor(kind, entity as Record<string, unknown>));
-
-	if (error) throw error;
+	const row = rowFor(kind, entity as Record<string, unknown>);
+	await insertEntityRow(kind, row);
 	return entity;
 }
 
@@ -187,13 +356,8 @@ export async function updateRemoteEntity<T extends { id: string }>(
 	kind: RemoteEntityKind,
 	entity: T,
 ): Promise<T> {
-	const supabase = requireSupabase();
-	const { error } = await supabase
-		.from(TABLE_BY_KIND[kind])
-		.update(rowFor(kind, entity as Record<string, unknown>))
-		.eq("id", entity.id);
-
-	if (error) throw error;
+	const row = rowFor(kind, entity as Record<string, unknown>);
+	await updateEntityRow(kind, entity.id, row);
 	return entity;
 }
 
@@ -202,7 +366,8 @@ export async function deleteRemoteEntity(
 	id: string,
 ): Promise<void> {
 	const supabase = requireSupabase();
-	const { error } = await supabase.from(TABLE_BY_KIND[kind]).delete().eq("id", id);
+	const table = tableFor(kind);
+	const { error } = await supabase.from(table).delete().eq("id", id);
 	if (error) throw error;
 }
 
@@ -210,12 +375,12 @@ export async function createRemoteActivity(
 	entry: Omit<RemoteActivityEntry, "id" | "timestamp">,
 ): Promise<void> {
 	const supabase = requireSupabase();
-	const { error } = await supabase.from(SUPABASE_TABLES.activity).insert({
+	const row: ActivityInsert = {
 		action: entry.action,
 		entity_kind: entry.entityKind,
 		entity_id: entry.entityId,
 		entity_name: entry.entityName,
-	});
-
+	};
+	const { error } = await supabase.from(SUPABASE_TABLES.activity).insert(row);
 	if (error) throw error;
 }
