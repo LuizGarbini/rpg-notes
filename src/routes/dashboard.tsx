@@ -9,7 +9,10 @@ import {
 	Users,
 } from "lucide-react";
 import { ActivityFeed } from "@/components/activity-feed";
+import { SpotifyJamCard } from "@/components/spotify-jam-card";
+import { JamPresenceSync } from "@/components/jam-presence-sync";
 import { useRPGStore } from "@/lib/store";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/dashboard")({
 	component: Dashboard,
@@ -73,6 +76,7 @@ function Dashboard() {
 	const items = useRPGStore((s) => s.items);
 	const locations = useRPGStore((s) => s.locations);
 	const lores = useRPGStore((s) => s.lores);
+	const isLoadingRemote = useRPGStore((s) => s.isLoadingRemote);
 
 	const counts = {
 		characters: characters.length,
@@ -91,17 +95,22 @@ function Dashboard() {
 
 	return (
 		<div className="w-full space-y-6 px-6 py-8">
+			<JamPresenceSync />
 			{/* Stat row */}
 			<div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-6">
 					{sections.map((s) => (
-						<StatPill
-							key={s.to}
-							to={s.to}
-							label={s.title}
-							value={counts[s.key]}
-							Icon={s.Icon}
-							iconColor={s.accent}
-						/>
+						isLoadingRemote ? (
+							<Skeleton key={s.to} className="h-[54px] w-full rounded-md" />
+						) : (
+							<StatPill
+								key={s.to}
+								to={s.to}
+								label={s.title}
+								value={counts[s.key]}
+								Icon={s.Icon}
+								iconColor={s.accent}
+							/>
+						)
 					))}
 				</div>
 
@@ -114,15 +123,19 @@ function Dashboard() {
 
 				<div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
 					{sections.map((s) => (
-						<DashboardCard
-							key={s.to}
-							to={s.to}
-							title={s.title}
-							description={s.description}
-							Icon={s.Icon}
-							iconColor={s.accent}
-							count={counts[s.key]}
-						/>
+						isLoadingRemote ? (
+							<Skeleton key={s.to} className="h-[68px] w-full rounded-lg" />
+						) : (
+							<DashboardCard
+								key={s.to}
+								to={s.to}
+								title={s.title}
+								description={s.description}
+								Icon={s.Icon}
+								iconColor={s.accent}
+								count={counts[s.key]}
+							/>
+						)
 					))}
 				</div>
 
@@ -131,43 +144,54 @@ function Dashboard() {
 					<div className="lg:col-span-2">
 						<ActivityFeed limit={10} />
 					</div>
-					<aside className="space-y-2.5">
-						<h2 className="text-[10px] font-semibold uppercase tracking-[0.25em] text-muted-foreground heading-rule">
-							Última sessão
-						</h2>
-						{lastSession ? (
-							<Link
-								to="/sessions"
-								className="group block rounded-lg border border-border bg-card-elevated p-4 transition-colors hover:border-border-hover"
-							>
-								<div className="flex items-start justify-between gap-3">
-									<div className="min-w-0 flex-1">
-										<div className="flex items-center gap-2">
-											<ScrollText
-												className="h-3.5 w-3.5 text-amber-400"
-												strokeWidth={1.7}
-											/>
-											<span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-												{lastSession.date || "sem data"}
-											</span>
+					<aside className="space-y-6">
+						<div>
+							<h2 className="text-[10px] font-semibold uppercase tracking-[0.25em] text-muted-foreground heading-rule mb-2.5">
+								Spotify Jam
+							</h2>
+							<SpotifyJamCard isDM={true} />
+						</div>
+
+						<div className="space-y-2.5">
+							<h2 className="text-[10px] font-semibold uppercase tracking-[0.25em] text-muted-foreground heading-rule">
+								Última sessão
+							</h2>
+							{isLoadingRemote ? (
+								<Skeleton className="h-[120px] w-full rounded-lg" />
+							) : lastSession ? (
+								<Link
+									to="/sessions"
+									className="group block rounded-lg border border-border bg-card-elevated p-4 transition-colors hover:border-border-hover"
+								>
+									<div className="flex items-start justify-between gap-3">
+										<div className="min-w-0 flex-1">
+											<div className="flex items-center gap-2">
+												<ScrollText
+													className="h-3.5 w-3.5 text-amber-400"
+													strokeWidth={1.7}
+												/>
+												<span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+													{lastSession.date || "sem data"}
+												</span>
+											</div>
+											<h3 className="font-display mt-1 text-base font-bold text-foreground">
+												{lastSession.title || "Sem título"}
+											</h3>
+											{lastSession.summary && (
+												<p className="mt-1.5 line-clamp-3 text-[12px] text-muted-foreground">
+													{lastSession.summary}
+												</p>
+											)}
 										</div>
-										<h3 className="font-display mt-1 text-base font-bold text-foreground">
-											{lastSession.title || "Sem título"}
-										</h3>
-										{lastSession.summary && (
-											<p className="mt-1.5 line-clamp-3 text-[12px] text-muted-foreground">
-												{lastSession.summary}
-											</p>
-										)}
+										<ArrowUpRight className="h-4 w-4 shrink-0 text-muted-foreground transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-primary" />
 									</div>
-									<ArrowUpRight className="h-4 w-4 shrink-0 text-muted-foreground transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-primary" />
+								</Link>
+							) : (
+								<div className="rounded-lg border border-dashed border-border px-4 py-6 text-center text-[12px] text-muted-foreground">
+									Nenhuma sessão registrada ainda.
 								</div>
-							</Link>
-						) : (
-							<div className="rounded-lg border border-dashed border-border px-4 py-6 text-center text-[12px] text-muted-foreground">
-								Nenhuma sessão registrada ainda.
-							</div>
-						)}
+							)}
+						</div>
 					</aside>
 				</div>
 			</div>

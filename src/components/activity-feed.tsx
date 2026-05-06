@@ -18,6 +18,7 @@ import {
 	useRPGStore,
 } from "@/lib/store";
 import { formatRelativeTime } from "@/lib/utils";
+import { Skeleton } from "./ui/skeleton";
 
 const ENTITY_ICONS: Record<EntityKind, LucideIcon> = {
 	character: User,
@@ -52,6 +53,7 @@ interface ActivityFeedProps {
 
 export function ActivityFeed({ limit = 8 }: ActivityFeedProps) {
 	const activity = useRPGStore((s) => s.activityLog);
+	const isLoadingRemote = useRPGStore((s) => s.isLoadingRemote);
 	const items = activity.slice(0, limit);
 
 	return (
@@ -61,14 +63,20 @@ export function ActivityFeed({ limit = 8 }: ActivityFeedProps) {
 					<History className="h-3 w-3 text-primary" />
 					Atividade recente
 				</h2>
-				{activity.length > 0 && (
+				{activity.length > 0 && !isLoadingRemote && (
 					<span className="text-[10px] uppercase tracking-wider text-muted-foreground/70">
 						{activity.length} eventos
 					</span>
 				)}
 			</header>
 
-			{items.length === 0 ? (
+			{isLoadingRemote ? (
+				<div className="flex flex-col gap-1.5">
+					{Array.from({ length: 5 }).map((_, i) => (
+						<Skeleton key={i} className="h-11 w-full rounded-md" />
+					))}
+				</div>
+			) : items.length === 0 ? (
 				<div className="rounded-lg border border-dashed border-border px-4 py-6 text-center text-[12px] text-muted-foreground">
 					Nada por aqui ainda. Crie ou edite algum registro pra ver o histórico.
 				</div>

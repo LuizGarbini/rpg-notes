@@ -37,7 +37,7 @@ export function EntityActions({
 
 	return (
 		<>
-			<div className="absolute right-2 top-2 z-10 flex items-center gap-1 opacity-0 transition-opacity duration-200 group-hover:opacity-100 focus-within:opacity-100">
+			<div className="absolute right-2 top-2 z-10 flex items-center gap-1 opacity-100 md:opacity-0 transition-opacity duration-200 md:group-hover:opacity-100 focus-within:opacity-100">
 				<button
 					type="button"
 					onClick={(e) => {

@@ -38,6 +38,7 @@ interface AppHeaderProps {
 export function AppHeader({ isSidebarOpen, onToggleSidebar }: AppHeaderProps) {
 	const { user, signOut } = useAuth();
 	const clearLocalData = useRPGStore((state) => state.clearLocalData);
+	const spotifyUser = useRPGStore((state) => state.spotifyUser);
 	const navigate = useNavigate();
 	const toast = useToast();
 	const [isSigningOut, setIsSigningOut] = useState(false);
@@ -47,6 +48,7 @@ export function AppHeader({ isSidebarOpen, onToggleSidebar }: AppHeaderProps) {
 			? metadataName
 			: "Aventureiro";
 	const userEmail = user?.email || "grimoire@rpg.notes";
+	const userImage = spotifyUser?.image || "";
 	const initials = userName
 		.split(" ")
 		.map((n) => n[0])
@@ -163,7 +165,7 @@ export function AppHeader({ isSidebarOpen, onToggleSidebar }: AppHeaderProps) {
 						)}
 					>
 						<Avatar className="h-full w-full">
-							<AvatarImage src="" />
+							<AvatarImage src={userImage} />
 							<AvatarFallback className="bg-primary/10 text-[10px] font-bold text-primary">
 								{initials}
 							</AvatarFallback>
@@ -174,12 +176,13 @@ export function AppHeader({ isSidebarOpen, onToggleSidebar }: AppHeaderProps) {
 							<DropdownMenuLabel className="font-normal">
 								<div className="flex items-center gap-3 px-1 py-1.5">
 									<Avatar className="h-9 w-9 border border-border/60">
+										<AvatarImage src={userImage} />
 										<AvatarFallback className="bg-primary/10 text-xs font-bold text-primary">
 											{initials}
 										</AvatarFallback>
 									</Avatar>
-									<div className="flex flex-col space-y-0.5">
-										<p className="text-sm font-bold text-foreground">
+									<div className="flex flex-col space-y-0.5 min-w-0 flex-1">
+										<p className="text-sm font-bold text-foreground truncate">
 											{userName}
 										</p>
 										<p className="text-xs text-muted-foreground truncate">

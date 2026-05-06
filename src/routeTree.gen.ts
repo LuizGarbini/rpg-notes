@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SpotifyCallbackRouteImport } from './routes/spotify-callback'
 import { Route as ErrorPreviewRouteImport } from './routes/error-preview'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AuthRouteImport } from './routes/auth'
@@ -22,6 +23,11 @@ import { Route as ItemsIndexRouteImport } from './routes/items/index'
 import { Route as CharactersIndexRouteImport } from './routes/characters/index'
 import { Route as SheetsCharacterIdRouteImport } from './routes/sheets/$characterId'
 
+const SpotifyCallbackRoute = SpotifyCallbackRouteImport.update({
+  id: '/spotify-callback',
+  path: '/spotify-callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ErrorPreviewRoute = ErrorPreviewRouteImport.update({
   id: '/error-preview',
   path: '/error-preview',
@@ -88,6 +94,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/error-preview': typeof ErrorPreviewRoute
+  '/spotify-callback': typeof SpotifyCallbackRoute
   '/sheets/$characterId': typeof SheetsCharacterIdRoute
   '/characters': typeof CharactersIndexRoute
   '/items': typeof ItemsIndexRoute
@@ -102,6 +109,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/error-preview': typeof ErrorPreviewRoute
+  '/spotify-callback': typeof SpotifyCallbackRoute
   '/sheets/$characterId': typeof SheetsCharacterIdRoute
   '/characters': typeof CharactersIndexRoute
   '/items': typeof ItemsIndexRoute
@@ -117,6 +125,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
   '/error-preview': typeof ErrorPreviewRoute
+  '/spotify-callback': typeof SpotifyCallbackRoute
   '/sheets/$characterId': typeof SheetsCharacterIdRoute
   '/characters/': typeof CharactersIndexRoute
   '/items/': typeof ItemsIndexRoute
@@ -133,6 +142,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/dashboard'
     | '/error-preview'
+    | '/spotify-callback'
     | '/sheets/$characterId'
     | '/characters'
     | '/items'
@@ -147,6 +157,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/dashboard'
     | '/error-preview'
+    | '/spotify-callback'
     | '/sheets/$characterId'
     | '/characters'
     | '/items'
@@ -161,6 +172,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/dashboard'
     | '/error-preview'
+    | '/spotify-callback'
     | '/sheets/$characterId'
     | '/characters/'
     | '/items/'
@@ -176,6 +188,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   DashboardRoute: typeof DashboardRoute
   ErrorPreviewRoute: typeof ErrorPreviewRoute
+  SpotifyCallbackRoute: typeof SpotifyCallbackRoute
   SheetsCharacterIdRoute: typeof SheetsCharacterIdRoute
   CharactersIndexRoute: typeof CharactersIndexRoute
   ItemsIndexRoute: typeof ItemsIndexRoute
@@ -188,6 +201,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/spotify-callback': {
+      id: '/spotify-callback'
+      path: '/spotify-callback'
+      fullPath: '/spotify-callback'
+      preLoaderRoute: typeof SpotifyCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/error-preview': {
       id: '/error-preview'
       path: '/error-preview'
@@ -280,6 +300,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   DashboardRoute: DashboardRoute,
   ErrorPreviewRoute: ErrorPreviewRoute,
+  SpotifyCallbackRoute: SpotifyCallbackRoute,
   SheetsCharacterIdRoute: SheetsCharacterIdRoute,
   CharactersIndexRoute: CharactersIndexRoute,
   ItemsIndexRoute: ItemsIndexRoute,
