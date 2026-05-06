@@ -32,10 +32,10 @@ function RouteComponent() {
 				action={<LoreForm />}
 			/>
 
-			<div className="space-y-4 px-6 py-5">
+			<div className="mx-auto flex w-full max-w-7xl flex-col gap-5 px-6 pb-10 sm:px-8">
 				<ListLayout onSearch={setSearchQuery} />
 
-				<div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+				<div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 					{filteredLores.map((lore) => (
 						<LoreCard key={lore.id} lore={lore} />
 					))}

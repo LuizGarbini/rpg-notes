@@ -1,11 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { FileText } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { FileText, Plus } from "lucide-react";
 import { useState } from "react";
 import { CharacterCard } from "@/components/character-card";
-import { CharacterForm } from "@/components/character-form";
 import { EmptyState } from "@/components/empty-state";
 import { ListLayout } from "@/components/list-layout";
 import { PageHeader } from "@/components/page-header";
+import { Button } from "@/components/ui/button";
 import { useRPGStore } from "@/lib/store";
 
 export const Route = createFileRoute("/sheets/")({
@@ -29,13 +29,20 @@ function RouteComponent() {
 				iconColor="text-emerald-300"
 				eyebrow="Sheets"
 				count={characters.length}
-				action={<CharacterForm />}
+				action={
+					<Link to="/sheets/new">
+						<Button size="sm" className="gap-2">
+							<Plus className="h-3.5 w-3.5" />
+							Nova Ficha
+						</Button>
+					</Link>
+				}
 			/>
 
-			<div className="space-y-4 px-6 py-5">
+			<div className="mx-auto flex w-full max-w-7xl flex-col gap-5 px-6 pb-10 sm:px-8">
 				<ListLayout onSearch={setSearchQuery} />
 
-				<div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
 					{filteredCharacters.map((character) => (
 						<CharacterCard key={character.id} character={character} />
 					))}

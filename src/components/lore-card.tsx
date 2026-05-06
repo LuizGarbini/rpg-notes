@@ -51,7 +51,7 @@ export function LoreCard({ lore }: LoreCardProps) {
 	return (
 		<div className="flex flex-col">
 			<div
-				className={`group relative flex flex-col rounded-xl border border-border bg-card-elevated p-4 transition-colors hover:border-border-hover ${importance.ring}`}
+				className={`group relative flex flex-col rounded-2xl border border-border/70 bg-card-elevated p-4 shadow-sm shadow-black/5 transition-all duration-150 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-lg hover:shadow-black/5 ${importance.ring}`}
 			>
 				<EntityActions
 					onEdit={() => setEditOpen(true)}
@@ -65,7 +65,7 @@ export function LoreCard({ lore }: LoreCardProps) {
 
 				<div className="flex items-start gap-3 pl-2">
 					<div
-						className={`relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-background/40 ring-1 ${importance.ring} ${importance.tone}`}
+						className={`relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-background/45 ring-1 ${importance.ring} ${importance.tone}`}
 					>
 						{lore.imageUrl ? (
 							<img

@@ -56,7 +56,7 @@ export function ItemCard({ item }: ItemCardProps) {
 		<>
 		<div className="flex flex-col">
 			<div
-				className={`group relative flex flex-col rounded-xl border border-border bg-card-elevated p-4 transition-colors hover:border-border-hover ${rarity.ring}`}
+				className={`group relative flex flex-col rounded-2xl border border-border/70 bg-card-elevated p-4 shadow-sm shadow-black/5 transition-all duration-150 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-lg hover:shadow-black/5 ${rarity.ring}`}
 			>
 				<EntityActions
 					onEdit={() => setEditOpen(true)}
@@ -67,7 +67,7 @@ export function ItemCard({ item }: ItemCardProps) {
 
 				<div className="flex items-start gap-3">
 					<div
-						className={`relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-linear-to-br ${rarity.glow} to-transparent ring-1 ${rarity.ring} ${rarity.tone}`}
+						className={`relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-linear-to-br ${rarity.glow} to-transparent ring-1 ${rarity.ring} ${rarity.tone}`}
 					>
 						{item.imageUrl ? (
 							<img
@@ -116,7 +116,7 @@ export function ItemCard({ item }: ItemCardProps) {
 				</div>
 
 				{item.stats && (
-					<p className="font-mono mt-3 line-clamp-2 rounded-md bg-background/40 p-2 text-[11px] text-foreground/90 ring-1 ring-border/60">
+					<p className="font-mono mt-3 line-clamp-2 rounded-xl bg-background/45 p-2 text-[11px] text-foreground/90 ring-1 ring-border/60">
 						{item.stats}
 					</p>
 				)}
@@ -159,7 +159,7 @@ interface MiniInfoProps {
 
 function MiniInfo({ Icon, label, value }: MiniInfoProps) {
 	return (
-		<div className="flex items-center gap-1.5 rounded bg-background/40 px-1.5 py-1 ring-1 ring-border/60">
+		<div className="flex items-center gap-1.5 rounded-xl bg-background/45 px-1.5 py-1 ring-1 ring-border/60">
 			<Icon className="h-3 w-3 shrink-0 text-muted-foreground" />
 			<div className="min-w-0">
 				<div className="text-[8px] uppercase tracking-wider text-muted-foreground">

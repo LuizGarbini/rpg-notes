@@ -1,0 +1,175 @@
+import type {
+	Character,
+	RpgSystem,
+	SheetLayoutConfig,
+	SheetModuleConfig,
+	SheetModuleKind,
+} from "./store/types";
+
+export const SHEET_MODULE_LABELS: Record<SheetModuleKind, string> = {
+	identity: "Identidade",
+	abilities: "Atributos",
+	combat: "Combate",
+	sanity: "Sanidade",
+	magic: "Magia",
+	inventory: "Inventário",
+	personality: "Personalidade",
+	notes: "Notas",
+	customText: "Texto livre",
+	customStats: "Bloco de stats",
+};
+
+const SYSTEMS_WITH_SANITY = new Set<RpgSystem>([
+	"coc",
+	"ordem",
+	"meltedlands",
+	"ashesoftomorrow",
+	"demonlord",
+]);
+
+const SYSTEMS_WITHOUT_MAGIC = new Set<RpgSystem>([
+	"vampire",
+	"coc",
+	"ordem",
+	"contosloop",
+	"mausritter",
+	"cyberpunkred",
+	"fallout2d20",
+	"wilderfeast",
+	"gothrpg",
+	"assassinscreed",
+	"corespringnpc",
+	"duna",
+	"stalker",
+	"fissura",
+	"sacramento",
+	"somdasseis",
+]);
+
+function moduleConfig(
+	kind: SheetModuleKind,
+	order: number,
+	column: "main" | "side" = "main",
+	overrides: Partial<SheetModuleConfig> = {},
+): SheetModuleConfig {
+	return {
+		id: `${kind}-${order}`,
+		kind,
+		title: SHEET_MODULE_LABELS[kind],
+		enabled: true,
+		order,
+		column,
+		...overrides,
+	};
+}
+
+export function createDefaultSheetLayout(
+	system: RpgSystem = "dnd5e",
+): SheetLayoutConfig {
+	const modules: SheetModuleConfig[] = [
+		moduleConfig("identity", 10, "side", {
+			fields: ["characterName", "race", "class", "background"],
+		}),
+		moduleConfig("abilities", 20, "main", {
+			fields: [
+				"strength",
+				"dexterity",
+				"constitution",
+				"intelligence",
+				"wisdom",
+				"charisma",
+			],
+		}),
+		moduleConfig("combat", 30, "main", {
+			fields: ["health", "healthMax", "armorClass", "initiative", "speed"],
+		}),
+		moduleConfig("inventory", 40, "main", {
+			fields: ["equipment", "currency"],
+		}),
+		moduleConfig("personality", 50, "side", {
+			fields: ["personalityTraits", "ideals", "bonds", "flaws"],
+		}),
+		moduleConfig("notes", 60, "main", {
+			fields: ["notes"],
+		}),
+	];
+
+	if (SYSTEMS_WITH_SANITY.has(system)) {
+		modules.splice(
+			3,
+			0,
+			moduleConfig("sanity", 35, "side", {
+				fields: ["sanity", "sanityMax", "power", "size", "education"],
+			}),
+		);
+	}
+
+	if (!SYSTEMS_WITHOUT_MAGIC.has(system)) {
+		modules.splice(
+			4,
+			0,
+			moduleConfig("magic", 38, "main", {
+				fields: ["spellcastingClass", "spellSaveDc", "spells", "spellSlots"],
+			}),
+		);
+	}
+
+	return {
+		version: 1,
+		template: system,
+		modules: modules.sort((a, b) => a.order - b.order),
+	};
+}
+
+export function normalizeSheetLayout(character: Character): SheetLayoutConfig {
+	const fallback = createDefaultSheetLayout(character.system);
+	const layout = character.sheetLayout;
+	if (!layout || layout.version !== 1 || !Array.isArray(layout.modules)) {
+		return fallback;
+	}
+
+	const knownFallbacks = new Map(
+		fallback.modules.map((module) => [module.kind, module]),
+	);
+	const normalizedModules = layout.modules
+		.filter((module): module is SheetModuleConfig => {
+			return (
+				typeof module?.id === "string" &&
+				typeof module.title === "string" &&
+				typeof module.order === "number"
+			);
+		})
+		.map((module) => ({
+			...(knownFallbacks.get(module.kind) ?? {}),
+			...module,
+			enabled: module.enabled !== false,
+		}));
+
+	for (const fallbackModule of fallback.modules) {
+		if (!normalizedModules.some((module) => module.kind === fallbackModule.kind)) {
+			normalizedModules.push(fallbackModule);
+		}
+	}
+
+	return {
+		version: 1,
+		template: layout.template ?? character.system,
+		modules: normalizedModules.sort((a, b) => a.order - b.order),
+	};
+}
+
+export function enabledSheetModules(character: Character) {
+	return normalizeSheetLayout(character).modules.filter((module) => module.enabled);
+}
+
+export function createCustomSheetModule(
+	kind: Extract<SheetModuleKind, "customText" | "customStats">,
+	order: number,
+): SheetModuleConfig {
+	return moduleConfig(kind, order, kind === "customStats" ? "side" : "main", {
+		id: `${kind}-${crypto.randomUUID()}`,
+		title: kind === "customText" ? "Novo texto livre" : "Novo bloco de stats",
+		content: "",
+		fields: [],
+	});
+}

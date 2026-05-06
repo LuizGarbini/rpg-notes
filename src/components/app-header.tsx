@@ -223,15 +223,24 @@ export function AppHeader({ isSidebarOpen, onToggleSidebar }: AppHeaderProps) {
 							</DropdownMenuGroup>
 							<DropdownMenuSeparator className="bg-border/50" />
 							<DropdownMenuGroup>
-								<DropdownMenuItem className="gap-2 text-xs font-medium focus:bg-primary/10 focus:text-primary cursor-pointer">
+								<DropdownMenuItem
+									onClick={() => void navigate({ to: "/account" })}
+									className="gap-2 text-xs font-medium focus:bg-primary/10 focus:text-primary cursor-pointer"
+								>
 									<User className="h-3.5 w-3.5" />
 									<span>Minha Conta</span>
 								</DropdownMenuItem>
-								<DropdownMenuItem className="gap-2 text-xs font-medium focus:bg-primary/10 focus:text-primary cursor-pointer">
+								<DropdownMenuItem
+									onClick={() => void navigate({ to: "/settings" })}
+									className="gap-2 text-xs font-medium focus:bg-primary/10 focus:text-primary cursor-pointer"
+								>
 									<Settings className="h-3.5 w-3.5" />
 									<span>Configurações</span>
 								</DropdownMenuItem>
-								<DropdownMenuItem className="gap-2 text-xs font-medium focus:bg-primary/10 focus:text-primary cursor-pointer">
+								<DropdownMenuItem
+									onClick={() => void navigate({ to: "/billing" })}
+									className="gap-2 text-xs font-medium focus:bg-primary/10 focus:text-primary cursor-pointer"
+								>
 									<CreditCard className="h-3.5 w-3.5" />
 									<span>Plano & Assinatura</span>
 								</DropdownMenuItem>
@@ -256,6 +265,9 @@ export function AppHeader({ isSidebarOpen, onToggleSidebar }: AppHeaderProps) {
 
 function getPageTitle(pathname: string) {
 	if (pathname === "/dashboard") return "Dashboard";
+	if (pathname.startsWith("/account")) return "Minha Conta";
+	if (pathname.startsWith("/settings")) return "Configurações";
+	if (pathname.startsWith("/billing")) return "Plano & Assinatura";
 	if (pathname.startsWith("/characters")) return "Personagens";
 	if (pathname.startsWith("/sheets")) return "Fichas";
 	if (pathname.startsWith("/npcs")) return "NPCs";
