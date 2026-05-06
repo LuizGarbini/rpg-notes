@@ -50,7 +50,7 @@ function ProtectedLayout() {
 	const setupRealtime = useRPGStore((s) => s.setupRealtime);
 	const clearLocalData = useRPGStore((s) => s.clearLocalData);
 	const syncError = useRPGStore((s) => s.syncError);
-	const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
 	useEffect(() => {
 		if (loading) return;
@@ -59,14 +59,20 @@ function ProtectedLayout() {
 			void navigate({ to: "/auth", replace: true });
 			return;
 		}
-
 		void loadRemoteData();
 		const cleanup = setupRealtime();
-		
+
 		return () => {
 			cleanup();
 		};
-	}, [clearLocalData, loadRemoteData, loading, navigate, session, setupRealtime]);
+	}, [
+		clearLocalData,
+		loadRemoteData,
+		loading,
+		navigate,
+		session,
+		setupRealtime,
+	]);
 
 	if (loading || (!session && !loading)) {
 		return (
@@ -77,9 +83,10 @@ function ProtectedLayout() {
 	}
 
 	return (
-		<div className="relative flex h-screen overflow-hidden bg-muted/20 sm:p-3 sm:gap-3">
-			<div className="pointer-events-none fixed inset-0 -z-10 arcane-grid opacity-[0.05]" />
-			
+		<div className="relative flex h-screen overflow-hidden bg-background sm:gap-4 sm:p-4">
+			<div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(ellipse_900px_560px_at_12%_0%,var(--primary-muted),transparent_62%),radial-gradient(ellipse_700px_520px_at_100%_100%,oklch(0.55_0.2_320/0.08),transparent_64%),linear-gradient(180deg,var(--background),var(--muted))]" />
+			<div className="pointer-events-none fixed inset-0 -z-10 arcane-grid opacity-[0.035]" />
+
 			{/* Mobile Sidebar Overlay */}
 			{isSidebarOpen && (
 				<button
@@ -91,12 +98,14 @@ function ProtectedLayout() {
 			)}
 
 			{/* Sidebar Island */}
-			<div className={cn(
-				"fixed inset-y-0 left-0 z-100 flex flex-col overflow-hidden transition-all duration-300 bg-background md:relative md:z-0 md:flex md:translate-x-0 md:rounded-xl md:border md:border-border/60 md:bg-background/50 md:shadow-2xl md:backdrop-blur-md",
-				isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-			)}>
-				<Sidebar 
-					isOpen={isSidebarOpen} 
+			<div
+				className={cn(
+					"fixed inset-y-0 left-0 z-100 flex flex-col overflow-hidden transition-all duration-300 bg-background md:relative md:z-0 md:flex md:translate-x-0 md:rounded-2xl md:border md:border-border/60 md:bg-card/70 md:shadow-2xl md:shadow-black/10 md:backdrop-blur-xl",
+					isSidebarOpen ? "translate-x-0" : "-translate-x-full",
+				)}
+			>
+				<Sidebar
+					isOpen={true}
 					onItemClick={() => {
 						if (window.innerWidth < 768) {
 							setIsSidebarOpen(false);
@@ -106,15 +115,14 @@ function ProtectedLayout() {
 			</div>
 
 			{/* Dashboard Island */}
-			<div className="flex flex-1 flex-col overflow-hidden bg-background shadow-2xl shadow-black/20 sm:rounded-xl sm:border sm:border-border/60 sm:bg-background/50 sm:backdrop-blur-md">
+			<div className="flex flex-1 flex-col overflow-hidden bg-card/70 shadow-2xl shadow-black/10 backdrop-blur-xl sm:rounded-2xl sm:border sm:border-border/60">
 				<AppHeader
 					isSidebarOpen={isSidebarOpen}
 					onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
 				/>
-				<main className="relative z-10 flex-1 overflow-y-auto overflow-x-hidden scrollbar-none">
+				<main className="relative z-10 flex-1 overflow-y-auto overflow-x-hidden bg-linear-to-b from-background/25 via-transparent to-muted/20 scrollbar-none">
 					{syncError && (
-						<div className="border-b border-rose-500/20 bg-rose-500/10 px-6 py-2 text-[12px] text-rose-400 font-medium flex items-center gap-2">
-							<div className="h-1.5 w-1.5 rounded-full bg-rose-500 animate-pulse" />
+						<div className="mx-4 mt-4 rounded-lg border border-destructive/20 bg-destructive/10 px-4 py-2 text-[12px] font-medium text-destructive sm:mx-6">
 							Falha ao sincronizar: {syncError}
 						</div>
 					)}
