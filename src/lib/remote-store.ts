@@ -384,16 +384,3 @@ export async function createRemoteActivity(
 	const { error } = await supabase.from(SUPABASE_TABLES.activity).insert(row);
 	if (error) throw error;
 }
-
-/**
- * Atualiza o link da Jam do Spotify na tabela de campanhas
- */
-export async function updateCampaignSpotify(campaignId: string, jamLink: string | null): Promise<void> {
-	const supabase = requireSupabase();
-	const { error } = await supabase
-		.from(SUPABASE_TABLES.campaigns)
-		.update({ spotify_jam_link: jamLink })
-		.eq("id", campaignId);
-
-	if (error) throw error;
-}

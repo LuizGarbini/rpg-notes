@@ -37,18 +37,15 @@ interface AppHeaderProps {
 
 export function AppHeader({ isSidebarOpen, onToggleSidebar }: AppHeaderProps) {
 	const { user, signOut } = useAuth();
-	const spotifyUser = useRPGStore((s) => s.spotifyUser);
 	const clearLocalData = useRPGStore((state) => state.clearLocalData);
 	const navigate = useNavigate();
 	const toast = useToast();
 	const [isSigningOut, setIsSigningOut] = useState(false);
-
 	const metadataName = user?.user_metadata?.name;
 	const userName =
-		spotifyUser?.name ||
-		(typeof metadataName === "string" && metadataName.trim()
+		typeof metadataName === "string" && metadataName.trim()
 			? metadataName
-			: "Aventureiro");
+			: "Aventureiro";
 	const userEmail = user?.email || "grimoire@rpg.notes";
 	const userImage = spotifyUser?.image || "";
 	const initials = userName
@@ -61,27 +58,23 @@ export function AppHeader({ isSidebarOpen, onToggleSidebar }: AppHeaderProps) {
 	async function handleSignOut() {
 		if (isSigningOut) return;
 		setIsSigningOut(true);
-		try {
-			const error = await signOut();
-			if (error) {
-				toast.error({
-					title: "Não foi possível sair",
-					description: error,
-				});
-				return;
-			}
+		const error = await signOut();
+		setIsSigningOut(false);
 
-			clearLocalData();
-			toast.success({
-				title: "Sessão encerrada",
-				description: "Você saiu do seu grimório com segurança.",
+		if (error) {
+			toast.error({
+				title: "Não foi possível sair",
+				description: error,
 			});
-			void navigate({ to: "/auth", replace: true });
-		} catch (err) {
-			console.error("Erro ao sair:", err);
-		} finally {
-			setIsSigningOut(false);
+			return;
 		}
+
+		clearLocalData();
+		toast.success({
+			title: "Sessão encerrada",
+			description: "Você saiu do seu grimório com segurança.",
+		});
+		await navigate({ to: "/auth", replace: true });
 	}
 
 	return (
@@ -109,7 +102,7 @@ export function AppHeader({ isSidebarOpen, onToggleSidebar }: AppHeaderProps) {
 				</div>
 
 				<div className="hidden flex-1 items-center justify-center md:flex">
-					<div className="relative w-full max-sm:max-w-xs md:max-w-sm">
+					<div className="relative w-full max-w-sm">
 						<Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
 						<div className="flex h-9 w-full items-center gap-2 rounded-md border border-input bg-background/50 px-8 text-[13px] text-muted-foreground transition-all focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/30">
 							<span>Pesquisar no Grimório...</span>

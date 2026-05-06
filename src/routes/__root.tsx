@@ -8,7 +8,6 @@ import { useEffect, useState } from "react";
 import { Sidebar } from "@/components/sidebar";
 import { AppHeader } from "@/components/app-header";
 import { NotFound } from "@/components/not-found";
-import { ErrorComponent } from "@/components/error-component";
 import { ToastProvider } from "@/components/ui/toast";
 import { AuthProvider, useAuth } from "@/lib/auth";
 import { useRPGStore } from "@/lib/store";
