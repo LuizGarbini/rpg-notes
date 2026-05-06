@@ -1,4 +1,5 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "./database.types";
 
 /**
  * Supabase — cliente compartilhado.
@@ -14,11 +15,19 @@ export interface SupabaseConfig {
 
 /** Lê e valida as variáveis de ambiente. Retorna null se incompletas. */
 export function getSupabaseConfig(): SupabaseConfig | null {
-	const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
-	const key = (import.meta.env.VITE_SUPABASE_KEY ||
+	const rawUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined;
+	const rawKey = (import.meta.env.VITE_SUPABASE_KEY ||
 		import.meta.env.VITE_SUPABASE_ANON_KEY) as string | undefined;
+	const url = rawUrl?.trim();
+	const key = rawKey?.trim();
 
 	if (!url || !key) return null;
+	try {
+		const parsedUrl = new URL(url);
+		if (!["http:", "https:"].includes(parsedUrl.protocol)) return null;
+	} catch {
+		return null;
+	}
 	return { url, key };
 }
 
@@ -30,10 +39,10 @@ export function isSupabaseConfigured(): boolean {
 	return getSupabaseConfig() !== null;
 }
 
-let client: SupabaseClient | null | undefined;
+let client: SupabaseClient<Database> | null | undefined;
 
 /** Cliente lazy e null-safe para chamadas ao banco/Auth. */
-export function getSupabase(): SupabaseClient | null {
+export function getSupabase(): SupabaseClient<Database> | null {
 	if (client !== undefined) return client;
 
 	const config = getSupabaseConfig();
@@ -42,7 +51,7 @@ export function getSupabase(): SupabaseClient | null {
 		return client;
 	}
 
-	client = createClient(config.url, config.key, {
+	client = createClient<Database>(config.url, config.key, {
 		auth: {
 			autoRefreshToken: true,
 			persistSession: true,

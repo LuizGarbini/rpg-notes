@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
-import { Music, QrCode, ExternalLink, Trash2, Check, Copy, Play } from "lucide-react";
+import { Music, ExternalLink, Trash2, Check, Copy } from "lucide-react";
 import { useRPGStore } from "@/lib/store";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { SpotifyConnect } from "./spotify-connect";
-import { getCurrentlyPlaying } from "@/lib/spotify";
 import { cn } from "@/lib/utils";
 
 import { Skeleton } from "./ui/skeleton";

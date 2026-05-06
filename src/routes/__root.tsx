@@ -8,6 +8,8 @@ import { useEffect, useState } from "react";
 import { Sidebar } from "@/components/sidebar";
 import { AppHeader } from "@/components/app-header";
 import { NotFound } from "@/components/not-found";
+import { ErrorComponent } from "@/components/error-component";
+import { ToastProvider } from "@/components/ui/toast";
 import { AuthProvider, useAuth } from "@/lib/auth";
 import { useRPGStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -15,13 +17,16 @@ import { cn } from "@/lib/utils";
 export const Route = createRootRoute({
 	component: RootLayout,
 	notFoundComponent: NotFound,
+	errorComponent: ErrorComponent,
 });
 
 function RootLayout() {
 	return (
-		<AuthProvider>
-			<RootContent />
-		</AuthProvider>
+		<ToastProvider>
+			<AuthProvider>
+				<RootContent />
+			</AuthProvider>
+		</ToastProvider>
 	);
 }
 
@@ -41,22 +46,26 @@ function ProtectedLayout() {
 	const navigate = useNavigate();
 	const { loading, session } = useAuth();
 	const loadRemoteData = useRPGStore((s) => s.loadRemoteData);
+	const setupRealtime = useRPGStore((s) => s.setupRealtime);
 	const clearLocalData = useRPGStore((s) => s.clearLocalData);
-	const isLoadingRemote = useRPGStore((s) => s.isLoadingRemote);
 	const syncError = useRPGStore((s) => s.syncError);
 	const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
 	useEffect(() => {
-		console.log("ProtectedLayout useEffect - session:", !!session, "loading:", loading);
 		if (loading) return;
 		if (!session) {
-			console.log("Sessão não encontrada, redirecionando para /auth...");
 			clearLocalData();
 			void navigate({ to: "/auth", replace: true });
 			return;
 		}
+
 		void loadRemoteData();
-	}, [clearLocalData, loadRemoteData, loading, navigate, session]);
+		const cleanup = setupRealtime();
+		
+		return () => {
+			cleanup();
+		};
+	}, [clearLocalData, loadRemoteData, loading, navigate, session, setupRealtime]);
 
 	if (loading || (!session && !loading)) {
 		return (
@@ -72,15 +81,17 @@ function ProtectedLayout() {
 			
 			{/* Mobile Sidebar Overlay */}
 			{isSidebarOpen && (
-				<div 
-					className="fixed inset-0 z-[90] bg-background/60 backdrop-blur-sm md:hidden"
+				<button
+					type="button"
+					aria-label="Fechar menu lateral"
+					className="fixed inset-0 z-90 bg-background/60 backdrop-blur-sm md:hidden"
 					onClick={() => setIsSidebarOpen(false)}
 				/>
 			)}
 
 			{/* Sidebar Island */}
 			<div className={cn(
-				"fixed inset-y-0 left-0 z-[100] flex flex-col overflow-hidden transition-all duration-300 bg-background md:relative md:z-0 md:flex md:translate-x-0 md:rounded-xl md:border md:border-border/60 md:bg-background/50 md:shadow-2xl md:backdrop-blur-md",
+				"fixed inset-y-0 left-0 z-100 flex flex-col overflow-hidden transition-all duration-300 bg-background md:relative md:z-0 md:flex md:translate-x-0 md:rounded-xl md:border md:border-border/60 md:bg-background/50 md:shadow-2xl md:backdrop-blur-md",
 				isSidebarOpen ? "translate-x-0" : "-translate-x-full"
 			)}>
 				<Sidebar 

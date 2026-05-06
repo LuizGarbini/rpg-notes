@@ -5,7 +5,6 @@ import { getSupabase } from "@/lib/supabase";
 
 export function JamPresenceSync() {
 	const { user } = useAuth();
-	const spotifyToken = useRPGStore((s) => s.spotifyToken);
 	const spotifyUser = useRPGStore((s) => s.spotifyUser);
 	const jamLink = useRPGStore((s) => s.spotifyJamLink);
 	const setJamParticipants = useRPGStore((s) => s.setJamParticipants);
