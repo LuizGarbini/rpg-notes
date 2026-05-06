@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SpotifyCallbackRouteImport } from './routes/spotify-callback'
+import { Route as ErrorPreviewRouteImport } from './routes/error-preview'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
@@ -25,6 +26,11 @@ import { Route as SheetsCharacterIdRouteImport } from './routes/sheets/$characte
 const SpotifyCallbackRoute = SpotifyCallbackRouteImport.update({
   id: '/spotify-callback',
   path: '/spotify-callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ErrorPreviewRoute = ErrorPreviewRouteImport.update({
+  id: '/error-preview',
+  path: '/error-preview',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
+  '/error-preview': typeof ErrorPreviewRoute
   '/spotify-callback': typeof SpotifyCallbackRoute
   '/sheets/$characterId': typeof SheetsCharacterIdRoute
   '/characters': typeof CharactersIndexRoute
@@ -101,6 +108,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
+  '/error-preview': typeof ErrorPreviewRoute
   '/spotify-callback': typeof SpotifyCallbackRoute
   '/sheets/$characterId': typeof SheetsCharacterIdRoute
   '/characters': typeof CharactersIndexRoute
@@ -116,6 +124,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
+  '/error-preview': typeof ErrorPreviewRoute
   '/spotify-callback': typeof SpotifyCallbackRoute
   '/sheets/$characterId': typeof SheetsCharacterIdRoute
   '/characters/': typeof CharactersIndexRoute
@@ -132,6 +141,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/dashboard'
+    | '/error-preview'
     | '/spotify-callback'
     | '/sheets/$characterId'
     | '/characters'
@@ -146,6 +156,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/dashboard'
+    | '/error-preview'
     | '/spotify-callback'
     | '/sheets/$characterId'
     | '/characters'
@@ -160,6 +171,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/dashboard'
+    | '/error-preview'
     | '/spotify-callback'
     | '/sheets/$characterId'
     | '/characters/'
@@ -175,6 +187,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
   DashboardRoute: typeof DashboardRoute
+  ErrorPreviewRoute: typeof ErrorPreviewRoute
   SpotifyCallbackRoute: typeof SpotifyCallbackRoute
   SheetsCharacterIdRoute: typeof SheetsCharacterIdRoute
   CharactersIndexRoute: typeof CharactersIndexRoute
@@ -193,6 +206,13 @@ declare module '@tanstack/react-router' {
       path: '/spotify-callback'
       fullPath: '/spotify-callback'
       preLoaderRoute: typeof SpotifyCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/error-preview': {
+      id: '/error-preview'
+      path: '/error-preview'
+      fullPath: '/error-preview'
+      preLoaderRoute: typeof ErrorPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -279,6 +299,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
   DashboardRoute: DashboardRoute,
+  ErrorPreviewRoute: ErrorPreviewRoute,
   SpotifyCallbackRoute: SpotifyCallbackRoute,
   SheetsCharacterIdRoute: SheetsCharacterIdRoute,
   CharactersIndexRoute: CharactersIndexRoute,

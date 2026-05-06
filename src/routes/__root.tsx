@@ -7,6 +7,7 @@ import {
 import { useEffect, useState } from "react";
 import { Sidebar } from "@/components/sidebar";
 import { AppHeader } from "@/components/app-header";
+import { GlobalError } from "@/components/global-error";
 import { NotFound } from "@/components/not-found";
 import { ToastProvider } from "@/components/ui/toast";
 import { AuthProvider, useAuth } from "@/lib/auth";
@@ -15,8 +16,8 @@ import { cn } from "@/lib/utils";
 
 export const Route = createRootRoute({
 	component: RootLayout,
+	errorComponent: GlobalError,
 	notFoundComponent: NotFound,
-	errorComponent: ErrorComponent,
 });
 
 function RootLayout() {
@@ -33,8 +34,9 @@ function RootContent() {
 	const location = useLocation();
 	const isLanding = location.pathname === "/";
 	const isAuth = location.pathname === "/auth";
+	const isErrorPreview = location.pathname === "/error-preview";
 
-	if (isLanding || isAuth) {
+	if (isLanding || isAuth || isErrorPreview) {
 		return <Outlet />;
 	}
 
@@ -69,7 +71,7 @@ function ProtectedLayout() {
 	if (loading || (!session && !loading)) {
 		return (
 			<div className="flex min-h-screen items-center justify-center text-[13px] text-muted-foreground">
-				Carregando sessão...
+				Carregando sess├úo...
 			</div>
 		);
 	}

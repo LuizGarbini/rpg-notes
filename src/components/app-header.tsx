@@ -38,6 +38,7 @@ interface AppHeaderProps {
 export function AppHeader({ isSidebarOpen, onToggleSidebar }: AppHeaderProps) {
 	const { user, signOut } = useAuth();
 	const clearLocalData = useRPGStore((state) => state.clearLocalData);
+	const spotifyUser = useRPGStore((state) => state.spotifyUser);
 	const navigate = useNavigate();
 	const toast = useToast();
 	const [isSigningOut, setIsSigningOut] = useState(false);
