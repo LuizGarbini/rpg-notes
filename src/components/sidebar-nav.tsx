@@ -10,9 +10,10 @@ interface SidebarNavProps {
 		Icon: LucideIcon;
 		exact?: boolean;
 	}[];
+	onItemClick?: () => void;
 }
 
-export function SidebarNav({ title, isCollapsed, items }: SidebarNavProps) {
+export function SidebarNav({ title, isCollapsed, items, onItemClick }: SidebarNavProps) {
 	return (
 		<div className="space-y-1">
 			{title && !isCollapsed && (
@@ -25,6 +26,7 @@ export function SidebarNav({ title, isCollapsed, items }: SidebarNavProps) {
 					<Link
 						key={to}
 						to={to}
+						onClick={onItemClick}
 						activeOptions={{ exact: exact ?? to === "/dashboard" }}
 						activeProps={{
 							className: "bg-primary/10 text-primary",

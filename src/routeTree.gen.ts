@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SpotifyCallbackRouteImport } from './routes/spotify-callback'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
@@ -21,6 +22,11 @@ import { Route as ItemsIndexRouteImport } from './routes/items/index'
 import { Route as CharactersIndexRouteImport } from './routes/characters/index'
 import { Route as SheetsCharacterIdRouteImport } from './routes/sheets/$characterId'
 
+const SpotifyCallbackRoute = SpotifyCallbackRouteImport.update({
+  id: '/spotify-callback',
+  path: '/spotify-callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -81,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
+  '/spotify-callback': typeof SpotifyCallbackRoute
   '/sheets/$characterId': typeof SheetsCharacterIdRoute
   '/characters': typeof CharactersIndexRoute
   '/items': typeof ItemsIndexRoute
@@ -94,6 +101,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
+  '/spotify-callback': typeof SpotifyCallbackRoute
   '/sheets/$characterId': typeof SheetsCharacterIdRoute
   '/characters': typeof CharactersIndexRoute
   '/items': typeof ItemsIndexRoute
@@ -108,6 +116,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof DashboardRoute
+  '/spotify-callback': typeof SpotifyCallbackRoute
   '/sheets/$characterId': typeof SheetsCharacterIdRoute
   '/characters/': typeof CharactersIndexRoute
   '/items/': typeof ItemsIndexRoute
@@ -123,6 +132,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/dashboard'
+    | '/spotify-callback'
     | '/sheets/$characterId'
     | '/characters'
     | '/items'
@@ -136,6 +146,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/dashboard'
+    | '/spotify-callback'
     | '/sheets/$characterId'
     | '/characters'
     | '/items'
@@ -149,6 +160,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/dashboard'
+    | '/spotify-callback'
     | '/sheets/$characterId'
     | '/characters/'
     | '/items/'
@@ -163,6 +175,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
   DashboardRoute: typeof DashboardRoute
+  SpotifyCallbackRoute: typeof SpotifyCallbackRoute
   SheetsCharacterIdRoute: typeof SheetsCharacterIdRoute
   CharactersIndexRoute: typeof CharactersIndexRoute
   ItemsIndexRoute: typeof ItemsIndexRoute
@@ -175,6 +188,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/spotify-callback': {
+      id: '/spotify-callback'
+      path: '/spotify-callback'
+      fullPath: '/spotify-callback'
+      preLoaderRoute: typeof SpotifyCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -259,6 +279,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
   DashboardRoute: DashboardRoute,
+  SpotifyCallbackRoute: SpotifyCallbackRoute,
   SheetsCharacterIdRoute: SheetsCharacterIdRoute,
   CharactersIndexRoute: CharactersIndexRoute,
   ItemsIndexRoute: ItemsIndexRoute,
