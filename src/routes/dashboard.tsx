@@ -2,17 +2,19 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import {
 	ArrowUpRight,
 	BookOpen,
+	CalendarDays,
+	Clock3,
 	MapIcon,
 	Package,
 	ScrollText,
 	User,
 	Users,
+	type LucideIcon,
 } from "lucide-react";
 import { ActivityFeed } from "@/components/activity-feed";
-import { SpotifyJamCard } from "@/components/spotify-jam-card";
-import { JamPresenceSync } from "@/components/jam-presence-sync";
+import { Button } from "@/components/ui/button";
 import { useRPGStore } from "@/lib/store";
-import { Skeleton } from "@/components/ui/skeleton";
+import { formatRelativeTime } from "@/lib/utils";
 
 export const Route = createFileRoute("/dashboard")({
 	component: Dashboard,
@@ -25,6 +27,7 @@ const sections = [
 		description: "Heróis da campanha",
 		Icon: User,
 		accent: "text-violet-300",
+		tint: "bg-violet-500/10 border-violet-500/20",
 		key: "characters" as const,
 	},
 	{
@@ -33,6 +36,7 @@ const sections = [
 		description: "Aliados, inimigos e mistérios",
 		Icon: Users,
 		accent: "text-fuchsia-300",
+		tint: "bg-fuchsia-500/10 border-fuchsia-500/20",
 		key: "npcs" as const,
 	},
 	{
@@ -41,6 +45,7 @@ const sections = [
 		description: "Crônicas das aventuras",
 		Icon: ScrollText,
 		accent: "text-amber-300",
+		tint: "bg-amber-500/10 border-amber-500/20",
 		key: "sessions" as const,
 	},
 	{
@@ -49,6 +54,7 @@ const sections = [
 		description: "Tesouros e relíquias",
 		Icon: Package,
 		accent: "text-emerald-300",
+		tint: "bg-emerald-500/10 border-emerald-500/20",
 		key: "items" as const,
 	},
 	{
@@ -57,6 +63,7 @@ const sections = [
 		description: "Reinos e fronteiras",
 		Icon: MapIcon,
 		accent: "text-rose-300",
+		tint: "bg-rose-500/10 border-rose-500/20",
 		key: "locations" as const,
 	},
 	{
@@ -65,6 +72,7 @@ const sections = [
 		description: "História e conhecimento",
 		Icon: BookOpen,
 		accent: "text-indigo-300",
+		tint: "bg-indigo-500/10 border-indigo-500/20",
 		key: "lores" as const,
 	},
 ];
@@ -76,7 +84,7 @@ function Dashboard() {
 	const items = useRPGStore((s) => s.items);
 	const locations = useRPGStore((s) => s.locations);
 	const lores = useRPGStore((s) => s.lores);
-	const isLoadingRemote = useRPGStore((s) => s.isLoadingRemote);
+	const activityLog = useRPGStore((s) => s.activityLog);
 
 	const counts = {
 		characters: characters.length,
@@ -87,114 +95,117 @@ function Dashboard() {
 		lores: lores.length,
 	};
 
-	// const totalEntries = Object.values(counts).reduce((a, b) => a + b, 0);
+	const totalEntries = Object.values(counts).reduce((a, b) => a + b, 0);
 
 	const lastSession = [...sessions].sort(
 		(a, b) => b.createdAt - a.createdAt,
 	)[0];
+	const lastActivity = activityLog[0];
 
 	return (
-		<div className="w-full space-y-6 px-6 py-8">
-			<JamPresenceSync />
-			{/* Stat row */}
-			<div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-6">
-					{sections.map((s) => (
-						isLoadingRemote ? (
-							<Skeleton key={s.to} className="h-[54px] w-full rounded-md" />
-						) : (
-							<StatPill
-								key={s.to}
-								to={s.to}
-								label={s.title}
-								value={counts[s.key]}
-								Icon={s.Icon}
-								iconColor={s.accent}
-							/>
-						)
-					))}
-				</div>
-
-				{/* Section header */}
-				<div className="flex items-center gap-3 pt-2">
-					<h2 className="text-[10px] font-semibold uppercase tracking-[0.25em] text-muted-foreground heading-rule">
-						Coleções
-					</h2>
-				</div>
-
-				<div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-					{sections.map((s) => (
-						isLoadingRemote ? (
-							<Skeleton key={s.to} className="h-[68px] w-full rounded-lg" />
-						) : (
-							<DashboardCard
-								key={s.to}
-								to={s.to}
-								title={s.title}
-								description={s.description}
-								Icon={s.Icon}
-								iconColor={s.accent}
-								count={counts[s.key]}
-							/>
-						)
-					))}
-				</div>
-
-				{/* Two-column: last session + activity feed */}
-				<div className="grid grid-cols-1 gap-6 pt-2 lg:grid-cols-3">
-					<div className="lg:col-span-2">
-						<ActivityFeed limit={10} />
+		<div className="mx-auto flex w-full max-w-7xl flex-col gap-9 px-6 py-10 sm:px-8">
+			<section className="relative overflow-hidden rounded-[1.75rem] border border-border/70 bg-linear-to-br from-card via-card/90 to-primary-muted/30 p-7 shadow-xl shadow-black/5 sm:p-10">
+				<div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
+				<div className="absolute -bottom-28 left-1/3 h-64 w-64 rounded-full bg-fuchsia-500/5 blur-3xl" />
+				<div className="relative grid gap-10 lg:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.65fr)] lg:items-center">
+					<div className="max-w-3xl">
+						<p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary">
+							Visão geral
+						</p>
+						<h1 className="font-display mt-4 text-4xl font-bold leading-[1.08] tracking-tight text-foreground sm:text-5xl">
+							Sua campanha em foco
+						</h1>
+						<p className="mt-5 max-w-2xl text-[15px] leading-7 text-muted-foreground">
+							Acompanhe os registros principais, retome a última sessão e acesse
+							as coleções que mantêm o mundo organizado.
+						</p>
+						<div className="mt-8 flex flex-wrap gap-3">
+							<Link to="/characters">
+								<Button className="h-11 gap-2 px-5 font-bold">
+									<User className="h-4 w-4" />
+									Novo personagem
+								</Button>
+							</Link>
+							<Link to="/sessions">
+								<Button variant="outline" className="h-11 gap-2 px-5 font-bold">
+									<ScrollText className="h-4 w-4" />
+									Registrar sessão
+								</Button>
+							</Link>
+						</div>
 					</div>
-					<aside className="space-y-6">
-						<div>
-							<h2 className="text-[10px] font-semibold uppercase tracking-[0.25em] text-muted-foreground heading-rule mb-2.5">
-								Spotify Jam
-							</h2>
-							<SpotifyJamCard isDM={true} />
-						</div>
 
-						<div className="space-y-2.5">
-							<h2 className="text-[10px] font-semibold uppercase tracking-[0.25em] text-muted-foreground heading-rule">
-								Última sessão
-							</h2>
-							{isLoadingRemote ? (
-								<Skeleton className="h-[120px] w-full rounded-lg" />
-							) : lastSession ? (
-								<Link
-									to="/sessions"
-									className="group block rounded-lg border border-border bg-card-elevated p-4 transition-colors hover:border-border-hover"
-								>
-									<div className="flex items-start justify-between gap-3">
-										<div className="min-w-0 flex-1">
-											<div className="flex items-center gap-2">
-												<ScrollText
-													className="h-3.5 w-3.5 text-amber-400"
-													strokeWidth={1.7}
-												/>
-												<span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-													{lastSession.date || "sem data"}
-												</span>
-											</div>
-											<h3 className="font-display mt-1 text-base font-bold text-foreground">
-												{lastSession.title || "Sem título"}
-											</h3>
-											{lastSession.summary && (
-												<p className="mt-1.5 line-clamp-3 text-[12px] text-muted-foreground">
-													{lastSession.summary}
-												</p>
-											)}
-										</div>
-										<ArrowUpRight className="h-4 w-4 shrink-0 text-muted-foreground transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-primary" />
-									</div>
-								</Link>
-							) : (
-								<div className="rounded-lg border border-dashed border-border px-4 py-6 text-center text-[12px] text-muted-foreground">
-									Nenhuma sessão registrada ainda.
-								</div>
-							)}
-						</div>
-					</aside>
+					<div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+						<MetricCard
+							label="Registros"
+							value={totalEntries}
+							description="entradas no grimório"
+							Icon={BookOpen}
+						/>
+						<MetricCard
+							label="Eventos"
+							value={activityLog.length}
+							description={
+								lastActivity
+									? `último ${formatRelativeTime(lastActivity.timestamp)}`
+									: "sem histórico"
+							}
+							Icon={Clock3}
+						/>
+						<MetricCard
+							label="Sessões"
+							value={sessions.length}
+							description={
+								lastSession
+									? lastSession.title || "última sem título"
+									: "nenhuma registrada"
+							}
+							Icon={ScrollText}
+						/>
+					</div>
 				</div>
-			</div>
+			</section>
+
+			<section className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+				{sections.map((section) => (
+					<StatPill
+						key={section.to}
+						to={section.to}
+						label={section.title}
+						value={counts[section.key]}
+						Icon={section.Icon}
+						iconColor={section.accent}
+					/>
+				))}
+			</section>
+
+			<section className="space-y-5">
+				<SectionHeading
+					eyebrow="Coleções"
+					title="Continue construindo o mundo"
+					description="Acesse rapidamente personagens, sessões, itens e os detalhes do cenário."
+				/>
+				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+					{sections.map((section) => (
+						<DashboardCard
+							key={section.to}
+							to={section.to}
+							title={section.title}
+							description={section.description}
+							Icon={section.Icon}
+							iconColor={section.accent}
+							tint={section.tint}
+							count={counts[section.key]}
+						/>
+					))}
+				</div>
+			</section>
+
+			<section className="grid grid-cols-1 gap-5 xl:grid-cols-[1.25fr_0.75fr]">
+				<ActivityFeed limit={10} />
+				<LastSessionCard lastSession={lastSession} />
+			</section>
+		</div>
 	);
 }
 
@@ -202,7 +213,7 @@ interface StatPillProps {
 	to: string;
 	label: string;
 	value: number;
-	Icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
+	Icon: LucideIcon;
 	iconColor: string;
 }
 
@@ -210,17 +221,19 @@ function StatPill({ to, label, value, Icon, iconColor }: StatPillProps) {
 	return (
 		<Link
 			to={to}
-			className="group flex items-center justify-between rounded-md border border-border bg-card-elevated px-3 py-2.5 transition-colors hover:border-border-hover"
+			className="group flex items-center justify-between rounded-2xl border border-border/70 bg-card-elevated px-4 py-4 shadow-sm shadow-black/5 transition-all hover:-translate-y-0.5 hover:border-primary/30"
 		>
 			<div className="flex flex-col">
 				<span className="text-[9px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
 					{label}
 				</span>
-				<span className="font-display text-lg font-bold leading-none text-foreground">
+				<span className="font-display mt-1 text-xl font-bold leading-none text-foreground">
 					{value}
 				</span>
 			</div>
-			<Icon className={`h-4 w-4 ${iconColor}`} strokeWidth={1.7} />
+			<div className="flex h-8 w-8 items-center justify-center rounded-lg border border-border/70 bg-background/60">
+				<Icon className={`h-4 w-4 ${iconColor}`} strokeWidth={1.7} />
+			</div>
 		</Link>
 	);
 }
@@ -229,8 +242,9 @@ interface DashboardCardProps {
 	to: string;
 	title: string;
 	description: string;
-	Icon: React.ComponentType<{ className?: string; strokeWidth?: number }>;
+	Icon: LucideIcon;
 	iconColor: string;
+	tint: string;
 	count: number;
 }
 
@@ -240,35 +254,157 @@ function DashboardCard({
 	description,
 	Icon,
 	iconColor,
+	tint,
 	count,
 }: DashboardCardProps) {
 	return (
 		<Link
 			to={to}
-			className="group relative flex items-center justify-between gap-3 rounded-lg border border-border bg-card-elevated p-4 transition-colors hover:border-border-hover"
+			className="group relative overflow-hidden rounded-2xl border border-border/70 bg-card-elevated p-6 shadow-sm shadow-black/5 transition-all hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-lg hover:shadow-black/5"
 		>
-			<div className="flex items-center gap-3 min-w-0">
+			<div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-primary/40 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
+			<div className="flex items-start justify-between gap-4">
 				<div
-					className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-background/60 ring-1 ring-border ${iconColor}`}
+					className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border ${tint} ${iconColor}`}
 				>
-					<Icon className="h-4 w-4" strokeWidth={1.7} />
+					<Icon className="h-5 w-5" strokeWidth={1.7} />
 				</div>
-				<div className="min-w-0">
-					<div className="flex items-center gap-2">
-						<h3 className="text-[14px] font-semibold text-foreground transition-colors group-hover:text-primary">
-							{title}
-						</h3>
-						<span className="rounded px-1.5 py-0.5 text-[10px] font-bold tabular-nums text-muted-foreground ring-1 ring-border">
-							{count}
-						</span>
-					</div>
-					<p className="mt-0.5 truncate text-[12px] text-muted-foreground">
-						{description}
+				<div className="text-right">
+					<span className="font-display text-3xl font-bold leading-none text-foreground">
+						{count}
+					</span>
+					<p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+						registros
 					</p>
 				</div>
 			</div>
 
-			<ArrowUpRight className="h-4 w-4 shrink-0 text-muted-foreground transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-primary" />
+			<div className="mt-6">
+				<h3 className="text-[15px] font-bold text-foreground transition-colors group-hover:text-primary">
+					{title}
+				</h3>
+				<p className="mt-2 text-[12px] leading-relaxed text-muted-foreground">
+					{description}
+				</p>
+			</div>
+
+			<div className="mt-6 flex items-center justify-between border-t border-border/60 pt-4 text-[12px] font-bold text-primary">
+				<span>Abrir coleção</span>
+				<ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+			</div>
 		</Link>
+	);
+}
+
+function MetricCard({
+	label,
+	value,
+	description,
+	Icon,
+}: {
+	label: string;
+	value: number;
+	description: string;
+	Icon: LucideIcon;
+}) {
+	return (
+		<div className="rounded-2xl border border-border/70 bg-background/45 p-5 shadow-sm shadow-black/5 backdrop-blur-sm">
+			<div className="flex items-center justify-between gap-3">
+				<p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+					{label}
+				</p>
+				<Icon className="h-4 w-4 text-primary" strokeWidth={1.7} />
+			</div>
+			<p className="font-display mt-3 text-3xl font-bold leading-none text-foreground">
+				{value}
+			</p>
+			<p className="mt-2 truncate text-[12px] text-muted-foreground">
+				{description}
+			</p>
+		</div>
+	);
+}
+
+function SectionHeading({
+	eyebrow,
+	title,
+	description,
+}: {
+	eyebrow: string;
+	title: string;
+	description: string;
+}) {
+	return (
+		<div className="flex max-w-2xl flex-col gap-2">
+			<p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-muted-foreground heading-rule">
+				{eyebrow}
+			</p>
+			<h2 className="text-2xl font-bold tracking-tight text-foreground">
+				{title}
+			</h2>
+			<p className="text-[13px] leading-6 text-muted-foreground">
+				{description}
+			</p>
+		</div>
+	);
+}
+
+function LastSessionCard({
+	lastSession,
+}: {
+	lastSession:
+		| {
+				title: string;
+				date: string;
+				summary: string;
+				createdAt: number;
+		  }
+		| undefined;
+}) {
+	return (
+		<aside className="rounded-2xl border border-border/70 bg-card/80 p-6 shadow-sm shadow-black/5">
+			<div className="mb-5 flex items-center justify-between gap-3">
+				<div>
+					<p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+						Sessões
+					</p>
+					<h2 className="mt-1 text-lg font-bold tracking-tight text-foreground">
+						Última sessão
+					</h2>
+				</div>
+				<CalendarDays className="h-5 w-5 text-amber-300" strokeWidth={1.7} />
+			</div>
+
+			{lastSession ? (
+				<Link
+					to="/sessions"
+					className="group block rounded-xl border border-border/70 bg-card-elevated p-4 transition-all hover:-translate-y-0.5 hover:border-primary/35"
+				>
+					<div className="flex items-start justify-between gap-3">
+						<div className="min-w-0">
+							<p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+								{lastSession.date || "Sem data"}
+							</p>
+							<h3 className="font-display mt-2 text-xl font-bold text-foreground">
+								{lastSession.title || "Sem título"}
+							</h3>
+						</div>
+						<ArrowUpRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-primary" />
+					</div>
+					<p className="mt-3 line-clamp-4 text-[12px] leading-relaxed text-muted-foreground">
+						{lastSession.summary || "Ainda não há resumo para esta sessão."}
+					</p>
+				</Link>
+			) : (
+				<div className="rounded-xl border border-dashed border-border px-4 py-8 text-center">
+					<p className="text-[13px] font-bold text-foreground">
+						Nenhuma sessão registrada
+					</p>
+					<p className="mt-1 text-[12px] text-muted-foreground">
+						Quando uma sessão for criada, ela aparece aqui como destaque.
+					</p>
+				</div>
+			)}
+		</aside>
 	);
 }

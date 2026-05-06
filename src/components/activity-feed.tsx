@@ -18,7 +18,6 @@ import {
 	useRPGStore,
 } from "@/lib/store";
 import { formatRelativeTime } from "@/lib/utils";
-import { Skeleton } from "./ui/skeleton";
 
 const ENTITY_ICONS: Record<EntityKind, LucideIcon> = {
 	character: User,
@@ -53,35 +52,38 @@ interface ActivityFeedProps {
 
 export function ActivityFeed({ limit = 8 }: ActivityFeedProps) {
 	const activity = useRPGStore((s) => s.activityLog);
-	const isLoadingRemote = useRPGStore((s) => s.isLoadingRemote);
 	const items = activity.slice(0, limit);
 
 	return (
-		<section className="space-y-2.5">
-			<header className="flex items-center justify-between">
-				<h2 className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.25em] text-muted-foreground heading-rule">
-					<History className="h-3 w-3 text-primary" />
-					Atividade recente
-				</h2>
-				{activity.length > 0 && !isLoadingRemote && (
-					<span className="text-[10px] uppercase tracking-wider text-muted-foreground/70">
+		<section className="rounded-2xl border border-border/70 bg-card/80 p-6 shadow-sm shadow-black/5">
+			<header className="mb-5 flex items-start justify-between gap-4">
+				<div>
+					<p className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+						<History className="h-3.5 w-3.5 text-primary" />
+						Timeline
+					</p>
+					<h2 className="mt-2 text-lg font-bold tracking-tight text-foreground">
+						Atividade recente
+					</h2>
+				</div>
+				{activity.length > 0 && (
+					<span className="rounded-full border border-border/70 bg-background/60 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
 						{activity.length} eventos
 					</span>
 				)}
 			</header>
 
-			{isLoadingRemote ? (
-				<div className="flex flex-col gap-1.5">
-					{Array.from({ length: 5 }).map((_, i) => (
-						<Skeleton key={i} className="h-11 w-full rounded-md" />
-					))}
-				</div>
-			) : items.length === 0 ? (
-				<div className="rounded-lg border border-dashed border-border px-4 py-6 text-center text-[12px] text-muted-foreground">
-					Nada por aqui ainda. Crie ou edite algum registro pra ver o histórico.
+			{items.length === 0 ? (
+				<div className="rounded-xl border border-dashed border-border px-4 py-8 text-center">
+					<p className="text-[13px] font-bold text-foreground">
+						Nada por aqui ainda
+					</p>
+					<p className="mt-1 text-[12px] text-muted-foreground">
+						Crie ou edite algum registro para ver o histórico.
+					</p>
 				</div>
 			) : (
-				<ol className="flex flex-col gap-1.5">
+				<ol className="flex flex-col gap-3">
 					{items.map((entry) => {
 						const Icon = ENTITY_ICONS[entry.entityKind];
 						const action = ACTION_META[entry.action];
@@ -90,29 +92,33 @@ export function ActivityFeed({ limit = 8 }: ActivityFeedProps) {
 						return (
 							<li
 								key={entry.id}
-								className="group flex items-center gap-3 rounded-md border border-border/60 bg-card-elevated/40 px-3 py-2 transition-colors hover:border-border-hover"
+								className="group flex items-center gap-4 rounded-xl border border-border/60 bg-card-elevated/60 px-4 py-3.5 transition-all hover:-translate-y-0.5 hover:border-primary/30"
 							>
 								<div
-									className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-background/60 ring-1 ring-border ${ENTITY_COLORS[entry.entityKind]}`}
+									className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-background/70 ring-1 ring-border ${ENTITY_COLORS[entry.entityKind]}`}
 								>
-									<Icon className="h-3.5 w-3.5" strokeWidth={1.7} />
+									<Icon className="h-4 w-4" strokeWidth={1.7} />
 								</div>
-								<div className="flex min-w-0 flex-1 items-center gap-2 text-[12px]">
-									<ActionIcon
-										className={`h-3 w-3 shrink-0 ${action.color}`}
-										strokeWidth={2}
-									/>
-									<span className="text-muted-foreground">{action.label}</span>
-									<span className="text-muted-foreground/70">
-										{entityLabel.toLowerCase()}
-									</span>
-									<span className="truncate font-medium text-foreground">
+								<div className="min-w-0 flex-1">
+									<div className="flex min-w-0 items-center gap-2 text-[12px]">
+										<ActionIcon
+											className={`h-3.5 w-3.5 shrink-0 ${action.color}`}
+											strokeWidth={2}
+										/>
+										<span className="text-muted-foreground">
+											{action.label}
+										</span>
+										<span className="text-muted-foreground/70">
+											{entityLabel.toLowerCase()}
+										</span>
+									</div>
+									<p className="mt-0.5 truncate text-[13px] font-bold text-foreground">
 										{entry.entityName}
-									</span>
+									</p>
 								</div>
 								<time
 									dateTime={new Date(entry.timestamp).toISOString()}
-									className="shrink-0 font-mono text-[10px] tabular-nums text-muted-foreground/70"
+									className="shrink-0 rounded-full border border-border/60 bg-background/60 px-2 py-1 font-mono text-[10px] tabular-nums text-muted-foreground"
 								>
 									{formatRelativeTime(entry.timestamp)}
 								</time>
