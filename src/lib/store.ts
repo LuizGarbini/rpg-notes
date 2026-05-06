@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 import {
 	createRemoteActivity,
 	createRemoteEntity,
@@ -516,6 +517,20 @@ interface RPGState {
 
 	activityLog: ActivityEntry[];
 	clearActivity: () => void;
+
+	// ----- Spotify Jam -----
+	spotifyJamLink: string | null;
+	spotifyJamActive: boolean;
+	spotifyToken: string | null;
+	spotifyUser: { name: string; email?: string; image?: string } | null;
+	currentTrack: { title: string; artist: string; albumArt?: string; isPlaying: boolean } | null;
+	jamParticipants: { id: string; name: string; image?: string }[];
+	setSpotifyJam: (link: string | null) => void;
+	clearSpotifyJam: () => void;
+	setSpotifyAuth: (token: string, user?: { name: string; email?: string; image?: string }) => void;
+	logoutSpotify: () => void;
+	setCurrentTrack: (track: { title: string; artist: string; albumArt?: string; isPlaying: boolean } | null) => void;
+	setJamParticipants: (participants: { id: string; name: string; image?: string }[]) => void;
 }
 
 const generateEntry = <T extends object>(
@@ -559,7 +574,9 @@ function entityNameOf(e: object, fallback = "Sem nome"): string {
 	return fallback;
 }
 
-export const useRPGStore = create<RPGState>()((set) => ({
+export const useRPGStore = create<RPGState>()(
+	persist(
+		(set, get) => ({
 	isLoadingRemote: false,
 	syncError: null,
 	loadRemoteData: async () => {
@@ -1003,7 +1020,33 @@ export const useRPGStore = create<RPGState>()((set) => ({
 	// ----- Activity Log -----
 	activityLog: [],
 	clearActivity: () => set({ activityLog: [] }),
-}));
+
+	// ----- Spotify Jam -----
+	spotifyJamLink: null,
+	spotifyJamActive: false,
+	spotifyToken: null,
+	spotifyUser: null,
+	setSpotifyJam: (link) => {
+		set({ spotifyJamLink: link, spotifyJamActive: !!link });
+		// Nota: Aqui poderíamos disparar a persistência no Supabase para a campanha
+	},
+	clearSpotifyJam: () => set({ spotifyJamLink: null, spotifyJamActive: false }),
+	setSpotifyAuth: (token, user) => set({ spotifyToken: token, spotifyUser: user || null }),
+	logoutSpotify: () => set({ spotifyToken: null, spotifyUser: null, currentTrack: null }),
+	setCurrentTrack: (track) => set({ currentTrack: track }),
+	jamParticipants: [],
+	setJamParticipants: (participants: { id: string; name: string; image?: string }[]) => set({ jamParticipants: participants }),
+}),
+		{
+			name: "rpg-notes-storage",
+			partialize: (state) => ({
+				spotifyToken: state.spotifyToken,
+				spotifyUser: state.spotifyUser,
+				spotifyJamLink: state.spotifyJamLink,
+			}),
+		},
+	),
+);
 
 // =====================================================
 //  Helpers

@@ -83,7 +83,14 @@ function ProtectedLayout() {
 				"fixed inset-y-0 left-0 z-[100] flex flex-col overflow-hidden transition-all duration-300 bg-background md:relative md:z-0 md:flex md:translate-x-0 md:rounded-xl md:border md:border-border/60 md:bg-background/50 md:shadow-2xl md:backdrop-blur-md",
 				isSidebarOpen ? "translate-x-0" : "-translate-x-full"
 			)}>
-				<Sidebar isOpen={isSidebarOpen} />
+				<Sidebar 
+					isOpen={isSidebarOpen} 
+					onItemClick={() => {
+						if (window.innerWidth < 768) {
+							setIsSidebarOpen(false);
+						}
+					}}
+				/>
 			</div>
 
 			{/* Dashboard Island */}
@@ -93,11 +100,10 @@ function ProtectedLayout() {
 					onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
 				/>
 				<main className="relative z-10 flex-1 overflow-y-auto overflow-x-hidden scrollbar-none">
-					{(isLoadingRemote || syncError) && (
-						<div className="border-b border-border bg-card-elevated/60 px-6 py-2 text-[12px] text-muted-foreground">
-							{syncError
-								? `Falha ao sincronizar: ${syncError}`
-								: "Sincronizando dados do Supabase..."}
+					{syncError && (
+						<div className="border-b border-rose-500/20 bg-rose-500/10 px-6 py-2 text-[12px] text-rose-400 font-medium flex items-center gap-2">
+							<div className="h-1.5 w-1.5 rounded-full bg-rose-500 animate-pulse" />
+							Falha ao sincronizar: {syncError}
 						</div>
 					)}
 					<Outlet />
