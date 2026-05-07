@@ -1,4 +1,5 @@
-import { MapPin, Skull, User } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { FileText, MapPin, Skull, User } from "lucide-react";
 import { useState } from "react";
 import type { Npc } from "@/lib/store";
 import { useRPGStore } from "@/lib/store";
@@ -42,6 +43,11 @@ const importanceStyles: Record<string, string> = {
 
 export function NpcCard({ npc }: NpcCardProps) {
 	const removeNpc = useRPGStore((s) => s.removeNpc);
+	const linkedCharacter = useRPGStore((s) =>
+		npc.linkedCharacterId
+			? s.characters.find((character) => character.id === npc.linkedCharacterId)
+			: undefined,
+	);
 	const [editOpen, setEditOpen] = useState(false);
 
 	const initials = npc.name
@@ -116,6 +122,17 @@ export function NpcCard({ npc }: NpcCardProps) {
 						<MapPin className="h-3 w-3 text-amber-300" />
 						<span className="truncate">{npc.location}</span>
 					</div>
+				)}
+
+				{linkedCharacter && (
+					<Link
+						to="/sheets/$characterId"
+						params={{ characterId: linkedCharacter.id }}
+						className="mt-3 inline-flex items-center gap-1.5 rounded-xl border border-primary/20 bg-primary/10 px-2.5 py-1.5 text-[11px] font-bold text-primary transition-[background-color,transform] duration-150 ease-[cubic-bezier(0.16,1,0.3,1)] hover:bg-primary/15 active:scale-[0.98]"
+					>
+						<FileText className="h-3 w-3" />
+						Ficha: {linkedCharacter.characterName || "Sem nome"}
+					</Link>
 				)}
 
 				{npc.description && (

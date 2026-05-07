@@ -1,11 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { User } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Plus, User } from "lucide-react";
 import { useState } from "react";
 import { CharacterCard } from "@/components/character-card";
-import { CharacterForm } from "@/components/character-form";
 import { EmptyState } from "@/components/empty-state";
 import { ListLayout } from "@/components/list-layout";
 import { PageHeader } from "@/components/page-header";
+import { Button } from "@/components/ui/button";
 import { useRPGStore } from "@/lib/store";
 
 export const Route = createFileRoute("/characters/")({
@@ -23,13 +23,20 @@ function RouteComponent() {
 	return (
 		<div className="w-full">
 			<PageHeader
-				title="Personagens"
-				description="Os heróis e protagonistas da sua campanha"
+				title="Elenco"
+				description="A visão narrativa dos personagens que participam da campanha"
 				Icon={User}
 				iconColor="text-violet-300"
-				eyebrow="Heróis"
+				eyebrow="Personagens da campanha"
 				count={characters.length}
-				action={<CharacterForm />}
+				action={
+					<Link to="/sheets/new">
+						<Button size="sm" className="gap-2">
+							<Plus className="h-3.5 w-3.5" />
+							Criar ficha
+						</Button>
+					</Link>
+				}
 			/>
 
 			<div className="mx-auto flex w-full max-w-7xl flex-col gap-5 px-6 pb-10 sm:px-8">
@@ -42,8 +49,8 @@ function RouteComponent() {
 					{filteredCharacters.length === 0 && (
 						<EmptyState
 							Icon={User}
-							title="Nenhum personagem encontrado"
-							description="Comece adicionando o primeiro herói da sua campanha."
+							title="Nenhum personagem no elenco"
+							description="Crie uma ficha para adicionar o primeiro protagonista da campanha."
 						/>
 					)}
 				</div>

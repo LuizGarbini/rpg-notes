@@ -65,7 +65,13 @@ function moduleConfig(
 
 export function createDefaultSheetLayout(
 	system: RpgSystem = "dnd5e",
+	options?: {
+		showSpells?: boolean;
+		showSanity?: boolean;
+	},
 ): SheetLayoutConfig {
+	const showSanity = options?.showSanity ?? SYSTEMS_WITH_SANITY.has(system);
+	const showSpells = options?.showSpells ?? !SYSTEMS_WITHOUT_MAGIC.has(system);
 	const modules: SheetModuleConfig[] = [
 		moduleConfig("identity", 10, "side", {
 			fields: ["characterName", "race", "class", "background"],
@@ -94,7 +100,7 @@ export function createDefaultSheetLayout(
 		}),
 	];
 
-	if (SYSTEMS_WITH_SANITY.has(system)) {
+	if (showSanity) {
 		modules.splice(
 			3,
 			0,
@@ -104,7 +110,7 @@ export function createDefaultSheetLayout(
 		);
 	}
 
-	if (!SYSTEMS_WITHOUT_MAGIC.has(system)) {
+	if (showSpells) {
 		modules.splice(
 			4,
 			0,

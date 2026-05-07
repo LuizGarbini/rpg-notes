@@ -93,6 +93,7 @@ function NpcFormDialog({
 	const [tab, setTab] = useState(TABS[0].id);
 	const addNpc = useRPGStore((state) => state.addNpc);
 	const updateNpc = useRPGStore((state) => state.updateNpc);
+	const characters = useRPGStore((state) => state.characters);
 
 	const { register, handleSubmit, reset, control, setValue } =
 		useForm<NpcFormValues>({
@@ -117,7 +118,7 @@ function NpcFormDialog({
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			{trigger && <DialogTrigger render={trigger as React.ReactElement} />}
-			<DialogContent className="!max-w-2xl max-h-[92vh] overflow-hidden p-0">
+			<DialogContent className="max-w-2xl! max-h-[92vh] overflow-hidden p-0">
 				<form
 					onSubmit={handleSubmit(onSubmit)}
 					className="flex max-h-[92vh] flex-col"
@@ -147,9 +148,8 @@ function NpcFormDialog({
 									size="md"
 								/>
 								<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-									<Field label="Nome" htmlFor="name">
+									<Field label="Nome">
 										<Input
-											id="name"
 											placeholder="Ex: Bob, o Taberneiro"
 											{...register("name", { required: true })}
 										/>
@@ -198,6 +198,16 @@ function NpcFormDialog({
 									</Field>
 									<Field label="CR / Nível">
 										<Input placeholder="Ex: 1/4 ou 5" {...register("cr")} />
+									</Field>
+									<Field label="Ficha vinculada">
+										<Select {...register("linkedCharacterId")}>
+											<option value="">Nenhuma ficha vinculada</option>
+											{characters.map((character) => (
+												<option key={character.id} value={character.id}>
+													{character.characterName || "Ficha sem nome"}
+												</option>
+											))}
+										</Select>
 									</Field>
 								</div>
 								<Field label="Descrição">

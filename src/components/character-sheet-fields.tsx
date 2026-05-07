@@ -64,7 +64,7 @@ export function sanitizeCharacterFormValues(
 
 export function SystemFields({ register }: { register: CharacterRegister }) {
 	return (
-		<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+		<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
 			<Field label="Sistema">
 				<Select {...register("system")}>
 					{Object.values(SYSTEM_CONFIG).map((system) => (
@@ -139,7 +139,7 @@ export function IdentityFields({
 	return (
 		<>
 			<FormSection title="Identidade Básica">
-				<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
 					<Field label="Nome do personagem">
 						<Input
 							placeholder="Ex: Aragorn, Lyra Cinzal..."
@@ -150,7 +150,7 @@ export function IdentityFields({
 						<Input placeholder="Ex: Caótico Bom" {...register("alignment")} />
 					</Field>
 				</div>
-				<div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+				<div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
 					<Field label="Raça">
 						<Input placeholder="Elfo, Humano..." {...register("race")} />
 					</Field>
@@ -161,7 +161,7 @@ export function IdentityFields({
 						<Input placeholder="Domínio da Vida..." {...register("subclass")} />
 					</Field>
 				</div>
-				<div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+				<div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
 					<Field label="Antecedente / Background">
 						<Input
 							placeholder="Charlatão, Sábio..."
@@ -194,7 +194,7 @@ export function IdentityFields({
 					folder="characters"
 					size="lg"
 				/>
-				<div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+				<div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
 					<Field label="Idade">
 						<Input placeholder="Ex: 137" {...register("age")} />
 					</Field>
@@ -254,7 +254,7 @@ export function AbilitiesFields({
 						: "Pontuações de 1 a 30."
 				}
 			>
-				<div className="grid grid-cols-3 gap-3 sm:grid-cols-6">
+				<div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-6">
 					{fields.map((field) => (
 						<AbilityField
 							key={field.name}
@@ -283,7 +283,7 @@ export function AbilitiesFields({
 						{...register("skills")}
 					/>
 				</Field>
-				<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
 					<Field label="Idiomas">
 						<Input placeholder="Comum, Élfico..." {...register("languages")} />
 					</Field>
@@ -305,7 +305,7 @@ export function SanityFields({ register }: { register: CharacterRegister }) {
 			title="Sanidade & Atributos Específicos"
 			description="Para Cthulhu, Ordem Paranormal e similares."
 		>
-			<div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+			<div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
 				<Field label="Poder (POW)">
 					<Input
 						type="number"
@@ -347,7 +347,7 @@ export function CombatFields({
 }) {
 	return (
 		<FormSection title="Status de Combate">
-			<div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+			<div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
 				<Field label="HP Atual">
 					<Input
 						type="number"
@@ -436,7 +436,7 @@ export function PersonalityFields({ register }: { register: CharacterRegister })
 export function MagicFields({ register }: { register: CharacterRegister }) {
 	return (
 		<FormSection title="Conjuração de Magias">
-			<div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+			<div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
 				<Field label="Classe conjuradora">
 					<Input placeholder="Mago, Clérigo..." {...register("spellcastingClass")} />
 				</Field>
@@ -527,7 +527,7 @@ function AbilityField({
 	const mod = abilityModifier(Number.isFinite(numeric) ? numeric : 10);
 
 	return (
-		<div className="flex flex-col items-center gap-1 rounded-2xl border border-border/70 bg-card/80 p-2 shadow-sm shadow-black/5">
+		<div className="flex flex-col items-center gap-2 rounded-2xl border border-border/70 bg-card/80 p-3 shadow-sm shadow-black/5">
 			<span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
 				{label}
 			</span>

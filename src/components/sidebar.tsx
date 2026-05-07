@@ -18,7 +18,7 @@ const FREE_CREATION_LIMIT = 20;
 
 const grimoireItems = [
 	{ to: "/dashboard", label: "Dashboard", Icon: House },
-	{ to: "/characters", label: "Personagens", Icon: User },
+	{ to: "/characters", label: "Elenco", Icon: User },
 	{ to: "/sheets", label: "Fichas", Icon: FileText },
 	{ to: "/npcs", label: "NPCs", Icon: Users },
 	{ to: "/sessions", label: "Sessões", Icon: ScrollText },

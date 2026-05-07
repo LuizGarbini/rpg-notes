@@ -23,8 +23,8 @@ export const Route = createFileRoute("/dashboard")({
 const sections = [
 	{
 		to: "/characters",
-		title: "Personagens",
-		description: "Heróis da campanha",
+		title: "Elenco",
+		description: "Visão narrativa",
 		Icon: User,
 		accent: "text-violet-300",
 		tint: "bg-violet-500/10 border-violet-500/20",
@@ -120,10 +120,10 @@ function Dashboard() {
 							as coleções que mantêm o mundo organizado.
 						</p>
 						<div className="mt-8 flex flex-wrap gap-3">
-							<Link to="/characters">
+							<Link to="/sheets/new">
 								<Button className="h-11 gap-2 px-5 font-bold">
 									<User className="h-4 w-4" />
-									Novo personagem
+									Criar ficha
 								</Button>
 							</Link>
 							<Link to="/sessions">

@@ -198,6 +198,7 @@ export interface Npc {
 	description: string;
 	imageUrl: string;
 	isAlive: boolean;
+	linkedCharacterId: string;
 }
 
 export interface Session {
