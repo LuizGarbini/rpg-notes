@@ -1,18 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { motion, type Variants } from "framer-motion";
 import {
 	ArrowUpRight,
 	BookOpen,
 	CalendarDays,
 	Clock3,
+	type LucideIcon,
 	MapIcon,
 	Package,
 	ScrollText,
 	User,
 	Users,
-	type LucideIcon,
-	ChevronRight,
 } from "lucide-react";
-import { motion } from "framer-motion";
 import { ActivityFeed } from "@/components/activity-feed";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -80,19 +79,30 @@ const sections = [
 	},
 ];
 
-const containerVariants = {
+const containerVariants: Variants = {
 	hidden: { opacity: 0 },
 	visible: {
 		opacity: 1,
 		transition: {
-			staggerChildren: 0.1
-		}
-	}
+			delayChildren: 0.04,
+			staggerChildren: 0.09,
+		},
+	},
 };
 
-const itemVariants = {
-	hidden: { opacity: 0, y: 20 },
-	visible: { opacity: 1, y: 0 }
+const itemVariants: Variants = {
+	hidden: { opacity: 0, scale: 0.98, y: 22 },
+	visible: {
+		opacity: 1,
+		scale: 1,
+		y: 0,
+		transition: {
+			damping: 18,
+			mass: 0.85,
+			stiffness: 230,
+			type: "spring",
+		},
+	},
 };
 
 function Dashboard() {
@@ -122,30 +132,29 @@ function Dashboard() {
 	const lastActivity = activityLog[0];
 
 	return (
-		<motion.div 
+		<motion.div
 			variants={containerVariants}
 			initial="hidden"
 			animate="visible"
-			className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-6 py-12 sm:px-8"
+			className="mx-auto flex w-full max-w-7xl flex-col gap-9 px-6 py-10 sm:px-8"
 		>
-			<motion.section 
+			<motion.section
 				variants={itemVariants}
-				className="relative overflow-hidden rounded-[2.5rem] border border-white/10 bg-card/40 p-8 shadow-2xl backdrop-blur-2xl ring-1 ring-white/5 sm:p-12"
+				className="relative overflow-hidden rounded-[1.75rem] border border-border/70 bg-linear-to-br from-card via-card/90 to-primary-muted/30 p-7 shadow-xl shadow-black/5 sm:p-10"
 			>
-				<div className="relative z-10 grid gap-12 lg:grid-cols-[1fr_340px] lg:items-center">
+				<div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
+				<div className="absolute -bottom-28 left-1/3 h-64 w-64 rounded-full bg-fuchsia-500/5 blur-3xl" />
+				<div className="relative grid gap-10 lg:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.65fr)] lg:items-center">
 					<div className="max-w-3xl">
-						<div className="flex items-center gap-2 mb-6">
-							<div className="h-px w-8 bg-primary/40" />
-							<span className="text-[10px] font-bold uppercase tracking-[0.3em] text-primary">
-								Visão geral do Reino
-							</span>
-						</div>
-						<h1 className="font-display text-5xl font-bold leading-[1.1] tracking-tight text-foreground sm:text-6xl">
-							Seu épico em <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-fuchsia-400">foco.</span>
+						<p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-primary">
+							Visão geral
+						</p>
+						<h1 className="font-display mt-4 text-4xl font-bold leading-[1.08] tracking-tight text-foreground sm:text-5xl">
+							Sua campanha em foco
 						</h1>
-						<p className="mt-6 max-w-xl text-[16px] leading-relaxed text-muted-foreground/80 font-medium">
+						<p className="mt-5 max-w-2xl text-[15px] leading-7 text-muted-foreground">
 							Acompanhe os registros principais, retome a última sessão e acesse
-							as coleções que mantêm o seu mundo organizado e vivo.
+							as coleções que mantêm o mundo organizado.
 						</p>
 						<div className="mt-8 flex flex-wrap gap-3">
 							<Link to="/sheets/new">
@@ -155,15 +164,15 @@ function Dashboard() {
 								</Button>
 							</Link>
 							<Link to="/sessions">
-								<Button variant="outline" className="h-12 gap-3 px-8 font-bold border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20 transition-all">
+								<Button variant="outline" className="h-11 gap-2 px-5 font-bold">
 									<ScrollText className="h-4 w-4" />
-									Registrar Sessão
+									Registrar sessão
 								</Button>
 							</Link>
 						</div>
 					</div>
 
-					<div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
+					<div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
 						<MetricCard
 							label="Registros"
 							value={totalEntries}
@@ -172,18 +181,18 @@ function Dashboard() {
 							isLoading={isLoading}
 						/>
 						<MetricCard
-							label="Atividades"
+							label="Eventos"
 							value={activityLog.length}
 							description={
 								lastActivity
-									? `última ${formatRelativeTime(lastActivity.timestamp)}`
+									? `último ${formatRelativeTime(lastActivity.timestamp)}`
 									: "sem histórico"
 							}
 							Icon={Clock3}
 							isLoading={isLoading}
 						/>
 						<MetricCard
-							label="Crônicas"
+							label="Sessões"
 							value={sessions.length}
 							description={
 								lastSession
@@ -197,7 +206,7 @@ function Dashboard() {
 				</div>
 			</motion.section>
 
-			<motion.section 
+			<motion.section
 				variants={itemVariants}
 				className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6"
 			>
@@ -214,16 +223,13 @@ function Dashboard() {
 				))}
 			</motion.section>
 
-			<motion.section 
-				variants={itemVariants}
-				className="space-y-6"
-			>
+			<motion.section variants={itemVariants} className="space-y-5">
 				<SectionHeading
-					eyebrow="Explorar Coleções"
-					title="Mantenha o mundo em movimento"
-					description="Acesse rapidamente personagens, sessões, itens e os detalhes que compõem o seu cenário."
+					eyebrow="Coleções"
+					title="Continue construindo o mundo"
+					description="Acesse rapidamente personagens, sessões, itens e os detalhes do cenário."
 				/>
-				<div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
 					{sections.map((section) => (
 						<DashboardCard
 							key={section.to}
@@ -240,9 +246,9 @@ function Dashboard() {
 				</div>
 			</motion.section>
 
-			<motion.section 
+			<motion.section
 				variants={itemVariants}
-				className="grid grid-cols-1 gap-6 xl:grid-cols-[1.3fr_0.7fr]"
+				className="grid grid-cols-1 gap-5 xl:grid-cols-[1.25fr_0.75fr]"
 			>
 				<ActivityFeed limit={10} isLoading={isLoading} />
 				<LastSessionCard lastSession={lastSession} isLoading={isLoading} />
@@ -260,15 +266,22 @@ interface StatPillProps {
 	isLoading?: boolean;
 }
 
-function StatPill({ to, label, value, Icon, iconColor, isLoading }: StatPillProps) {
+function StatPill({
+	to,
+	label,
+	value,
+	Icon,
+	iconColor,
+	isLoading,
+}: StatPillProps) {
 	if (isLoading) {
 		return (
-			<div className="flex flex-col items-center gap-3 rounded-2xl border border-white/5 bg-card/30 p-4 shadow-sm ring-1 ring-white/5 backdrop-blur-sm">
-				<Skeleton className="h-10 w-10 rounded-xl" />
-				<div className="flex flex-col items-center gap-1 w-full">
-					<Skeleton className="h-6 w-8" />
+			<div className="flex items-center justify-between rounded-2xl border border-border/70 bg-card-elevated px-4 py-4 shadow-sm shadow-black/5">
+				<div className="flex flex-col gap-2">
 					<Skeleton className="h-3 w-16" />
+					<Skeleton className="h-5 w-8" />
 				</div>
+				<Skeleton className="h-8 w-8 rounded-lg" />
 			</div>
 		);
 	}
@@ -276,18 +289,18 @@ function StatPill({ to, label, value, Icon, iconColor, isLoading }: StatPillProp
 	return (
 		<Link
 			to={to}
-			className="group flex flex-col items-center gap-3 rounded-2xl border border-white/5 bg-card/30 p-4 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/40 hover:bg-card/50 hover:shadow-xl hover:shadow-primary/10 ring-1 ring-white/5 backdrop-blur-sm cursor-pointer"
+			className="group flex items-center justify-between rounded-2xl border border-border/70 bg-card-elevated px-4 py-4 shadow-sm shadow-black/5 transition-all hover:-translate-y-0.5 hover:border-primary/30"
 		>
-			<div className={`flex h-10 w-10 items-center justify-center rounded-xl border border-white/5 bg-background/40 ${iconColor} transition-all duration-500 group-hover:scale-110 group-hover:bg-primary/20 group-hover:text-primary`}>
-				<Icon className="h-5 w-5" strokeWidth={2} />
-			</div>
-			<div className="text-center">
-				<span className="font-display text-2xl font-bold leading-none text-foreground tracking-tight transition-colors group-hover:text-primary">
+			<div className="flex flex-col">
+				<span className="text-[9px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+					{label}
+				</span>
+				<span className="font-display mt-1 text-xl font-bold leading-none text-foreground">
 					{value}
 				</span>
-				<p className="mt-1 text-[10px] font-bold uppercase tracking-[0.1em] text-muted-foreground/60">
-					{label}
-				</p>
+			</div>
+			<div className="flex h-8 w-8 items-center justify-center rounded-lg border border-border/70 bg-background/60">
+				<Icon className={`h-4 w-4 ${iconColor}`} strokeWidth={1.7} />
 			</div>
 		</Link>
 	);
@@ -316,22 +329,20 @@ function DashboardCard({
 }: DashboardCardProps) {
 	if (isLoading) {
 		return (
-			<div className="flex flex-col rounded-3xl border border-white/5 bg-card/30 p-7 shadow-sm ring-1 ring-white/5 backdrop-blur-md">
+			<div className="rounded-2xl border border-border/70 bg-card-elevated p-6 shadow-sm shadow-black/5">
 				<div className="flex items-start justify-between gap-4">
-					<Skeleton className="h-12 w-12 rounded-2xl" />
-					<div className="text-right flex flex-col items-end gap-1">
-						<Skeleton className="h-10 w-12" />
+					<Skeleton className="h-11 w-11 rounded-xl" />
+					<div className="flex flex-col items-end gap-2">
+						<Skeleton className="h-8 w-12" />
 						<Skeleton className="h-3 w-16" />
 					</div>
 				</div>
-				<div className="mt-8 flex-1 space-y-3">
-					<Skeleton className="h-6 w-3/4" />
-					<div className="space-y-2">
-						<Skeleton className="h-4 w-full" />
-						<Skeleton className="h-4 w-5/6" />
-					</div>
+				<div className="mt-6 space-y-2">
+					<Skeleton className="h-5 w-28" />
+					<Skeleton className="h-3 w-full" />
+					<Skeleton className="h-3 w-3/4" />
 				</div>
-				<div className="mt-8 border-t border-white/5 pt-5">
+				<div className="mt-6 border-t border-border/60 pt-4">
 					<Skeleton className="h-4 w-24" />
 				</div>
 			</div>
@@ -341,42 +352,37 @@ function DashboardCard({
 	return (
 		<Link
 			to={to}
-			className="group relative flex flex-col overflow-hidden rounded-3xl border border-white/5 bg-card/30 p-7 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:border-primary/40 hover:bg-card/50 hover:shadow-2xl hover:shadow-black/20 ring-1 ring-white/5 backdrop-blur-md cursor-pointer"
+			className="group relative block overflow-hidden rounded-2xl border border-border/70 bg-card-elevated p-6 shadow-sm shadow-black/5 transition-all hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-lg hover:shadow-black/5"
 		>
-			{/* Hover Glow Shine */}
-			<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-			<div className="absolute -inset-full bg-gradient-to-tr from-white/0 via-white/[0.03] to-white/0 -rotate-45 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000 ease-in-out" />
-			
+			<div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-primary/40 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
 			<div className="flex items-start justify-between gap-4">
 				<div
-					className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-white/5 ${tint} ${iconColor} shadow-inner transition-all duration-500 group-hover:scale-110 group-hover:brightness-125 group-hover:bg-primary/20`}
+					className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border ${tint} ${iconColor}`}
 				>
-					<Icon className="h-6 w-6" strokeWidth={1.8} />
+					<Icon className="h-5 w-5" strokeWidth={1.7} />
 				</div>
 				<div className="text-right">
-					<div className="font-display text-4xl font-bold leading-none text-foreground tracking-tight transition-colors group-hover:text-primary">
+					<span className="font-display text-3xl font-bold leading-none text-foreground">
 						{count}
-					</div>
-					<p className="mt-1 text-[9px] font-bold uppercase tracking-[0.2em] text-muted-foreground/50">
+					</span>
+					<p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
 						registros
 					</p>
 				</div>
 			</div>
 
-			<div className="mt-8 flex-1">
-				<h3 className="text-[17px] font-bold text-foreground transition-colors group-hover:text-primary tracking-tight">
+			<div className="mt-6">
+				<h3 className="text-[15px] font-bold text-foreground transition-colors group-hover:text-primary">
 					{title}
 				</h3>
-				<p className="mt-2 text-[13px] leading-relaxed text-muted-foreground/70 font-medium">
+				<p className="mt-2 text-[12px] leading-relaxed text-muted-foreground">
 					{description}
 				</p>
 			</div>
 
-			<div className="mt-8 flex items-center justify-between border-t border-white/5 pt-5 text-[12px] font-bold text-primary group/link">
-				<span className="tracking-tight">Abrir Coleção</span>
-				<div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 transition-transform group-hover/link:translate-x-1 group-hover/link:bg-primary/20">
-					<ChevronRight className="h-3.5 w-3.5" />
-				</div>
+			<div className="mt-6 flex items-center justify-between border-t border-border/60 pt-4 text-[12px] font-bold text-primary">
+				<span>Abrir coleção</span>
+				<ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
 			</div>
 		</Link>
 	);
@@ -397,34 +403,29 @@ function MetricCard({
 }) {
 	if (isLoading) {
 		return (
-			<div className="rounded-[1.5rem] border border-white/5 bg-white/5 p-6 shadow-sm ring-1 ring-white/5 backdrop-blur-md">
-				<div className="flex items-center justify-between gap-3 mb-4">
+			<div className="rounded-2xl border border-border/70 bg-background/45 p-5 shadow-sm shadow-black/5 backdrop-blur-sm">
+				<div className="flex items-center justify-between gap-3">
 					<Skeleton className="h-3 w-16" />
-					<Skeleton className="h-8 w-8 rounded-lg" />
+					<Skeleton className="h-4 w-4 rounded" />
 				</div>
-				<Skeleton className="h-10 w-16 mb-2" />
-				<Skeleton className="h-3 w-32" />
+				<Skeleton className="mt-3 h-8 w-14" />
+				<Skeleton className="mt-2 h-3 w-28" />
 			</div>
 		);
 	}
 
 	return (
-		<div className="group relative cursor-pointer rounded-[1.5rem] border border-white/5 bg-white/5 p-6 shadow-sm ring-1 ring-white/5 backdrop-blur-md transition-all duration-300 hover:-translate-y-1.5 hover:bg-white/10 hover:border-primary/30 hover:shadow-xl hover:shadow-black/20">
-			{/* Shine Effect */}
-			<div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none" />
-			
-			<div className="flex items-center justify-between gap-3 mb-4">
-				<span className="text-[10px] font-bold uppercase tracking-[0.25em] text-muted-foreground/60 transition-colors group-hover:text-primary/70">
+		<div className="rounded-2xl border border-border/70 bg-background/45 p-5 shadow-sm shadow-black/5 backdrop-blur-sm">
+			<div className="flex items-center justify-between gap-3">
+				<p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
 					{label}
-				</span>
-				<div className="h-8 w-8 flex items-center justify-center rounded-lg bg-primary/10 text-primary transition-all duration-500 group-hover:scale-110 group-hover:brightness-125 group-hover:bg-primary/20">
-					<Icon className="h-4 w-4" strokeWidth={2.2} />
-				</div>
+				</p>
+				<Icon className="h-4 w-4 text-primary" strokeWidth={1.7} />
 			</div>
-			<div className="font-display text-3xl font-bold leading-none text-foreground tracking-tight transition-all duration-300 group-hover:text-primary group-hover:scale-[1.02]">
+			<p className="font-display mt-3 text-3xl font-bold leading-none text-foreground">
 				{value}
-			</div>
-			<p className="mt-2 truncate text-[11px] font-bold text-muted-foreground/40 uppercase tracking-wider">
+			</p>
+			<p className="mt-2 truncate text-[12px] text-muted-foreground">
 				{description}
 			</p>
 		</div>
@@ -442,16 +443,13 @@ function SectionHeading({
 }) {
 	return (
 		<div className="flex max-w-2xl flex-col gap-2">
-			<div className="flex items-center gap-2">
-				<div className="h-px w-6 bg-primary/40" />
-				<p className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground/70">
-					{eyebrow}
-				</p>
-			</div>
-			<h2 className="text-3xl font-bold tracking-tight text-foreground/90">
+			<p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-muted-foreground heading-rule">
+				{eyebrow}
+			</p>
+			<h2 className="text-2xl font-bold tracking-tight text-foreground">
 				{title}
 			</h2>
-			<p className="text-[14px] leading-relaxed text-muted-foreground/60 font-medium">
+			<p className="text-[13px] leading-6 text-muted-foreground">
 				{description}
 			</p>
 		</div>
@@ -474,23 +472,21 @@ function LastSessionCard({
 }) {
 	if (isLoading) {
 		return (
-			<aside className="rounded-[2rem] border border-white/5 bg-card/30 p-8 shadow-xl ring-1 ring-white/5 backdrop-blur-md">
-				<div className="mb-6 flex items-center justify-between gap-3">
+			<aside className="rounded-2xl border border-border/70 bg-card/80 p-6 shadow-sm shadow-black/5">
+				<div className="mb-5 flex items-center justify-between gap-3">
 					<div className="space-y-2">
 						<Skeleton className="h-3 w-16" />
-						<Skeleton className="h-8 w-40" />
+						<Skeleton className="h-6 w-36" />
 					</div>
-					<Skeleton className="h-12 w-12 rounded-2xl" />
+					<Skeleton className="h-5 w-5 rounded" />
 				</div>
-				<div className="rounded-2xl border border-white/5 bg-white/5 p-6 space-y-4">
-					<div className="space-y-2">
-						<Skeleton className="h-3 w-24" />
-						<Skeleton className="h-7 w-3/4" />
-					</div>
-					<div className="space-y-2">
-						<Skeleton className="h-4 w-full" />
-						<Skeleton className="h-4 w-full" />
-						<Skeleton className="h-4 w-2/3" />
+				<div className="rounded-xl border border-border/70 bg-card-elevated p-4">
+					<Skeleton className="h-3 w-20" />
+					<Skeleton className="mt-3 h-6 w-3/4" />
+					<div className="mt-4 space-y-2">
+						<Skeleton className="h-3 w-full" />
+						<Skeleton className="h-3 w-full" />
+						<Skeleton className="h-3 w-2/3" />
 					</div>
 				</div>
 			</aside>
@@ -498,53 +494,46 @@ function LastSessionCard({
 	}
 
 	return (
-		<aside className="rounded-[2rem] border border-white/5 bg-card/30 p-8 shadow-xl ring-1 ring-white/5 backdrop-blur-md">
-			<div className="mb-6 flex items-center justify-between gap-3">
+		<aside className="rounded-2xl border border-border/70 bg-card/80 p-6 shadow-sm shadow-black/5">
+			<div className="mb-5 flex items-center justify-between gap-3">
 				<div>
-					<p className="text-[10px] font-bold uppercase tracking-[0.25em] text-primary/80">
-						Crônicas
+					<p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+						Sessões
 					</p>
-					<h2 className="mt-1 text-2xl font-bold tracking-tight text-foreground">
-						Última Sessão
+					<h2 className="mt-1 text-lg font-bold tracking-tight text-foreground">
+						Última sessão
 					</h2>
 				</div>
-				<div className="h-12 w-12 flex items-center justify-center rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/10 shadow-[0_0_15px_rgba(245,158,11,0.1)]">
-					<CalendarDays className="h-6 w-6" strokeWidth={1.8} />
-				</div>
+				<CalendarDays className="h-5 w-5 text-amber-300" strokeWidth={1.7} />
 			</div>
 
 			{lastSession ? (
 				<Link
 					to="/sessions"
-					className="group block relative rounded-2xl border border-white/5 bg-white/5 p-6 transition-all hover:-translate-y-1 hover:border-primary/40 hover:bg-white/10 cursor-pointer"
+					className="group block rounded-xl border border-border/70 bg-card-elevated p-4 transition-all hover:-translate-y-0.5 hover:border-primary/35"
 				>
-					<div className="flex items-start justify-between gap-4">
+					<div className="flex items-start justify-between gap-3">
 						<div className="min-w-0">
-							<p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground/50 mb-2">
-								{lastSession.date || "Sem data registrada"}
+							<p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+								{lastSession.date || "Sem data"}
 							</p>
-							<h3 className="font-display text-2xl font-bold text-foreground leading-tight group-hover:text-primary transition-colors">
+							<h3 className="font-display mt-2 text-xl font-bold text-foreground">
 								{lastSession.title || "Sem título"}
 							</h3>
 						</div>
-						<div className="h-8 w-8 flex items-center justify-center rounded-full bg-primary/10 text-primary opacity-0 group-hover:opacity-100 transition-all group-hover:translate-x-1">
-							<ArrowUpRight className="h-4 w-4" />
-						</div>
+						<ArrowUpRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-primary" />
 					</div>
-					<p className="mt-4 line-clamp-5 text-[13px] leading-relaxed text-muted-foreground/70 font-medium italic border-l-2 border-white/10 pl-4">
-						{lastSession.summary || "Ainda não há um resumo arcano para esta sessão."}
+					<p className="mt-3 line-clamp-4 text-[12px] leading-relaxed text-muted-foreground">
+						{lastSession.summary || "Ainda não há resumo para esta sessão."}
 					</p>
 				</Link>
 			) : (
-				<div className="rounded-2xl border border-dashed border-white/10 px-6 py-12 text-center bg-white/2 cursor-default transition-colors hover:bg-white/5">
-					<div className="h-12 w-12 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 text-muted-foreground/30">
-						<ScrollText className="h-6 w-6" />
-					</div>
-					<p className="text-[15px] font-bold text-foreground/80">
+				<div className="rounded-xl border border-dashed border-border px-4 py-8 text-center">
+					<p className="text-[13px] font-bold text-foreground">
 						Nenhuma sessão registrada
 					</p>
-					<p className="mt-2 text-[12px] text-muted-foreground/50 leading-relaxed font-medium">
-						Quando uma nova crônica for iniciada, ela aparecerá aqui como destaque no seu grimório.
+					<p className="mt-1 text-[12px] text-muted-foreground">
+						Quando uma sessão for criada, ela aparece aqui como destaque.
 					</p>
 				</div>
 			)}
