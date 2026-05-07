@@ -18,12 +18,26 @@ export interface SyncSlice {
 	clearActivity: () => void;
 }
 
-export const createSyncSlice: StateCreator<RPGState, [], [], SyncSlice> = (set) => ({
+export const createSyncSlice: StateCreator<RPGState, [], [], SyncSlice> = (set, get) => ({
 	isLoadingRemote: false,
 	syncError: null,
 	activityLog: [],
 	loadRemoteData: async () => {
-		set({ isLoadingRemote: true, syncError: null });
+		const state = get();
+		const hasData = 
+			state.characters.length > 0 || 
+			state.npcs.length > 0 || 
+			state.sessions.length > 0 || 
+			state.items.length > 0 || 
+			state.locations.length > 0 || 
+			state.lores.length > 0;
+
+		// Só mostra skeleton se não houver NENHUM dado local ainda
+		if (!hasData) {
+			set({ isLoadingRemote: true, syncError: null });
+		} else {
+			set({ syncError: null });
+		}
 		try {
 			const remote = await loadRemoteState();
 			

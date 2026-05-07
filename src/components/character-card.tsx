@@ -9,13 +9,47 @@ import {
 } from "@/lib/store";
 import { EntityActions } from "./entity-actions";
 
+import { Skeleton } from "@/components/ui/skeleton";
+
 interface CharacterCardProps {
-	character: Character;
+	character?: Character;
+	isLoading?: boolean;
 }
 
-export function CharacterCard({ character }: CharacterCardProps) {
+export function CharacterCard({ character, isLoading }: CharacterCardProps) {
 	const removeCharacter = useRPGStore((s) => s.removeCharacter);
 	const navigate = useNavigate();
+
+	if (isLoading || !character) {
+		return (
+			<div className="flex flex-col overflow-hidden rounded-xl border border-border bg-card-elevated p-0">
+				<Skeleton className="h-28 w-full rounded-none" />
+				<div className="flex flex-1 flex-col p-4 space-y-4">
+					<div className="space-y-2">
+						<Skeleton className="h-5 w-3/4" />
+						<Skeleton className="h-3 w-1/2" />
+					</div>
+					<div className="space-y-2">
+						<Skeleton className="h-3 w-full" />
+						<Skeleton className="h-1.5 w-full rounded-full" />
+					</div>
+					<div className="grid grid-cols-3 gap-1.5">
+						<Skeleton className="h-10 w-full rounded-md" />
+						<Skeleton className="h-10 w-full rounded-md" />
+						<Skeleton className="h-10 w-full rounded-md" />
+					</div>
+					<div className="grid grid-cols-6 gap-1 border-t border-border/60 pt-3">
+						{[...Array(6)].map((_, i) => (
+							<div key={i} className="flex flex-col items-center gap-1">
+								<Skeleton className="h-2 w-4" />
+								<Skeleton className="h-3 w-6" />
+							</div>
+						))}
+					</div>
+				</div>
+			</div>
+		);
+	}
 
 	const hpPercent = character.healthMax
 		? Math.min(100, Math.round((character.health / character.healthMax) * 100))

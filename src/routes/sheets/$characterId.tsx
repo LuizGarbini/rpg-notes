@@ -67,6 +67,45 @@ function CharacterSheetPage() {
 	);
 	const [isExportingPdf, setIsExportingPdf] = useState(false);
 
+	if (isLoading) {
+		return (
+			<div className="w-full">
+				<div className="border-b border-white/5 bg-card/30 p-8 space-y-6">
+					<div className="flex items-start gap-4">
+						<Skeleton className="h-14 w-14 rounded-xl" />
+						<div className="flex-1 space-y-2">
+							<Skeleton className="h-6 w-48" />
+							<div className="flex gap-2">
+								<Skeleton className="h-4 w-20 rounded" />
+								<Skeleton className="h-4 w-20 rounded" />
+							</div>
+						</div>
+						<div className="flex gap-3">
+							<Skeleton className="h-10 w-12 rounded-lg" />
+							<Skeleton className="h-10 w-12 rounded-lg" />
+						</div>
+					</div>
+					<div className="grid grid-cols-4 gap-2">
+						{[...Array(4)].map((_, i) => (
+							<Skeleton key={i} className="h-12 w-full rounded-lg" />
+						))}
+					</div>
+				</div>
+				<div className="px-6 py-6 space-y-8">
+					<div className="grid grid-cols-3 gap-2">
+						{[...Array(6)].map((_, i) => (
+							<Skeleton key={i} className="h-24 w-full rounded-lg" />
+						))}
+					</div>
+					<div className="space-y-4">
+						<Skeleton className="h-4 w-32" />
+						<Skeleton className="h-24 w-full rounded-lg" />
+					</div>
+				</div>
+			</div>
+		);
+	}
+
 	if (!character) {
 		return (
 			<div className="flex min-h-[70vh] flex-col items-center justify-center gap-4 px-6 text-center">

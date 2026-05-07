@@ -20,6 +20,8 @@ function RouteComponent() {
 		c.characterName.toLowerCase().includes(searchQuery.toLowerCase()),
 	);
 
+	const isLoading = useRPGStore((state) => state.isLoadingRemote);
+
 	return (
 		<div className="w-full">
 			<PageHeader
