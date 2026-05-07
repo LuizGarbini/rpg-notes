@@ -1,13 +1,12 @@
 import { Link } from "@tanstack/react-router";
 import { FileText, MapPin, Skull, User } from "lucide-react";
 import { useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { Npc } from "@/lib/store";
 import { useRPGStore } from "@/lib/store";
-import { EntityLinkChips } from "./entity-links";
 import { EntityActions } from "./entity-actions";
+import { EntityLinkChips } from "./entity-links";
 import { NpcEditButton } from "./npc-form";
-
-import { Skeleton } from "@/components/ui/skeleton";
 
 interface NpcCardProps {
 	npc?: Npc;
@@ -47,9 +46,10 @@ const importanceStyles: Record<string, string> = {
 
 export function NpcCard({ npc, isLoading }: NpcCardProps) {
 	const removeNpc = useRPGStore((s) => s.removeNpc);
+	const linkedCharacterId = npc?.linkedCharacterId;
 	const linkedCharacter = useRPGStore((s) =>
-		npc.linkedCharacterId
-			? s.characters.find((character) => character.id === npc.linkedCharacterId)
+		linkedCharacterId
+			? s.characters.find((character) => character.id === linkedCharacterId)
 			: undefined,
 	);
 	const [editOpen, setEditOpen] = useState(false);

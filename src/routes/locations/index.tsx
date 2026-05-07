@@ -12,6 +12,13 @@ export const Route = createFileRoute("/locations/")({
 	component: RouteComponent,
 });
 
+const loadingCardKeys = [
+	"location-1",
+	"location-2",
+	"location-3",
+	"location-4",
+];
+
 function RouteComponent() {
 	const locations = useRPGStore((state) => state.locations);
 	const [searchQuery, setSearchQuery] = useState("");
@@ -38,10 +45,12 @@ function RouteComponent() {
 				<ListLayout onSearch={setSearchQuery} />
 
 				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-					{filteredLocations.map((location) => (
-						<LocationCard key={location.id} location={location} />
-					))}
-					{filteredLocations.length === 0 && (
+					{isLoading
+						? loadingCardKeys.map((key) => <LocationCard key={key} isLoading />)
+						: filteredLocations.map((location) => (
+								<LocationCard key={location.id} location={location} />
+							))}
+					{!isLoading && filteredLocations.length === 0 && (
 						<EmptyState
 							Icon={MapIcon}
 							title="Nenhum local encontrado"

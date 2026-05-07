@@ -12,6 +12,13 @@ export const Route = createFileRoute("/characters/")({
 	component: RouteComponent,
 });
 
+const loadingCardKeys = [
+	"character-1",
+	"character-2",
+	"character-3",
+	"character-4",
+];
+
 function RouteComponent() {
 	const characters = useRPGStore((state) => state.characters);
 	const [searchQuery, setSearchQuery] = useState("");
@@ -45,10 +52,14 @@ function RouteComponent() {
 				<ListLayout onSearch={setSearchQuery} />
 
 				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-					{filteredCharacters.map((character) => (
-						<CharacterCard key={character.id} character={character} />
-					))}
-					{filteredCharacters.length === 0 && (
+					{isLoading
+						? loadingCardKeys.map((key) => (
+								<CharacterCard key={key} isLoading />
+							))
+						: filteredCharacters.map((character) => (
+								<CharacterCard key={character.id} character={character} />
+							))}
+					{!isLoading && filteredCharacters.length === 0 && (
 						<EmptyState
 							Icon={User}
 							title="Nenhum personagem no elenco"

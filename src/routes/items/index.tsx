@@ -12,6 +12,8 @@ export const Route = createFileRoute("/items/")({
 	component: RouteComponent,
 });
 
+const loadingCardKeys = ["item-1", "item-2", "item-3", "item-4"];
+
 function RouteComponent() {
 	const items = useRPGStore((state) => state.items);
 	const [searchQuery, setSearchQuery] = useState("");
@@ -38,10 +40,12 @@ function RouteComponent() {
 				<ListLayout onSearch={setSearchQuery} />
 
 				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-					{filteredItems.map((item) => (
-						<ItemCard key={item.id} item={item} />
-					))}
-					{filteredItems.length === 0 && (
+					{isLoading
+						? loadingCardKeys.map((key) => <ItemCard key={key} isLoading />)
+						: filteredItems.map((item) => (
+								<ItemCard key={item.id} item={item} />
+							))}
+					{!isLoading && filteredItems.length === 0 && (
 						<EmptyState
 							Icon={Package}
 							title="Nenhum item encontrado"

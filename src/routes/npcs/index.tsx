@@ -12,6 +12,8 @@ export const Route = createFileRoute("/npcs/")({
 	component: RouteComponent,
 });
 
+const loadingCardKeys = ["npc-1", "npc-2", "npc-3", "npc-4"];
+
 function RouteComponent() {
 	const npcs = useRPGStore((state) => state.npcs);
 	const [searchQuery, setSearchQuery] = useState("");
@@ -38,10 +40,10 @@ function RouteComponent() {
 				<ListLayout onSearch={setSearchQuery} />
 
 				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-					{filteredNpcs.map((npc) => (
-						<NpcCard key={npc.id} npc={npc} />
-					))}
-					{filteredNpcs.length === 0 && (
+					{isLoading
+						? loadingCardKeys.map((key) => <NpcCard key={key} isLoading />)
+						: filteredNpcs.map((npc) => <NpcCard key={npc.id} npc={npc} />)}
+					{!isLoading && filteredNpcs.length === 0 && (
 						<EmptyState
 							Icon={Users}
 							title="Nenhum NPC encontrado"

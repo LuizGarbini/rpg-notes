@@ -13,12 +13,12 @@ import {
 	User,
 	Zap,
 } from "lucide-react";
-import { useEffect, useState, type ComponentType } from "react";
+import { type ComponentType, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
-	CharacterModuleFields,
 	buildCharacterFormDefaults,
 	type CharacterFormValues,
+	CharacterModuleFields,
 	sanitizeCharacterFormValues,
 } from "@/components/character-sheet-fields";
 import { Button } from "@/components/ui/button";
@@ -33,6 +33,7 @@ import {
 import { Field } from "@/components/ui/form-tabs";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import {
 	createCustomSheetModule,
@@ -55,11 +56,22 @@ export const Route = createFileRoute("/sheets/$characterId")({
 	component: CharacterSheetPage,
 });
 
+const headerSkeletonKeys = ["stat-1", "stat-2", "stat-3", "stat-4"];
+const moduleSkeletonKeys = [
+	"module-1",
+	"module-2",
+	"module-3",
+	"module-4",
+	"module-5",
+	"module-6",
+];
+
 function CharacterSheetPage() {
 	const { characterId } = Route.useParams();
 	const character = useRPGStore((state) =>
 		state.characters.find((item) => item.id === characterId),
 	);
+	const isLoading = useRPGStore((state) => state.isLoadingRemote);
 	const updateCharacter = useRPGStore((state) => state.updateCharacter);
 	const [isEditingLayout, setIsEditingLayout] = useState(false);
 	const [editingModule, setEditingModule] = useState<SheetModuleConfig | null>(
@@ -86,15 +98,15 @@ function CharacterSheetPage() {
 						</div>
 					</div>
 					<div className="grid grid-cols-4 gap-2">
-						{[...Array(4)].map((_, i) => (
-							<Skeleton key={i} className="h-12 w-full rounded-lg" />
+						{headerSkeletonKeys.map((key) => (
+							<Skeleton key={key} className="h-12 w-full rounded-lg" />
 						))}
 					</div>
 				</div>
 				<div className="px-6 py-6 space-y-8">
 					<div className="grid grid-cols-3 gap-2">
-						{[...Array(6)].map((_, i) => (
-							<Skeleton key={i} className="h-24 w-full rounded-lg" />
+						{moduleSkeletonKeys.map((key) => (
+							<Skeleton key={key} className="h-24 w-full rounded-lg" />
 						))}
 					</div>
 					<div className="space-y-4">
@@ -129,11 +141,13 @@ function CharacterSheetPage() {
 	}
 
 	const currentCharacter = character;
-	const config = SYSTEM_CONFIG[currentCharacter.system] ?? SYSTEM_CONFIG.generic;
+	const config =
+		SYSTEM_CONFIG[currentCharacter.system] ?? SYSTEM_CONFIG.generic;
 	const layout = normalizeSheetLayout(currentCharacter);
-	const modules = (isEditingLayout
-		? layout.modules
-		: layout.modules.filter((module) => module.enabled)
+	const modules = (
+		isEditingLayout
+			? layout.modules
+			: layout.modules.filter((module) => module.enabled)
 	).sort((a, b) => a.order - b.order);
 	const mainModules = modules.filter((module) => module.column !== "side");
 	const sideModules = modules.filter((module) => module.column === "side");
@@ -143,7 +157,10 @@ function CharacterSheetPage() {
 	}
 
 	function handleAddCustomModule(kind: "customText" | "customStats") {
-		const nextModule = createCustomSheetModule(kind, layout.modules.length * 10 + 100);
+		const nextModule = createCustomSheetModule(
+			kind,
+			layout.modules.length * 10 + 100,
+		);
 		updateLayout({
 			...layout,
 			modules: [...layout.modules, nextModule],
@@ -186,8 +203,8 @@ function CharacterSheetPage() {
 							<div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-linear-to-br from-primary/20 via-fuchsia-500/10 to-transparent ring-1 ring-border/70">
 								{currentCharacter.imageUrl ? (
 									<img
-									src={currentCharacter.imageUrl}
-									alt={currentCharacter.characterName}
+										src={currentCharacter.imageUrl}
+										alt={currentCharacter.characterName}
 										className="h-full w-full object-cover"
 									/>
 								) : (
@@ -203,7 +220,11 @@ function CharacterSheetPage() {
 									{currentCharacter.characterName || "Ficha sem nome"}
 								</h1>
 								<p className="mt-2 text-[13px] text-muted-foreground">
-									{[currentCharacter.race, currentCharacter.class, currentCharacter.subclass]
+									{[
+										currentCharacter.race,
+										currentCharacter.class,
+										currentCharacter.subclass,
+									]
 										.filter(Boolean)
 										.join(" · ") || config.tagline}
 								</p>
@@ -394,7 +415,10 @@ function ModuleContent({
 	if (module.kind === "identity") {
 		return (
 			<div className="grid gap-3">
-				<InfoRow label="Jogador" value={character.playerName || "Não informado"} />
+				<InfoRow
+					label="Jogador"
+					value={character.playerName || "Não informado"}
+				/>
 				<InfoRow label="Raça" value={character.race || "Não informada"} />
 				<InfoRow label="Classe" value={character.class || "Não informada"} />
 				<InfoRow
@@ -438,7 +462,10 @@ function ModuleContent({
 
 	if (module.kind === "combat") {
 		const hpPercent = character.healthMax
-			? Math.min(100, Math.round((character.health / character.healthMax) * 100))
+			? Math.min(
+					100,
+					Math.round((character.health / character.healthMax) * 100),
+				)
 			: 0;
 		return (
 			<div className="grid gap-4">
@@ -558,7 +585,10 @@ function ModuleEditorDialog({
 	layout: SheetLayoutConfig;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	onSave: (patch: Partial<SheetModuleConfig>, values: CharacterFormValues) => void;
+	onSave: (
+		patch: Partial<SheetModuleConfig>,
+		values: CharacterFormValues,
+	) => void;
 }) {
 	const form = useForm<CharacterFormValues>({
 		defaultValues: buildCharacterFormDefaults(character),
@@ -587,7 +617,8 @@ function ModuleEditorDialog({
 		});
 	}
 
-	const isCustom = module.kind === "customText" || module.kind === "customStats";
+	const isCustom =
+		module.kind === "customText" || module.kind === "customStats";
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>

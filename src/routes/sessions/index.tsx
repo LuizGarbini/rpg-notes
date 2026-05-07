@@ -12,6 +12,8 @@ export const Route = createFileRoute("/sessions/")({
 	component: RouteComponent,
 });
 
+const loadingCardKeys = ["session-1", "session-2", "session-3", "session-4"];
+
 function RouteComponent() {
 	const sessions = useRPGStore((state) => state.sessions);
 	const [searchQuery, setSearchQuery] = useState("");
@@ -38,10 +40,12 @@ function RouteComponent() {
 				<ListLayout onSearch={setSearchQuery} />
 
 				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-					{filteredSessions.map((session) => (
-						<SessionCard key={session.id} session={session} />
-					))}
-					{filteredSessions.length === 0 && (
+					{isLoading
+						? loadingCardKeys.map((key) => <SessionCard key={key} isLoading />)
+						: filteredSessions.map((session) => (
+								<SessionCard key={session.id} session={session} />
+							))}
+					{!isLoading && filteredSessions.length === 0 && (
 						<EmptyState
 							Icon={ScrollText}
 							title="Nenhuma sessão registrada"

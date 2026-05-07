@@ -12,6 +12,8 @@ export const Route = createFileRoute("/lore/")({
 	component: RouteComponent,
 });
 
+const loadingCardKeys = ["lore-1", "lore-2", "lore-3", "lore-4"];
+
 function RouteComponent() {
 	const lores = useRPGStore((state) => state.lores);
 	const [searchQuery, setSearchQuery] = useState("");
@@ -38,10 +40,12 @@ function RouteComponent() {
 				<ListLayout onSearch={setSearchQuery} />
 
 				<div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-					{filteredLores.map((lore) => (
-						<LoreCard key={lore.id} lore={lore} />
-					))}
-					{filteredLores.length === 0 && (
+					{isLoading
+						? loadingCardKeys.map((key) => <LoreCard key={key} isLoading />)
+						: filteredLores.map((lore) => (
+								<LoreCard key={lore.id} lore={lore} />
+							))}
+					{!isLoading && filteredLores.length === 0 && (
 						<EmptyState
 							Icon={BookOpen}
 							title="Nenhum registro de lore"
