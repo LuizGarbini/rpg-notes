@@ -61,7 +61,7 @@ export function LocationCard({ location, isLoading }: LocationCardProps) {
 	return (
 		<div className="flex flex-col">
 			<div
-				className={`group relative flex flex-col overflow-hidden rounded-xl border border-border bg-card-elevated transition-colors hover:border-border-hover ${danger.ring}`}
+				className={`group relative flex flex-col overflow-hidden rounded-2xl border border-border/70 bg-card-elevated shadow-sm shadow-black/5 transition-all duration-150 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-lg hover:shadow-black/5 ${danger.ring}`}
 			>
 				<EntityActions
 					onEdit={() => setEditOpen(true)}
@@ -152,7 +152,7 @@ interface MiniInfoProps {
 
 function MiniInfo({ Icon, label, value }: MiniInfoProps) {
 	return (
-		<div className="flex items-center gap-1.5 rounded bg-background/40 px-1.5 py-1 ring-1 ring-border/60">
+		<div className="flex items-center gap-1.5 rounded-xl bg-background/45 px-1.5 py-1 ring-1 ring-border/60">
 			<Icon className="h-3 w-3 shrink-0 text-muted-foreground" />
 			<div className="min-w-0">
 				<div className="text-[8px] uppercase tracking-wider text-muted-foreground">

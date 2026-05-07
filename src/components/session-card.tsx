@@ -45,7 +45,7 @@ export function SessionCard({ session, isLoading }: SessionCardProps) {
 
 	return (
 		<div className="flex flex-col">
-			<div className="group relative flex flex-col rounded-xl border border-border bg-card-elevated p-4 transition-colors hover:border-border-hover">
+			<div className="group relative flex flex-col rounded-2xl border border-border/70 bg-card-elevated p-4 shadow-sm shadow-black/5 transition-all duration-150 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-lg hover:shadow-black/5">
 				<EntityActions
 					onEdit={() => setEditOpen(true)}
 					onDelete={() => removeSession(session.id)}
@@ -54,7 +54,7 @@ export function SessionCard({ session, isLoading }: SessionCardProps) {
 				/>
 
 				<div className="flex items-start gap-3">
-					<div className="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-lg bg-amber-500/10 text-amber-300 ring-1 ring-amber-500/20">
+					<div className="flex h-12 w-12 shrink-0 flex-col items-center justify-center rounded-xl bg-amber-500/10 text-amber-300 ring-1 ring-amber-500/20">
 						<span className="text-[8px] font-semibold uppercase tracking-wider opacity-70">
 							Sessão
 						</span>
@@ -95,7 +95,7 @@ export function SessionCard({ session, isLoading }: SessionCardProps) {
 					</div>
 				</div>
 
-				<div className="mt-3 rounded-md bg-background/40 p-3 ring-1 ring-border/60">
+				<div className="mt-3 rounded-xl bg-background/45 p-3 ring-1 ring-border/60">
 					<div className="mb-1.5 flex items-center gap-1.5 text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
 						<ScrollText className="h-2.5 w-2.5" />
 						Resumo

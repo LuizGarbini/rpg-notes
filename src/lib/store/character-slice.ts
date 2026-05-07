@@ -2,6 +2,7 @@ import type { StateCreator } from "zustand";
 import type { Character, RPGState } from "./types";
 import { generateEntry, pushLog, entityNameOf, remoteErrorMessage } from "./helpers";
 import { createRemoteEntity, createRemoteActivity, updateRemoteEntity, deleteRemoteEntity } from "../remote-store";
+import { createDefaultSheetLayout } from "../sheet-modules";
 
 export const characterDefaults: Omit<Character, "id" | "createdAt"> = {
 	system: "dnd5e",
@@ -59,6 +60,7 @@ export const characterDefaults: Omit<Character, "id" | "createdAt"> = {
 	flaws: "",
 	notes: "",
 	imageUrl: "",
+	sheetLayout: createDefaultSheetLayout("dnd5e"),
 };
 
 export interface CharacterSlice {
@@ -71,7 +73,12 @@ export interface CharacterSlice {
 export const createCharacterSlice: StateCreator<RPGState, [], [], CharacterSlice> = (set) => ({
 	characters: [],
 	addCharacter: (character) => {
-		const created = generateEntry(characterDefaults, character) as Character;
+		const created = generateEntry(characterDefaults, {
+			...character,
+			sheetLayout:
+				character.sheetLayout ??
+				createDefaultSheetLayout(character.system ?? characterDefaults.system),
+		}) as Character;
 		const log = {
 			action: "create" as const,
 			entityKind: "character" as const,

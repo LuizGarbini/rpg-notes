@@ -9,7 +9,9 @@ import {
 	type RpgSystem,
 	useRPGStore,
 } from "@/lib/store";
+import { createDefaultSheetLayout } from "@/lib/sheet-modules";
 import { type CharacterSection, SYSTEM_CONFIG } from "@/lib/systems";
+import { sanitizeCharacterFormValues } from "./character-sheet-fields";
 import { ImageUploader } from "./image-uploader";
 import { SystemPicker } from "./system-picker";
 import { Button } from "./ui/button";
@@ -34,7 +36,12 @@ type CharacterFormValues = Omit<Character, "id" | "createdAt" | "updatedAt">;
 function buildDefaults(
 	overrides?: Partial<CharacterFormValues>,
 ): CharacterFormValues {
-	return { ...characterDefaults, ...overrides };
+	const system = overrides?.system ?? characterDefaults.system;
+	return {
+		...characterDefaults,
+		sheetLayout: createDefaultSheetLayout(system),
+		...overrides,
+	};
 }
 
 // Mapa de label das abas (refletindo as `sections` do system config).
@@ -162,16 +169,20 @@ function CharacterFormDialog({
 	);
 
 	function onSubmit(data: CharacterFormValues) {
+		const values = sanitizeCharacterFormValues(data);
 		if (isEdit && character) {
-			updateCharacter(character.id, data);
+			updateCharacter(character.id, values);
 		} else {
-			addCharacter(data);
+			addCharacter(values);
 		}
 		setOpen(false);
 	}
 
 	function handleSelectSystem(value: RpgSystem) {
 		setValue("system", value, { shouldDirty: true });
+		setValue("sheetLayout", createDefaultSheetLayout(value), {
+			shouldDirty: true,
+		});
 		setStep("form");
 	}
 
@@ -179,7 +190,7 @@ function CharacterFormDialog({
 		<Dialog open={open} onOpenChange={setOpen}>
 			{trigger && <DialogTrigger render={trigger as React.ReactElement} />}
 
-			<DialogContent className="!max-w-3xl max-h-[92vh] overflow-hidden p-0">
+			<DialogContent className="max-w-3xl! max-h-[92vh] overflow-hidden p-0">
 				<form
 					onSubmit={handleSubmit(onSubmit)}
 					className="flex max-h-[92vh] flex-col"
@@ -216,8 +227,8 @@ function CharacterFormDialog({
 
 						{step === "form" && (
 							<div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-								<Field label="Sistema" htmlFor="system">
-									<Select id="system" {...register("system")}>
+								<Field label="Sistema">
+									<Select {...register("system")}>
 										{Object.values(SYSTEM_CONFIG).map((s) => (
 											<option key={s.value} value={s.value}>
 												{s.label}
@@ -225,9 +236,8 @@ function CharacterFormDialog({
 										))}
 									</Select>
 								</Field>
-								<Field label="Nome do jogador" htmlFor="playerName">
+								<Field label="Nome do jogador">
 									<Input
-										id="playerName"
 										placeholder="Quem joga este personagem"
 										{...register("playerName")}
 									/>
@@ -342,9 +352,8 @@ function IdentitySection({
 		<>
 			<FormSection title="Identidade Básica">
 				<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-					<Field label="Nome do personagem" htmlFor="characterName">
+					<Field label="Nome do personagem">
 						<Input
-							id="characterName"
 							placeholder="Ex: Aragorn, Lyra Cinzal..."
 							{...register("characterName", { required: true })}
 						/>

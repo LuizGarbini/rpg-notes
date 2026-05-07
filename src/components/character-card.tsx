@@ -1,6 +1,5 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Heart, Shield, Sparkles, User, Zap } from "lucide-react";
-import { useState } from "react";
 import {
 	abilityModifier,
 	type Character,
@@ -8,7 +7,6 @@ import {
 	systemLabel,
 	useRPGStore,
 } from "@/lib/store";
-import { CharacterEditButton } from "./character-form";
 import { EntityActions } from "./entity-actions";
 
 import { Skeleton } from "@/components/ui/skeleton";
@@ -20,7 +18,7 @@ interface CharacterCardProps {
 
 export function CharacterCard({ character, isLoading }: CharacterCardProps) {
 	const removeCharacter = useRPGStore((s) => s.removeCharacter);
-	const [editOpen, setEditOpen] = useState(false);
+	const navigate = useNavigate();
 
 	if (isLoading || !character) {
 		return (
@@ -72,10 +70,15 @@ export function CharacterCard({ character, isLoading }: CharacterCardProps) {
 		<Link
 			to="/sheets/$characterId"
 			params={{ characterId: character.id }}
-			className="group relative flex flex-col overflow-hidden rounded-xl border border-border bg-card-elevated transition-colors hover:border-border-hover cursor-pointer"
+			className="group relative flex cursor-pointer flex-col overflow-hidden rounded-2xl border border-border/70 bg-card-elevated shadow-sm shadow-black/5 transition-all duration-150 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-lg hover:shadow-black/5"
 		>
 			<EntityActions
-				onEdit={() => setEditOpen(true)}
+				onEdit={() =>
+					void navigate({
+						to: "/sheets/$characterId",
+						params: { characterId: character.id },
+					})
+				}
 				onDelete={() => removeCharacter(character.id)}
 				entityName={character.characterName || "Sem nome"}
 				entityKindLabel="personagem"
@@ -95,7 +98,7 @@ export function CharacterCard({ character, isLoading }: CharacterCardProps) {
 					</div>
 				)}
 				<div className="absolute inset-x-0 bottom-0 h-12 bg-linear-to-t from-card to-transparent" />
-				<div className="absolute right-2 bottom-2 flex h-8 min-w-8 items-center justify-center rounded-md bg-background/85 px-1.5 backdrop-blur ring-1 ring-border">
+				<div className="absolute right-2 bottom-2 flex h-8 min-w-8 items-center justify-center rounded-xl bg-background/85 px-1.5 backdrop-blur ring-1 ring-border/70">
 					<span className="text-[8px] font-semibold uppercase tracking-wider text-muted-foreground">
 						Lv
 					</span>
@@ -209,12 +212,6 @@ export function CharacterCard({ character, isLoading }: CharacterCardProps) {
 				)}
 			</div>
 
-			<CharacterEditButton
-				character={character}
-				open={editOpen}
-				onOpenChange={setEditOpen}
-				trigger={<span className="hidden" />}
-			/>
 		</Link>
 	);
 }
@@ -228,7 +225,7 @@ interface MiniStatProps {
 
 function MiniStat({ Icon, color, label, value }: MiniStatProps) {
 	return (
-		<div className="flex flex-col items-center gap-0.5 rounded-md bg-background/40 py-1.5 ring-1 ring-border/60">
+		<div className="flex flex-col items-center gap-0.5 rounded-xl bg-background/45 py-1.5 ring-1 ring-border/60">
 			<Icon className={`h-3 w-3 ${color}`} />
 			<span className="text-[8px] uppercase tracking-wider text-muted-foreground">
 				{label}

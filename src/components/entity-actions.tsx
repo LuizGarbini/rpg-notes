@@ -41,6 +41,7 @@ export function EntityActions({
 				<button
 					type="button"
 					onClick={(e) => {
+						e.preventDefault();
 						e.stopPropagation();
 						onEdit();
 					}}
@@ -53,6 +54,7 @@ export function EntityActions({
 				<button
 					type="button"
 					onClick={(e) => {
+						e.preventDefault();
 						e.stopPropagation();
 						setConfirmOpen(true);
 					}}

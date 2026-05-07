@@ -84,7 +84,7 @@ export function NpcCard({ npc, isLoading }: NpcCardProps) {
 
 	return (
 		<div className="flex flex-col">
-			<div className="group relative flex flex-col rounded-xl border border-border bg-card-elevated p-4 transition-colors hover:border-border-hover">
+			<div className="group relative flex flex-col rounded-2xl border border-border/70 bg-card-elevated p-4 shadow-sm shadow-black/5 transition-all duration-150 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-lg hover:shadow-black/5">
 				<EntityActions
 					onEdit={() => setEditOpen(true)}
 					onDelete={() => removeNpc(npc.id)}
@@ -93,7 +93,7 @@ export function NpcCard({ npc, isLoading }: NpcCardProps) {
 				/>
 
 				<div className="flex items-start gap-3">
-					<div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-fuchsia-500/10 ring-1 ring-fuchsia-500/20">
+					<div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-fuchsia-500/10 ring-1 ring-fuchsia-500/20">
 						{npc.imageUrl ? (
 							<img
 								src={npc.imageUrl}

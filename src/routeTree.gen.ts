@@ -10,10 +10,13 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SpotifyCallbackRouteImport } from './routes/spotify-callback'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ErrorPreviewRouteImport } from './routes/error-preview'
 import { Route as DesignSystemRouteImport } from './routes/design-system'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as BillingRouteImport } from './routes/billing'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AccountRouteImport } from './routes/account'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SheetsIndexRouteImport } from './routes/sheets/index'
 import { Route as SessionsIndexRouteImport } from './routes/sessions/index'
@@ -22,11 +25,17 @@ import { Route as LoreIndexRouteImport } from './routes/lore/index'
 import { Route as LocationsIndexRouteImport } from './routes/locations/index'
 import { Route as ItemsIndexRouteImport } from './routes/items/index'
 import { Route as CharactersIndexRouteImport } from './routes/characters/index'
+import { Route as SheetsNewRouteImport } from './routes/sheets/new'
 import { Route as SheetsCharacterIdRouteImport } from './routes/sheets/$characterId'
 
 const SpotifyCallbackRoute = SpotifyCallbackRouteImport.update({
   id: '/spotify-callback',
   path: '/spotify-callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ErrorPreviewRoute = ErrorPreviewRouteImport.update({
@@ -44,9 +53,19 @@ const DashboardRoute = DashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BillingRoute = BillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountRoute = AccountRouteImport.update({
+  id: '/account',
+  path: '/account',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -89,6 +108,11 @@ const CharactersIndexRoute = CharactersIndexRouteImport.update({
   path: '/characters/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SheetsNewRoute = SheetsNewRouteImport.update({
+  id: '/sheets/new',
+  path: '/sheets/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SheetsCharacterIdRoute = SheetsCharacterIdRouteImport.update({
   id: '/sheets/$characterId',
   path: '/sheets/$characterId',
@@ -97,12 +121,16 @@ const SheetsCharacterIdRoute = SheetsCharacterIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
   '/auth': typeof AuthRoute
+  '/billing': typeof BillingRoute
   '/dashboard': typeof DashboardRoute
   '/design-system': typeof DesignSystemRoute
   '/error-preview': typeof ErrorPreviewRoute
+  '/settings': typeof SettingsRoute
   '/spotify-callback': typeof SpotifyCallbackRoute
   '/sheets/$characterId': typeof SheetsCharacterIdRoute
+  '/sheets/new': typeof SheetsNewRoute
   '/characters': typeof CharactersIndexRoute
   '/items': typeof ItemsIndexRoute
   '/locations': typeof LocationsIndexRoute
@@ -113,12 +141,16 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
   '/auth': typeof AuthRoute
+  '/billing': typeof BillingRoute
   '/dashboard': typeof DashboardRoute
   '/design-system': typeof DesignSystemRoute
   '/error-preview': typeof ErrorPreviewRoute
+  '/settings': typeof SettingsRoute
   '/spotify-callback': typeof SpotifyCallbackRoute
   '/sheets/$characterId': typeof SheetsCharacterIdRoute
+  '/sheets/new': typeof SheetsNewRoute
   '/characters': typeof CharactersIndexRoute
   '/items': typeof ItemsIndexRoute
   '/locations': typeof LocationsIndexRoute
@@ -130,12 +162,16 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/account': typeof AccountRoute
   '/auth': typeof AuthRoute
+  '/billing': typeof BillingRoute
   '/dashboard': typeof DashboardRoute
   '/design-system': typeof DesignSystemRoute
   '/error-preview': typeof ErrorPreviewRoute
+  '/settings': typeof SettingsRoute
   '/spotify-callback': typeof SpotifyCallbackRoute
   '/sheets/$characterId': typeof SheetsCharacterIdRoute
+  '/sheets/new': typeof SheetsNewRoute
   '/characters/': typeof CharactersIndexRoute
   '/items/': typeof ItemsIndexRoute
   '/locations/': typeof LocationsIndexRoute
@@ -148,12 +184,16 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/account'
     | '/auth'
+    | '/billing'
     | '/dashboard'
     | '/design-system'
     | '/error-preview'
+    | '/settings'
     | '/spotify-callback'
     | '/sheets/$characterId'
+    | '/sheets/new'
     | '/characters'
     | '/items'
     | '/locations'
@@ -164,12 +204,16 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/account'
     | '/auth'
+    | '/billing'
     | '/dashboard'
     | '/design-system'
     | '/error-preview'
+    | '/settings'
     | '/spotify-callback'
     | '/sheets/$characterId'
+    | '/sheets/new'
     | '/characters'
     | '/items'
     | '/locations'
@@ -180,12 +224,16 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/account'
     | '/auth'
+    | '/billing'
     | '/dashboard'
     | '/design-system'
     | '/error-preview'
+    | '/settings'
     | '/spotify-callback'
     | '/sheets/$characterId'
+    | '/sheets/new'
     | '/characters/'
     | '/items/'
     | '/locations/'
@@ -197,12 +245,16 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AccountRoute: typeof AccountRoute
   AuthRoute: typeof AuthRoute
+  BillingRoute: typeof BillingRoute
   DashboardRoute: typeof DashboardRoute
   DesignSystemRoute: typeof DesignSystemRoute
   ErrorPreviewRoute: typeof ErrorPreviewRoute
+  SettingsRoute: typeof SettingsRoute
   SpotifyCallbackRoute: typeof SpotifyCallbackRoute
   SheetsCharacterIdRoute: typeof SheetsCharacterIdRoute
+  SheetsNewRoute: typeof SheetsNewRoute
   CharactersIndexRoute: typeof CharactersIndexRoute
   ItemsIndexRoute: typeof ItemsIndexRoute
   LocationsIndexRoute: typeof LocationsIndexRoute
@@ -219,6 +271,13 @@ declare module '@tanstack/react-router' {
       path: '/spotify-callback'
       fullPath: '/spotify-callback'
       preLoaderRoute: typeof SpotifyCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/error-preview': {
@@ -242,11 +301,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/billing': {
+      id: '/billing'
+      path: '/billing'
+      fullPath: '/billing'
+      preLoaderRoute: typeof BillingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account': {
+      id: '/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -305,6 +378,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CharactersIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sheets/new': {
+      id: '/sheets/new'
+      path: '/sheets/new'
+      fullPath: '/sheets/new'
+      preLoaderRoute: typeof SheetsNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sheets/$characterId': {
       id: '/sheets/$characterId'
       path: '/sheets/$characterId'
@@ -317,12 +397,16 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AccountRoute: AccountRoute,
   AuthRoute: AuthRoute,
+  BillingRoute: BillingRoute,
   DashboardRoute: DashboardRoute,
   DesignSystemRoute: DesignSystemRoute,
   ErrorPreviewRoute: ErrorPreviewRoute,
+  SettingsRoute: SettingsRoute,
   SpotifyCallbackRoute: SpotifyCallbackRoute,
   SheetsCharacterIdRoute: SheetsCharacterIdRoute,
+  SheetsNewRoute: SheetsNewRoute,
   CharactersIndexRoute: CharactersIndexRoute,
   ItemsIndexRoute: ItemsIndexRoute,
   LocationsIndexRoute: LocationsIndexRoute,

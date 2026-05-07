@@ -144,6 +144,36 @@ export interface Character {
 	flaws: string;
 	notes: string;
 	imageUrl: string;
+	sheetLayout: SheetLayoutConfig;
+}
+
+export type SheetModuleKind =
+	| "identity"
+	| "abilities"
+	| "combat"
+	| "sanity"
+	| "magic"
+	| "inventory"
+	| "personality"
+	| "notes"
+	| "customText"
+	| "customStats";
+
+export interface SheetModuleConfig {
+	id: string;
+	kind: SheetModuleKind;
+	title: string;
+	enabled: boolean;
+	order: number;
+	column?: "main" | "side";
+	fields?: string[];
+	content?: string;
+}
+
+export interface SheetLayoutConfig {
+	version: 1;
+	template: RpgSystem | "custom";
+	modules: SheetModuleConfig[];
 }
 
 export interface Npc {

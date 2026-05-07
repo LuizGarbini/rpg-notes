@@ -34,15 +34,13 @@ function RouteComponent() {
 				action={<SessionForm />}
 			/>
 
-			<div className="space-y-4 px-6 py-5">
+			<div className="mx-auto flex w-full max-w-7xl flex-col gap-5 px-6 pb-10 sm:px-8">
 				<ListLayout onSearch={setSearchQuery} />
 
-				<div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-					{isLoading
-						? [...Array(10)].map((_, i) => <SessionCard key={`skeleton-${i}`} isLoading />)
-						: filteredSessions.map((session) => (
-								<SessionCard key={session.id} session={session} />
-						  ))}
+				<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+					{filteredSessions.map((session) => (
+						<SessionCard key={session.id} session={session} />
+					))}
 					{filteredSessions.length === 0 && (
 						<EmptyState
 							Icon={ScrollText}
