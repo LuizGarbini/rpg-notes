@@ -2,6 +2,7 @@ import { Compass, Eye, Mountain, Users } from "lucide-react";
 import { useState } from "react";
 import type { GameLocation } from "@/lib/store";
 import { useRPGStore } from "@/lib/store";
+import { EntityLinkChips } from "./entity-links";
 import { EntityActions } from "./entity-actions";
 import { LocationEditButton } from "./location-form";
 
@@ -101,6 +102,11 @@ export function LocationCard({ location }: LocationCardProps) {
 						<p className="mt-3 line-clamp-3 border-t border-border/60 pt-2.5 text-[11px] italic text-muted-foreground">
 							“{location.description}”
 						</p>
+					)}
+					{location.entityLinks?.length > 0 && (
+						<div className="mt-3 border-t border-border/60 pt-3">
+							<EntityLinkChips links={location.entityLinks} />
+						</div>
 					)}
 				</div>
 			</div>

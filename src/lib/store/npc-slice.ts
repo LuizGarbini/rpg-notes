@@ -23,6 +23,7 @@ export const npcDefaults: Omit<Npc, "id" | "createdAt"> = {
 	imageUrl: "",
 	isAlive: true,
 	linkedCharacterId: "",
+	entityLinks: [],
 };
 
 export interface NpcSlice {

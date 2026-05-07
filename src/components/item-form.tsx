@@ -1,8 +1,9 @@
 import { Pencil, Plus } from "lucide-react";
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useEffect, useId, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import type { Item } from "@/lib/store";
 import { itemDefaults, useRPGStore } from "@/lib/store";
+import { EntityLinkManager } from "./entity-links";
 import { ImageUploader } from "./image-uploader";
 import { Button } from "./ui/button";
 import {
@@ -80,6 +81,7 @@ function ItemFormDialog({
 }: ItemFormDialogProps) {
 	const isEdit = !!item;
 	const [internalOpen, setInternalOpen] = useState(false);
+	const nameId = useId();
 	const open = openProp ?? internalOpen;
 	const setOpen = onOpenChange ?? setInternalOpen;
 
@@ -92,6 +94,7 @@ function ItemFormDialog({
 		});
 
 	const imageUrl = useWatch({ control, name: "imageUrl" });
+	const watchedValues = useWatch({ control });
 
 	useEffect(() => {
 		if (open) reset({ ...itemDefaults, ...(item ?? {}) });
@@ -106,7 +109,7 @@ function ItemFormDialog({
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			{trigger && <DialogTrigger render={trigger as React.ReactElement} />}
-			<DialogContent className="!max-w-2xl max-h-[92vh] overflow-hidden p-0">
+			<DialogContent className="max-w-2xl! max-h-[92vh] overflow-hidden p-0">
 				<form
 					onSubmit={handleSubmit(onSubmit)}
 					className="flex max-h-[92vh] flex-col"
@@ -132,9 +135,9 @@ function ItemFormDialog({
 								size="md"
 							/>
 							<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-								<Field label="Nome" htmlFor="name" className="sm:col-span-2">
+								<Field label="Nome" htmlFor={nameId} className="sm:col-span-2">
 									<Input
-										id="name"
+										id={nameId}
 										placeholder="Ex: Espada Longa Flamejante"
 										{...register("name", { required: true })}
 									/>
@@ -238,6 +241,17 @@ function ItemFormDialog({
 								/>
 							</Field>
 						</FormSection>
+						<EntityLinkManager
+							value={watchedValues.entityLinks ?? []}
+							onChange={(links) =>
+								setValue("entityLinks", links, { shouldDirty: true })
+							}
+							sourceValues={watchedValues as Record<string, unknown>}
+							currentEntity={{
+								entityKind: "item",
+								entityId: item?.id,
+							}}
+						/>
 					</div>
 
 					<div className="flex items-center justify-end gap-2 border-t border-border bg-card-elevated/40 px-6 py-3">

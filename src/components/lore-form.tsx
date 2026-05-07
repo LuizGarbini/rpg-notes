@@ -1,8 +1,9 @@
 import { Pencil, Plus } from "lucide-react";
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useEffect, useId, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import type { Lore } from "@/lib/store";
 import { loreDefaults, useRPGStore } from "@/lib/store";
+import { EntityLinkManager } from "./entity-links";
 import { ImageUploader } from "./image-uploader";
 import { Button } from "./ui/button";
 import {
@@ -80,6 +81,7 @@ function LoreFormDialog({
 }: LoreFormDialogProps) {
 	const isEdit = !!lore;
 	const [internalOpen, setInternalOpen] = useState(false);
+	const titleId = useId();
 	const open = openProp ?? internalOpen;
 	const setOpen = onOpenChange ?? setInternalOpen;
 
@@ -92,6 +94,7 @@ function LoreFormDialog({
 		});
 
 	const imageUrl = useWatch({ control, name: "imageUrl" });
+	const watchedValues = useWatch({ control });
 
 	useEffect(() => {
 		if (open) reset({ ...loreDefaults, ...(lore ?? {}) });
@@ -106,7 +109,7 @@ function LoreFormDialog({
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			{trigger && <DialogTrigger render={trigger as React.ReactElement} />}
-			<DialogContent className="!max-w-2xl max-h-[92vh] overflow-hidden p-0">
+			<DialogContent className="max-w-2xl! max-h-[92vh] overflow-hidden p-0">
 				<form
 					onSubmit={handleSubmit(onSubmit)}
 					className="flex max-h-[92vh] flex-col"
@@ -132,9 +135,9 @@ function LoreFormDialog({
 								size="md"
 							/>
 							<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-								<Field label="Título" htmlFor="title" className="sm:col-span-2">
+								<Field label="Título" htmlFor={titleId} className="sm:col-span-2">
 									<Input
-										id="title"
+										id={titleId}
 										placeholder="Ex: A Queda do Império de Netheril"
 										{...register("title", { required: true })}
 									/>
@@ -210,6 +213,17 @@ function LoreFormDialog({
 								Conhecimento secreto (não revelado aos jogadores)
 							</label>
 						</FormSection>
+						<EntityLinkManager
+							value={watchedValues.entityLinks ?? []}
+							onChange={(links) =>
+								setValue("entityLinks", links, { shouldDirty: true })
+							}
+							sourceValues={watchedValues as Record<string, unknown>}
+							currentEntity={{
+								entityKind: "lore",
+								entityId: lore?.id,
+							}}
+						/>
 					</div>
 
 					<div className="flex items-center justify-end gap-2 border-t border-border bg-card-elevated/40 px-6 py-3">

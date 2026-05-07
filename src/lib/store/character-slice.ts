@@ -62,6 +62,7 @@ export const characterDefaults: Omit<Character, "id" | "createdAt"> = {
 	imageUrl: "",
 	sheetLayout: createDefaultSheetLayout("dnd5e"),
 	familyRelations: [],
+	entityLinks: [],
 };
 
 export interface CharacterSlice {

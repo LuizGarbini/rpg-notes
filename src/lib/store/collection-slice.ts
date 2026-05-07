@@ -20,6 +20,7 @@ export const itemDefaults: Omit<Item, "id" | "createdAt"> = {
 	owner: "",
 	imageUrl: "",
 	equipped: false,
+	entityLinks: [],
 };
 
 export const locationDefaults: Omit<GameLocation, "id" | "createdAt"> = {
@@ -41,6 +42,7 @@ export const locationDefaults: Omit<GameLocation, "id" | "createdAt"> = {
 	imageUrl: "",
 	mapUrl: "",
 	visited: false,
+	entityLinks: [],
 };
 
 export const loreDefaults: Omit<Lore, "id" | "createdAt"> = {
@@ -56,6 +58,7 @@ export const loreDefaults: Omit<Lore, "id" | "createdAt"> = {
 	notes: "",
 	isSecret: false,
 	imageUrl: "",
+	entityLinks: [],
 };
 
 export interface CollectionSlice {

@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import {
 	ArrowLeft,
 	BookOpen,
+	Download,
 	Edit,
 	Eye,
 	FileText,
@@ -64,6 +65,7 @@ function CharacterSheetPage() {
 	const [editingModule, setEditingModule] = useState<SheetModuleConfig | null>(
 		null,
 	);
+	const [isExportingPdf, setIsExportingPdf] = useState(false);
 
 	if (!character) {
 		return (
@@ -108,6 +110,24 @@ function CharacterSheetPage() {
 			modules: [...layout.modules, nextModule],
 		});
 		setEditingModule(nextModule);
+	}
+
+	async function handleExportPdf() {
+		setIsExportingPdf(true);
+		try {
+			const { downloadCharacterSheetPdf } = await import(
+				"@/components/character-sheet-pdf"
+			);
+			await downloadCharacterSheetPdf(currentCharacter);
+		} catch (error) {
+			window.alert(
+				error instanceof Error
+					? error.message
+					: "Não foi possível exportar a ficha em PDF.",
+			);
+		} finally {
+			setIsExportingPdf(false);
+		}
 	}
 
 	return (
@@ -175,6 +195,16 @@ function CharacterSheetPage() {
 								</Button>
 							</>
 						)}
+						<Button
+							type="button"
+							variant="outline"
+							onClick={handleExportPdf}
+							disabled={isExportingPdf}
+							className="gap-2"
+						>
+							<Download className="h-4 w-4" />
+							{isExportingPdf ? "Exportando..." : "Exportar PDF"}
+						</Button>
 						<Button
 							type="button"
 							onClick={() => setIsEditingLayout((current) => !current)}

@@ -3,6 +3,7 @@ import { FileText, MapPin, Skull, User } from "lucide-react";
 import { useState } from "react";
 import type { Npc } from "@/lib/store";
 import { useRPGStore } from "@/lib/store";
+import { EntityLinkChips } from "./entity-links";
 import { EntityActions } from "./entity-actions";
 import { NpcEditButton } from "./npc-form";
 
@@ -133,6 +134,12 @@ export function NpcCard({ npc }: NpcCardProps) {
 						<FileText className="h-3 w-3" />
 						Ficha: {linkedCharacter.characterName || "Sem nome"}
 					</Link>
+				)}
+
+				{npc.entityLinks?.length > 0 && (
+					<div className="mt-3 border-t border-border/60 pt-3">
+						<EntityLinkChips links={npc.entityLinks} />
+					</div>
 				)}
 
 				{npc.description && (

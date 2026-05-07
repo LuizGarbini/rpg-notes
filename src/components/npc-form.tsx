@@ -3,6 +3,7 @@ import { type ReactNode, useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import type { Npc } from "@/lib/store";
 import { npcDefaults, useRPGStore } from "@/lib/store";
+import { EntityLinkManager } from "./entity-links";
 import { ImageUploader } from "./image-uploader";
 import { Button } from "./ui/button";
 import {
@@ -101,6 +102,7 @@ function NpcFormDialog({
 		});
 
 	const imageUrl = useWatch({ control, name: "imageUrl" });
+	const watchedValues = useWatch({ control });
 
 	useEffect(() => {
 		if (open) {
@@ -287,6 +289,19 @@ function NpcFormDialog({
 									/>
 								</Field>
 							</FormSection>
+						)}
+						{tab === "basic" && (
+							<EntityLinkManager
+								value={watchedValues.entityLinks ?? []}
+								onChange={(links) =>
+									setValue("entityLinks", links, { shouldDirty: true })
+								}
+								sourceValues={watchedValues as Record<string, unknown>}
+								currentEntity={{
+									entityKind: "npc",
+									entityId: npc?.id,
+								}}
+							/>
 						)}
 					</div>
 

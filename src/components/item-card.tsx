@@ -2,6 +2,7 @@ import { Coins, Gem, Link2, Weight } from "lucide-react";
 import { useState } from "react";
 import type { Item } from "@/lib/store";
 import { useRPGStore } from "@/lib/store";
+import { EntityLinkChips } from "./entity-links";
 import { EntityActions } from "./entity-actions";
 import { ItemEditButton } from "./item-form";
 
@@ -137,6 +138,11 @@ export function ItemCard({ item }: ItemCardProps) {
 					<p className="mt-3 line-clamp-2 border-t border-border/60 pt-2.5 text-[11px] italic text-muted-foreground">
 						“{item.description}”
 					</p>
+				)}
+				{item.entityLinks?.length > 0 && (
+					<div className="mt-3 border-t border-border/60 pt-3">
+						<EntityLinkChips links={item.entityLinks} />
+					</div>
 				)}
 			</div>
 

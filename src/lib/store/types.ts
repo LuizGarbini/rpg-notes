@@ -82,6 +82,14 @@ export interface ActivityEntry {
 	entityName: string;
 }
 
+export interface EntityLink {
+	id: string;
+	entityKind: EntityKind;
+	entityId: string;
+	label?: string;
+	note?: string;
+}
+
 // =====================================================
 //  Interfaces das Entidades
 // =====================================================
@@ -146,6 +154,7 @@ export interface Character {
 	imageUrl: string;
 	sheetLayout: SheetLayoutConfig;
 	familyRelations: FamilyRelation[];
+	entityLinks: EntityLink[];
 }
 
 export type FamilyRelationKind =
@@ -219,6 +228,7 @@ export interface Npc {
 	imageUrl: string;
 	isAlive: boolean;
 	linkedCharacterId: string;
+	entityLinks: EntityLink[];
 }
 
 export interface Session {
@@ -242,6 +252,7 @@ export interface Session {
 	cliffhanger: string;
 	dmNotes: string;
 	mood: string;
+	entityLinks: EntityLink[];
 }
 
 export interface Item {
@@ -264,6 +275,7 @@ export interface Item {
 	owner: string;
 	imageUrl: string;
 	equipped: boolean;
+	entityLinks: EntityLink[];
 }
 
 export interface GameLocation {
@@ -288,6 +300,7 @@ export interface GameLocation {
 	imageUrl: string;
 	mapUrl: string;
 	visited: boolean;
+	entityLinks: EntityLink[];
 }
 
 export interface Lore {
@@ -306,6 +319,7 @@ export interface Lore {
 	notes: string;
 	isSecret: boolean;
 	imageUrl: string;
+	entityLinks: EntityLink[];
 }
 
 // =====================================================
