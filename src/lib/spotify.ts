@@ -134,7 +134,16 @@ export async function getUserProfile(accessToken: string) {
 	});
 
 	if (!response.ok) {
-		throw new Error(`Erro ao buscar perfil: ${response.status}`);
+		let errorDetails = "";
+		try {
+			const errorBody = await response.json();
+			errorDetails = JSON.stringify(errorBody);
+		} catch (e) {
+			errorDetails = "Não foi possível ler o corpo do erro.";
+		}
+		
+		console.error(`Erro Spotify (${response.status}):`, errorDetails);
+		throw new Error(`Erro ao buscar perfil (${response.status}): ${errorDetails}`);
 	}
 
 	return response.json();
