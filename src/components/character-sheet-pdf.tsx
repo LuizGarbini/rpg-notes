@@ -102,7 +102,6 @@ const styles = StyleSheet.create({
 		backgroundColor: "#211a2c",
 		border: "1 solid #3a3048",
 		marginBottom: 10,
-		breakInside: "avoid",
 	},
 	moduleTitle: {
 		fontSize: 11,
@@ -177,7 +176,7 @@ function CharacterSheetPdfDocument({ character }: { character: Character }) {
 	return (
 		<Document title={`${character.characterName || "Ficha"} | Grimório`}>
 			<Page size="A4" style={styles.page}>
-				<View style={styles.header}>
+				<View style={styles.header} wrap={false}>
 					<View style={styles.brandRow}>
 						<View style={styles.brand}>
 							<View style={styles.brandMark}>
@@ -245,13 +244,14 @@ function PdfModule({
 	if (fields.length === 0) return null;
 
 	return (
-		<View style={styles.module}>
+		<View style={styles.module} wrap={false}>
 			<Text style={styles.moduleTitle}>{title}</Text>
 			<View style={styles.fieldGrid}>
 				{fields.map((field) => (
 					<View
 						key={field.label}
 						style={field.full ? styles.fieldFull : styles.field}
+						wrap={false}
 					>
 						<Text style={styles.fieldLabel}>{field.label}</Text>
 						<Text style={field.emphasis ? styles.abilityValue : styles.fieldValue}>
