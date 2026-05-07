@@ -2,6 +2,7 @@ import {
 	BookOpen,
 	ChevronDown,
 	FileText,
+	GitFork,
 	House,
 	Map as MapIcon,
 	Package,
@@ -20,6 +21,7 @@ const grimoireItems = [
 	{ to: "/dashboard", label: "Dashboard", Icon: House },
 	{ to: "/characters", label: "Elenco", Icon: User },
 	{ to: "/sheets", label: "Fichas", Icon: FileText },
+	{ to: "/family-tree", label: "Árvore", Icon: GitFork },
 	{ to: "/npcs", label: "NPCs", Icon: Users },
 	{ to: "/sessions", label: "Sessões", Icon: ScrollText },
 ];

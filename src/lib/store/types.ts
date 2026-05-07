@@ -145,6 +145,26 @@ export interface Character {
 	notes: string;
 	imageUrl: string;
 	sheetLayout: SheetLayoutConfig;
+	familyRelations: FamilyRelation[];
+}
+
+export type FamilyRelationKind =
+	| "father"
+	| "mother"
+	| "parent"
+	| "guardian"
+	| "sibling"
+	| "child"
+	| "spouse"
+	| "partner"
+	| "relative";
+
+export interface FamilyRelation {
+	id: string;
+	relatedCharacterId: string;
+	kind: FamilyRelationKind;
+	note?: string;
+	isSecret?: boolean;
 }
 
 export type SheetModuleKind =
