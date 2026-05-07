@@ -34,6 +34,7 @@ function QRCodePlaceholder({ value, size }: { value: string; size: number }) {
 				alt="QR Code"
 				width={size}
 				height={size}
+				draggable={false}
 				className={cn(
 					"rounded-sm transition-opacity duration-300",
 					loading ? "opacity-0" : "opacity-100",
