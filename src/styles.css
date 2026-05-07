@@ -200,6 +200,25 @@
   ::-webkit-scrollbar-thumb:hover {
     background: var(--primary-dark);
   }
+
+  /* Interactive elements cursor */
+  button, 
+  a, 
+  [role="button"],
+  input[type="submit"],
+  input[type="reset"],
+  input[type="button"],
+  label,
+  select,
+  summary {
+    cursor: pointer;
+  }
+
+  /* Prevent image dragging */
+  img {
+    user-select: none;
+    -webkit-user-drag: none;
+  }
 }
 
 @layer utilities {

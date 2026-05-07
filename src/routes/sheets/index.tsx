@@ -24,10 +24,10 @@ function RouteComponent() {
 		<div className="w-full">
 			<PageHeader
 				title="Fichas"
-				description="Fichas de personagem de todos os sistemas"
+				description="A área mecânica para criar, editar e consultar fichas jogáveis"
 				Icon={FileText}
 				iconColor="text-emerald-300"
-				eyebrow="Sheets"
+				eyebrow="Mecânicas"
 				count={characters.length}
 				action={
 					<Link to="/sheets/new">
@@ -50,7 +50,7 @@ function RouteComponent() {
 						<EmptyState
 							Icon={FileText}
 							title="Nenhuma ficha encontrada"
-							description="Crie sua primeira ficha de personagem usando o botão acima."
+							description="Crie sua primeira ficha para começar a organizar os dados de jogo."
 						/>
 					)}
 				</div>

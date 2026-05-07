@@ -2,6 +2,7 @@ import { Calendar, Clock, ScrollText, Users } from "lucide-react";
 import { useState } from "react";
 import type { Session } from "@/lib/store";
 import { useRPGStore } from "@/lib/store";
+import { EntityLinkChips } from "./entity-links";
 import { EntityActions } from "./entity-actions";
 import { SessionEditButton } from "./session-form";
 
@@ -109,6 +110,12 @@ export function SessionCard({ session, isLoading }: SessionCardProps) {
 					<div className="mt-2 flex items-center gap-1.5 text-[10px] text-muted-foreground">
 						<Users className="h-3 w-3 text-emerald-300" />
 						<span className="line-clamp-1">{session.attendees}</span>
+					</div>
+				)}
+
+				{session.entityLinks?.length > 0 && (
+					<div className="mt-3 border-t border-border/60 pt-3">
+						<EntityLinkChips links={session.entityLinks} />
 					</div>
 				)}
 

@@ -1,8 +1,9 @@
 import { Pencil, Plus } from "lucide-react";
-import { type ReactNode, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { type ReactNode, useEffect, useId, useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
 import type { Session } from "@/lib/store";
 import { sessionDefaults, useRPGStore } from "@/lib/store";
+import { EntityLinkManager } from "./entity-links";
 import { Button } from "./ui/button";
 import {
 	Dialog,
@@ -86,6 +87,7 @@ function SessionFormDialog({
 }: SessionFormDialogProps) {
 	const isEdit = !!session;
 	const [internalOpen, setInternalOpen] = useState(false);
+	const titleId = useId();
 	const open = openProp ?? internalOpen;
 	const setOpen = onOpenChange ?? setInternalOpen;
 
@@ -93,9 +95,11 @@ function SessionFormDialog({
 	const addSession = useRPGStore((state) => state.addSession);
 	const updateSession = useRPGStore((state) => state.updateSession);
 
-	const { register, handleSubmit, reset } = useForm<SessionFormValues>({
-		defaultValues: { ...sessionDefaults, ...(session ?? {}) },
-	});
+	const { register, handleSubmit, reset, control, setValue } =
+		useForm<SessionFormValues>({
+			defaultValues: { ...sessionDefaults, ...(session ?? {}) },
+		});
+	const watchedValues = useWatch({ control });
 
 	useEffect(() => {
 		if (open) {
@@ -113,7 +117,7 @@ function SessionFormDialog({
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			{trigger && <DialogTrigger render={trigger as React.ReactElement} />}
-			<DialogContent className="!max-w-2xl max-h-[92vh] overflow-hidden p-0">
+			<DialogContent className="max-w-2xl! max-h-[92vh] overflow-hidden p-0">
 				<form
 					onSubmit={handleSubmit(onSubmit)}
 					className="flex max-h-[92vh] flex-col"
@@ -136,11 +140,11 @@ function SessionFormDialog({
 								<div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
 									<Field
 										label="Título"
-										htmlFor="title"
+										htmlFor={titleId}
 										className="sm:col-span-2"
 									>
 										<Input
-											id="title"
+											id={titleId}
 											placeholder="Ex: A Caverna dos Goblins"
 											{...register("title", { required: true })}
 										/>
@@ -273,6 +277,19 @@ function SessionFormDialog({
 									/>
 								</Field>
 							</FormSection>
+						)}
+						{tab === "people" && (
+							<EntityLinkManager
+								value={watchedValues.entityLinks ?? []}
+								onChange={(links) =>
+									setValue("entityLinks", links, { shouldDirty: true })
+								}
+								sourceValues={watchedValues as Record<string, unknown>}
+								currentEntity={{
+									entityKind: "session",
+									entityId: session?.id,
+								}}
+							/>
 						)}
 					</div>
 

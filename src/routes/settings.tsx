@@ -1,7 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Bell, Eye, Moon, Settings, ShieldCheck, Sparkles } from "lucide-react";
+import {
+	Bell,
+	Download,
+	Eye,
+	Moon,
+	Settings,
+	ShieldCheck,
+	Sparkles,
+} from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { downloadCampaignBackup } from "@/lib/campaign-backup";
+import { useRPGStore } from "@/lib/store";
 
 export const Route = createFileRoute("/settings")({
 	component: SettingsPage,
@@ -32,6 +42,22 @@ function SettingsPage() {
 	const [checked, setChecked] = useState(
 		() => new Set(preferences.filter((item) => item.defaultChecked).map((item) => item.title)),
 	);
+	const backupState = useRPGStore((state) => ({
+		characters: state.characters,
+		npcs: state.npcs,
+		sessions: state.sessions,
+		items: state.items,
+		locations: state.locations,
+		lores: state.lores,
+		activityLog: state.activityLog,
+	}));
+	const backupTotal =
+		backupState.characters.length +
+		backupState.npcs.length +
+		backupState.sessions.length +
+		backupState.items.length +
+		backupState.locations.length +
+		backupState.lores.length;
 
 	function togglePreference(title: string) {
 		setChecked((current) => {
@@ -147,6 +173,37 @@ function SettingsPage() {
 					</div>
 				</section>
 			</div>
+
+			<section className="rounded-2xl border border-border/70 bg-card/80 p-5 shadow-sm shadow-black/5">
+				<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+					<div>
+						<p className="text-[10px] font-bold uppercase tracking-[0.22em] text-primary">
+							Backup
+						</p>
+						<h2 className="font-display mt-1 text-xl font-bold text-foreground">
+							Exportar dados da campanha
+						</h2>
+						<p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-muted-foreground">
+							Baixe um JSON versionado com fichas, elenco, NPCs, sessões,
+							itens, locais, lore, conexões e histórico de atividade. Tokens de
+							serviços externos não entram no arquivo.
+						</p>
+					</div>
+					<div className="flex flex-col gap-2 sm:items-end">
+						<span className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+							{backupTotal} registros
+						</span>
+						<Button
+							type="button"
+							className="gap-2"
+							onClick={() => downloadCampaignBackup(backupState)}
+						>
+							<Download className="h-4 w-4" />
+							Baixar backup JSON
+						</Button>
+					</div>
+				</div>
+			</section>
 		</div>
 	);
 }

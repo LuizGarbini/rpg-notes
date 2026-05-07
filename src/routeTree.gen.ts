@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SpotifyCallbackRouteImport } from './routes/spotify-callback'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as FamilyTreeRouteImport } from './routes/family-tree'
 import { Route as ErrorPreviewRouteImport } from './routes/error-preview'
 import { Route as DesignSystemRouteImport } from './routes/design-system'
 import { Route as DashboardRouteImport } from './routes/dashboard'
@@ -36,6 +37,11 @@ const SpotifyCallbackRoute = SpotifyCallbackRouteImport.update({
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FamilyTreeRoute = FamilyTreeRouteImport.update({
+  id: '/family-tree',
+  path: '/family-tree',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ErrorPreviewRoute = ErrorPreviewRouteImport.update({
@@ -127,6 +133,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/design-system': typeof DesignSystemRoute
   '/error-preview': typeof ErrorPreviewRoute
+  '/family-tree': typeof FamilyTreeRoute
   '/settings': typeof SettingsRoute
   '/spotify-callback': typeof SpotifyCallbackRoute
   '/sheets/$characterId': typeof SheetsCharacterIdRoute
@@ -147,6 +154,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/design-system': typeof DesignSystemRoute
   '/error-preview': typeof ErrorPreviewRoute
+  '/family-tree': typeof FamilyTreeRoute
   '/settings': typeof SettingsRoute
   '/spotify-callback': typeof SpotifyCallbackRoute
   '/sheets/$characterId': typeof SheetsCharacterIdRoute
@@ -168,6 +176,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/design-system': typeof DesignSystemRoute
   '/error-preview': typeof ErrorPreviewRoute
+  '/family-tree': typeof FamilyTreeRoute
   '/settings': typeof SettingsRoute
   '/spotify-callback': typeof SpotifyCallbackRoute
   '/sheets/$characterId': typeof SheetsCharacterIdRoute
@@ -190,6 +199,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/design-system'
     | '/error-preview'
+    | '/family-tree'
     | '/settings'
     | '/spotify-callback'
     | '/sheets/$characterId'
@@ -210,6 +220,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/design-system'
     | '/error-preview'
+    | '/family-tree'
     | '/settings'
     | '/spotify-callback'
     | '/sheets/$characterId'
@@ -230,6 +241,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/design-system'
     | '/error-preview'
+    | '/family-tree'
     | '/settings'
     | '/spotify-callback'
     | '/sheets/$characterId'
@@ -251,6 +263,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   DesignSystemRoute: typeof DesignSystemRoute
   ErrorPreviewRoute: typeof ErrorPreviewRoute
+  FamilyTreeRoute: typeof FamilyTreeRoute
   SettingsRoute: typeof SettingsRoute
   SpotifyCallbackRoute: typeof SpotifyCallbackRoute
   SheetsCharacterIdRoute: typeof SheetsCharacterIdRoute
@@ -278,6 +291,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/family-tree': {
+      id: '/family-tree'
+      path: '/family-tree'
+      fullPath: '/family-tree'
+      preLoaderRoute: typeof FamilyTreeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/error-preview': {
@@ -403,6 +423,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   DesignSystemRoute: DesignSystemRoute,
   ErrorPreviewRoute: ErrorPreviewRoute,
+  FamilyTreeRoute: FamilyTreeRoute,
   SettingsRoute: SettingsRoute,
   SpotifyCallbackRoute: SpotifyCallbackRoute,
   SheetsCharacterIdRoute: SheetsCharacterIdRoute,

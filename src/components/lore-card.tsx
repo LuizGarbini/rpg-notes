@@ -2,6 +2,7 @@ import { BookOpen, Lock } from "lucide-react";
 import { useState } from "react";
 import type { Lore } from "@/lib/store";
 import { useRPGStore } from "@/lib/store";
+import { EntityLinkChips } from "./entity-links";
 import { EntityActions } from "./entity-actions";
 import { LoreEditButton } from "./lore-form";
 
@@ -152,6 +153,11 @@ export function LoreCard({ lore, isLoading }: LoreCardProps) {
 								#{tag}
 							</span>
 						))}
+					</div>
+				)}
+				{lore.entityLinks?.length > 0 && (
+					<div className="mt-3 border-t border-border/60 pt-3 pl-2">
+						<EntityLinkChips links={lore.entityLinks} />
 					</div>
 				)}
 			</div>

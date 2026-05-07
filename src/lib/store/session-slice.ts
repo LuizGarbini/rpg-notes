@@ -21,6 +21,7 @@ export const sessionDefaults: Omit<Session, "id" | "createdAt"> = {
 	cliffhanger: "",
 	dmNotes: "",
 	mood: "",
+	entityLinks: [],
 };
 
 export interface SessionSlice {

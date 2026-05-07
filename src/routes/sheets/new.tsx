@@ -8,7 +8,7 @@ import {
 	Plus,
 	Sparkles,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import {
 	AbilitiesFields,
@@ -77,6 +77,18 @@ function NewSheetPage() {
 		[modules],
 	);
 
+	useEffect(() => {
+		const currentTemplate = form.getValues("sheetLayout")?.template;
+		if (currentTemplate === system) return;
+		const nextConfig = SYSTEM_CONFIG[system] ?? SYSTEM_CONFIG.generic;
+		const nextLayout = createDefaultSheetLayout(system, {
+			showSanity: nextConfig.showSanity,
+			showSpells: nextConfig.showSpells,
+		});
+		setModules(nextLayout.modules);
+		setValue("sheetLayout", nextLayout, { shouldDirty: true });
+	}, [form, setValue, system]);
+
 	function goToStep(step: WizardStep) {
 		setActiveStep(step);
 	}
@@ -92,7 +104,11 @@ function NewSheetPage() {
 	}
 
 	function handleSelectSystem(nextSystem: RpgSystem) {
-		const nextLayout = createDefaultSheetLayout(nextSystem);
+		const nextConfig = SYSTEM_CONFIG[nextSystem] ?? SYSTEM_CONFIG.generic;
+		const nextLayout = createDefaultSheetLayout(nextSystem, {
+			showSanity: nextConfig.showSanity,
+			showSpells: nextConfig.showSpells,
+		});
 		setValue("system", nextSystem, { shouldDirty: true });
 		setValue("sheetLayout", nextLayout, { shouldDirty: true });
 		setModules(nextLayout.modules);
@@ -138,22 +154,24 @@ function NewSheetPage() {
 	return (
 		<form
 			onSubmit={handleSubmit(onSubmit)}
-			className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-6 py-8 sm:px-8"
+			className="mx-auto flex w-full max-w-7xl flex-col gap-7 px-6 py-8 sm:px-8"
 		>
-			<header className="relative overflow-hidden rounded-[1.75rem] border border-border/70 bg-linear-to-br from-card via-card/95 to-primary-muted/25 p-6 shadow-xl shadow-black/5 sm:p-8">
+			<header className="relative overflow-hidden rounded-[1.75rem] border border-border/70 bg-linear-to-br from-card via-card/95 to-primary-muted/25 p-7 shadow-xl shadow-black/5 sm:p-9">
 				<div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
 				<div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
 					<div className="max-w-3xl">
-						<Link
-							to="/sheets"
-							className="inline-flex items-center gap-1.5 text-[12px] font-bold text-muted-foreground transition-colors hover:text-primary"
-						>
-							<ArrowLeft className="h-3.5 w-3.5" />
-							Voltar para fichas
-						</Link>
-						<div className="mt-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-primary">
-							<FileText className="h-3.5 w-3.5" />
-							Nova ficha
+						<div className="flex flex-col items-start gap-4">
+							<Link
+								to="/sheets"
+								className="inline-flex items-center gap-1.5 text-[12px] font-bold text-muted-foreground transition-colors hover:text-primary"
+							>
+								<ArrowLeft className="h-3.5 w-3.5" />
+								Voltar para fichas
+							</Link>
+							<div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-primary">
+								<FileText className="h-3.5 w-3.5" />
+								Nova ficha
+							</div>
 						</div>
 						<h1 className="font-display mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
 							Crie uma ficha modular
@@ -171,7 +189,7 @@ function NewSheetPage() {
 				</div>
 			</header>
 
-			<div className="grid gap-5 lg:grid-cols-[280px_1fr_340px]">
+			<div className="grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
 				<aside className="rounded-2xl border border-border/70 bg-card/80 p-3 shadow-sm shadow-black/5 lg:sticky lg:top-24 lg:self-start">
 					{STEPS.map((step, index) => {
 						const active = step.id === activeStep;
@@ -205,9 +223,9 @@ function NewSheetPage() {
 					})}
 				</aside>
 
-				<section className="min-h-[520px] rounded-2xl border border-border/70 bg-card/80 p-5 shadow-sm shadow-black/5">
+				<section className="min-h-[560px] rounded-3xl border border-border/70 bg-card/80 p-6 shadow-sm shadow-black/5 sm:p-8">
 					{activeStep === "system" && (
-						<div className="space-y-5">
+						<div className="space-y-7">
 							<SectionIntro
 								eyebrow="Template"
 								title="Escolha o sistema da ficha"
@@ -218,7 +236,7 @@ function NewSheetPage() {
 					)}
 
 					{activeStep === "identity" && (
-						<div className="space-y-5">
+						<div className="space-y-7">
 							<SectionIntro
 								eyebrow="Identidade"
 								title="Quem é esse personagem?"
@@ -234,7 +252,7 @@ function NewSheetPage() {
 					)}
 
 					{activeStep === "abilities" && (
-						<div className="space-y-5">
+						<div className="space-y-7">
 							<SectionIntro
 								eyebrow="Atributos"
 								title="Configure números e proficiências"
@@ -249,7 +267,7 @@ function NewSheetPage() {
 					)}
 
 					{activeStep === "combat" && (
-						<div className="space-y-5">
+						<div className="space-y-7">
 							<SectionIntro
 								eyebrow="Combate"
 								title="Defina os recursos de mesa"
@@ -265,7 +283,7 @@ function NewSheetPage() {
 					)}
 
 					{activeStep === "modules" && (
-						<div className="space-y-5">
+						<div className="space-y-7">
 							<SectionIntro
 								eyebrow="Módulos"
 								title="Monte a estrutura da ficha"
@@ -352,7 +370,7 @@ function NewSheetPage() {
 					)}
 
 					{activeStep === "review" && (
-						<div className="space-y-5">
+						<div className="space-y-7">
 							<SectionIntro
 								eyebrow="Revisão"
 								title="Tudo pronto para salvar"
@@ -395,7 +413,7 @@ function NewSheetPage() {
 					</div>
 				</section>
 
-				<aside className="rounded-2xl border border-border/70 bg-card/80 p-5 shadow-sm shadow-black/5 lg:sticky lg:top-24 lg:self-start">
+				<aside className="rounded-3xl border border-border/70 bg-card/80 p-6 shadow-sm shadow-black/5 lg:col-start-2">
 					<div className="flex items-center justify-between gap-3">
 						<div>
 							<p className="text-[10px] font-bold uppercase tracking-[0.22em] text-primary">

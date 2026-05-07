@@ -1,8 +1,9 @@
 import { Pencil, Plus } from "lucide-react";
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useEffect, useId, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import type { GameLocation } from "@/lib/store";
 import { locationDefaults, useRPGStore } from "@/lib/store";
+import { EntityLinkManager } from "./entity-links";
 import { ImageUploader } from "./image-uploader";
 import { Button } from "./ui/button";
 import {
@@ -86,6 +87,7 @@ function LocationFormDialog({
 }: LocationFormDialogProps) {
 	const isEdit = !!location;
 	const [internalOpen, setInternalOpen] = useState(false);
+	const nameId = useId();
 	const open = openProp ?? internalOpen;
 	const setOpen = onOpenChange ?? setInternalOpen;
 
@@ -99,6 +101,7 @@ function LocationFormDialog({
 		});
 
 	const imageUrl = useWatch({ control, name: "imageUrl" });
+	const watchedValues = useWatch({ control });
 
 	useEffect(() => {
 		if (open) {
@@ -116,7 +119,7 @@ function LocationFormDialog({
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			{trigger && <DialogTrigger render={trigger as React.ReactElement} />}
-			<DialogContent className="!max-w-2xl max-h-[92vh] overflow-hidden p-0">
+			<DialogContent className="max-w-2xl! max-h-[92vh] overflow-hidden p-0">
 				<form
 					onSubmit={handleSubmit(onSubmit)}
 					className="flex max-h-[92vh] flex-col"
@@ -146,9 +149,9 @@ function LocationFormDialog({
 									size="md"
 								/>
 								<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-									<Field label="Nome" htmlFor="name" className="sm:col-span-2">
+									<Field label="Nome" htmlFor={nameId} className="sm:col-span-2">
 										<Input
-											id="name"
+											id={nameId}
 											placeholder="Ex: Cidade Livre de Greyhawk"
 											{...register("name", { required: true })}
 										/>
@@ -261,6 +264,19 @@ function LocationFormDialog({
 									<Input placeholder="https://..." {...register("mapUrl")} />
 								</Field>
 							</FormSection>
+						)}
+						{tab === "history" && (
+							<EntityLinkManager
+								value={watchedValues.entityLinks ?? []}
+								onChange={(links) =>
+									setValue("entityLinks", links, { shouldDirty: true })
+								}
+								sourceValues={watchedValues as Record<string, unknown>}
+								currentEntity={{
+									entityKind: "location",
+									entityId: location?.id,
+								}}
+							/>
 						)}
 					</div>
 

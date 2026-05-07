@@ -179,10 +179,18 @@ function CharacterFormDialog({
 	}
 
 	function handleSelectSystem(value: RpgSystem) {
+		const selectedConfig = SYSTEM_CONFIG[value] ?? SYSTEM_CONFIG.generic;
 		setValue("system", value, { shouldDirty: true });
-		setValue("sheetLayout", createDefaultSheetLayout(value), {
-			shouldDirty: true,
-		});
+		setValue(
+			"sheetLayout",
+			createDefaultSheetLayout(value, {
+				showSanity: selectedConfig.showSanity,
+				showSpells: selectedConfig.showSpells,
+			}),
+			{
+				shouldDirty: true,
+			},
+		);
 		setStep("form");
 	}
 
@@ -218,6 +226,7 @@ function CharacterFormDialog({
 									variant="ghost"
 									size="sm"
 									onClick={() => setStep("system")}
+									className="mr-8"
 								>
 									<ArrowLeft className="h-3.5 w-3.5" />
 									Trocar sistema

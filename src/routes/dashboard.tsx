@@ -26,8 +26,8 @@ export const Route = createFileRoute("/dashboard")({
 const sections = [
 	{
 		to: "/characters",
-		title: "Personagens",
-		description: "Heróis da campanha",
+		title: "Elenco",
+		description: "Visão narrativa",
 		Icon: User,
 		accent: "text-violet-300",
 		tint: "bg-violet-500/10 border-violet-500/20",
@@ -147,11 +147,11 @@ function Dashboard() {
 							Acompanhe os registros principais, retome a última sessão e acesse
 							as coleções que mantêm o seu mundo organizado e vivo.
 						</p>
-						<div className="mt-10 flex flex-wrap gap-4">
-							<Link to="/characters">
-								<Button className="h-12 gap-3 px-8 font-bold shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all">
+						<div className="mt-8 flex flex-wrap gap-3">
+							<Link to="/sheets/new">
+								<Button className="h-11 gap-2 px-5 font-bold">
 									<User className="h-4 w-4" />
-									Novo Personagem
+									Criar ficha
 								</Button>
 							</Link>
 							<Link to="/sessions">

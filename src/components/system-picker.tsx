@@ -26,7 +26,7 @@ export function SystemPicker({ value, onSelect }: SystemPickerProps) {
 	});
 
 	return (
-		<div className="space-y-3">
+		<div className="space-y-4">
 			{/* Search */}
 			<div className="relative">
 				<Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
@@ -34,13 +34,13 @@ export function SystemPicker({ value, onSelect }: SystemPickerProps) {
 					placeholder="Buscar sistema..."
 					value={search}
 					onChange={(e) => setSearch(e.target.value)}
-					className="pl-8 h-8 text-[13px]"
+					className="h-10 rounded-2xl pl-9 text-[13px]"
 					autoFocus
 				/>
 			</div>
 
 			{/* Grid */}
-			<div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 max-h-[50vh] overflow-y-auto pr-1">
+			<div className="grid max-h-[58vh] grid-cols-1 gap-3 overflow-y-auto pr-1 md:grid-cols-2">
 				{filtered.map((s) => {
 					const Icon = s.Icon;
 					const active = value === s.value;
@@ -49,20 +49,20 @@ export function SystemPicker({ value, onSelect }: SystemPickerProps) {
 							key={s.value}
 							type="button"
 							onClick={() => onSelect(s.value)}
-							className={`group relative flex items-start gap-3 rounded-lg border p-3 text-left transition-all ${
+							className={`group relative flex min-h-28 items-start gap-3 rounded-2xl border p-4 text-left shadow-sm shadow-black/5 transition-all duration-150 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-0.5 ${
 								active
-									? "border-primary/60 bg-primary/5 ring-1 ring-primary/30"
-									: "border-border bg-card-elevated/40 hover:border-border-hover hover:bg-card-elevated/70"
+									? "border-primary/60 bg-primary/10 ring-1 ring-primary/30"
+									: "border-border/70 bg-card-elevated/60 hover:border-primary/35 hover:bg-card-elevated"
 							}`}
 						>
 							<div
-								className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-linear-to-br ${s.bgAccent} ring-1 ring-border ${s.accent}`}
+								className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-linear-to-br ${s.bgAccent} ring-1 ring-border/70 ${s.accent}`}
 							>
 								<Icon className="h-4 w-4" strokeWidth={1.6} />
 							</div>
 							<div className="min-w-0 flex-1">
 								<div className="flex items-center justify-between gap-2">
-									<h4 className="font-display text-[12px] font-bold text-foreground leading-tight">
+									<h4 className="font-display text-[13px] font-bold leading-tight text-foreground">
 										{s.label}
 									</h4>
 									<ArrowRight
@@ -76,7 +76,7 @@ export function SystemPicker({ value, onSelect }: SystemPickerProps) {
 								<p className="mt-0.5 text-[9px] font-medium uppercase tracking-wider text-muted-foreground">
 									{s.tagline}
 								</p>
-								<p className="mt-1 line-clamp-2 text-[10px] leading-snug text-muted-foreground">
+								<p className="mt-2 line-clamp-3 text-[11px] leading-relaxed text-muted-foreground">
 									{s.description}
 								</p>
 							</div>

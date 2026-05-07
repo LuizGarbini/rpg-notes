@@ -137,15 +137,15 @@ function DesignSystem() {
 			<SpecPanel eyebrow="Page pattern" title="Hero, busca e grid">
 				<div className="overflow-hidden rounded-[1.75rem] border border-border/70 bg-background/35">
 					<PageHeader
-						title="Personagens"
-						description="Personagens principais, fichas e protagonistas da campanha."
+						title="Elenco"
+						description="Visão narrativa dos personagens principais da campanha."
 						Icon={User}
 						eyebrow="Coleção"
 						count={12}
 						action={
 							<Button className="h-11 gap-2 px-5">
 								<Plus className="h-4 w-4" />
-								Novo Personagem
+								Criar ficha
 							</Button>
 						}
 					/>
