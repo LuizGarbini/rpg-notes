@@ -54,6 +54,13 @@ export function CharacterSheetPage() {
 		s.characters.find((c) => c.id === characterId),
 	);
 	const isLoading = useRPGStore((s) => s.isLoadingRemote);
+	const [activeTab, setActiveTab] = useState<SheetTab>("geral");
+	const updateCharacter = useRPGStore((s) => s.updateCharacter);
+
+	const update = useCallback(
+		(data: Partial<Character>) => updateCharacter(characterId, data),
+		[characterId, updateCharacter],
+	);
 
 	if (isLoading) {
 		return (
