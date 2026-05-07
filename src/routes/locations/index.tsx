@@ -20,6 +20,8 @@ function RouteComponent() {
 		l.name.toLowerCase().includes(searchQuery.toLowerCase()),
 	);
 
+	const isLoading = useRPGStore((state) => state.isLoadingRemote);
+
 	return (
 		<div className="w-full">
 			<PageHeader
@@ -36,9 +38,11 @@ function RouteComponent() {
 				<ListLayout onSearch={setSearchQuery} />
 
 				<div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-					{filteredLocations.map((location) => (
-						<LocationCard key={location.id} location={location} />
-					))}
+					{isLoading
+						? [...Array(10)].map((_, i) => <LocationCard key={`skeleton-${i}`} isLoading />)
+						: filteredLocations.map((location) => (
+								<LocationCard key={location.id} location={location} />
+						  ))}
 					{filteredLocations.length === 0 && (
 						<EmptyState
 							Icon={MapIcon}

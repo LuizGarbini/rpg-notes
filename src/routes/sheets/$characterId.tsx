@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import {
 	abilityModifier,
@@ -47,18 +48,51 @@ const TABS: {
 	{ id: "notas", label: "Notas", Icon: ScrollText },
 	{ id: "editar", label: "Editar", Icon: Edit },
 ];
-
-function CharacterSheetPage() {
+export function CharacterSheetPage() {
 	const { characterId } = Route.useParams();
 	const character = useRPGStore((s) =>
 		s.characters.find((c) => c.id === characterId),
 	);
-	const [activeTab, setActiveTab] = useState<SheetTab>("geral");
-	const updateCharacter = useRPGStore((s) => s.updateCharacter);
-	const update = useCallback(
-		(patch: Partial<Character>) => updateCharacter(characterId, patch),
-		[updateCharacter, characterId],
-	);
+	const isLoading = useRPGStore((s) => s.isLoadingRemote);
+
+	if (isLoading) {
+		return (
+			<div className="w-full">
+				<div className="border-b border-white/5 bg-card/30 p-8 space-y-6">
+					<div className="flex items-start gap-4">
+						<Skeleton className="h-14 w-14 rounded-xl" />
+						<div className="flex-1 space-y-2">
+							<Skeleton className="h-6 w-48" />
+							<div className="flex gap-2">
+								<Skeleton className="h-4 w-20 rounded" />
+								<Skeleton className="h-4 w-20 rounded" />
+							</div>
+						</div>
+						<div className="flex gap-3">
+							<Skeleton className="h-10 w-12 rounded-lg" />
+							<Skeleton className="h-10 w-12 rounded-lg" />
+						</div>
+					</div>
+					<div className="grid grid-cols-4 gap-2">
+						{[...Array(4)].map((_, i) => (
+							<Skeleton key={i} className="h-12 w-full rounded-lg" />
+						))}
+					</div>
+				</div>
+				<div className="px-6 py-6 space-y-8">
+					<div className="grid grid-cols-3 gap-2">
+						{[...Array(6)].map((_, i) => (
+							<Skeleton key={i} className="h-24 w-full rounded-lg" />
+						))}
+					</div>
+					<div className="space-y-4">
+						<Skeleton className="h-4 w-32" />
+						<Skeleton className="h-24 w-full rounded-lg" />
+					</div>
+				</div>
+			</div>
+		);
+	}
 
 	if (!character) {
 		return (

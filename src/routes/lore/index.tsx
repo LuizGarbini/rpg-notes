@@ -20,6 +20,8 @@ function RouteComponent() {
 		l.title.toLowerCase().includes(searchQuery.toLowerCase()),
 	);
 
+	const isLoading = useRPGStore((state) => state.isLoadingRemote);
+
 	return (
 		<div className="w-full">
 			<PageHeader
@@ -36,9 +38,9 @@ function RouteComponent() {
 				<ListLayout onSearch={setSearchQuery} />
 
 				<div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-					{filteredLores.map((lore) => (
-						<LoreCard key={lore.id} lore={lore} />
-					))}
+					{isLoading
+						? [...Array(10)].map((_, i) => <LoreCard key={`skeleton-${i}`} isLoading />)
+						: filteredLores.map((lore) => <LoreCard key={lore.id} lore={lore} />)}
 					{filteredLores.length === 0 && (
 						<EmptyState
 							Icon={BookOpen}

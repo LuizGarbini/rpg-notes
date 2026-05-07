@@ -20,6 +20,8 @@ function RouteComponent() {
 		c.characterName.toLowerCase().includes(searchQuery.toLowerCase()),
 	);
 
+	const isLoading = useRPGStore((state) => state.isLoadingRemote);
+
 	return (
 		<div className="w-full">
 			<PageHeader
@@ -36,9 +38,13 @@ function RouteComponent() {
 				<ListLayout onSearch={setSearchQuery} />
 
 				<div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-					{filteredCharacters.map((character) => (
-						<CharacterCard key={character.id} character={character} />
-					))}
+					{isLoading
+						? [...Array(10)].map((_, i) => (
+								<CharacterCard key={`skeleton-${i}`} isLoading />
+						  ))
+						: filteredCharacters.map((character) => (
+								<CharacterCard key={character.id} character={character} />
+						  ))}
 					{filteredCharacters.length === 0 && (
 						<EmptyState
 							Icon={User}

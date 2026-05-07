@@ -5,8 +5,11 @@ import { useRPGStore } from "@/lib/store";
 import { EntityActions } from "./entity-actions";
 import { ItemEditButton } from "./item-form";
 
+import { Skeleton } from "@/components/ui/skeleton";
+
 interface ItemCardProps {
-	item: Item;
+	item?: Item;
+	isLoading?: boolean;
 }
 
 const rarityStyles: Record<
@@ -45,9 +48,36 @@ const rarityStyles: Record<
 	},
 };
 
-export function ItemCard({ item }: ItemCardProps) {
+export function ItemCard({ item, isLoading }: ItemCardProps) {
 	const removeItem = useRPGStore((s) => s.removeItem);
 	const [editOpen, setEditOpen] = useState(false);
+
+	if (isLoading || !item) {
+		return (
+			<div className="flex flex-col rounded-xl border border-border bg-card-elevated p-4 space-y-4">
+				<div className="flex items-start gap-3">
+					<Skeleton className="h-14 w-14 rounded-lg shrink-0" />
+					<div className="min-w-0 flex-1 space-y-2">
+						<Skeleton className="h-5 w-3/4" />
+						<div className="flex gap-2">
+							<Skeleton className="h-4 w-16 rounded" />
+							<Skeleton className="h-4 w-12 rounded" />
+						</div>
+					</div>
+				</div>
+				<Skeleton className="h-10 w-full rounded-md" />
+				<div className="grid grid-cols-3 gap-1.5">
+					<Skeleton className="h-10 w-full rounded" />
+					<Skeleton className="h-10 w-full rounded" />
+					<Skeleton className="h-10 w-full rounded" />
+				</div>
+				<div className="border-t border-border/60 pt-2.5">
+					<Skeleton className="h-3 w-full" />
+					<Skeleton className="h-3 w-4/5 mt-1" />
+				</div>
+			</div>
+		);
+	}
 
 	const rarityKey = (item.rarity || "comum").toLowerCase();
 	const rarity = rarityStyles[rarityKey] ?? rarityStyles.comum;

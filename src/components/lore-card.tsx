@@ -5,8 +5,11 @@ import { useRPGStore } from "@/lib/store";
 import { EntityActions } from "./entity-actions";
 import { LoreEditButton } from "./lore-form";
 
+import { Skeleton } from "@/components/ui/skeleton";
+
 interface LoreCardProps {
-	lore: Lore;
+	lore?: Lore;
+	isLoading?: boolean;
 }
 
 const importanceStyles: Record<
@@ -35,9 +38,37 @@ const importanceStyles: Record<
 	},
 };
 
-export function LoreCard({ lore }: LoreCardProps) {
+export function LoreCard({ lore, isLoading }: LoreCardProps) {
 	const removeLore = useRPGStore((s) => s.removeLore);
 	const [editOpen, setEditOpen] = useState(false);
+
+	if (isLoading || !lore) {
+		return (
+			<div className="flex flex-col rounded-xl border border-border bg-card-elevated p-4 space-y-4">
+				<div className="flex items-start gap-3 pl-2">
+					<Skeleton className="h-12 w-12 rounded-lg shrink-0" />
+					<div className="min-w-0 flex-1 space-y-2">
+						<div className="flex items-center gap-1.5">
+							<Skeleton className="h-5 w-3/4" />
+						</div>
+						<div className="flex gap-2">
+							<Skeleton className="h-3 w-16" />
+							<Skeleton className="h-3 w-12" />
+						</div>
+					</div>
+				</div>
+				<div className="border-t border-border/60 pt-2.5 pl-2 space-y-2">
+					<Skeleton className="h-3 w-full" />
+					<Skeleton className="h-3 w-full" />
+					<Skeleton className="h-3 w-2/3" />
+				</div>
+				<div className="flex gap-1 pl-2">
+					<Skeleton className="h-4 w-10 rounded" />
+					<Skeleton className="h-4 w-10 rounded" />
+				</div>
+			</div>
+		);
+	}
 
 	const importance =
 		importanceStyles[lore.importance] ?? importanceStyles.supporting;

@@ -5,13 +5,43 @@ import { useRPGStore } from "@/lib/store";
 import { EntityActions } from "./entity-actions";
 import { SessionEditButton } from "./session-form";
 
+import { Skeleton } from "@/components/ui/skeleton";
+
 interface SessionCardProps {
-	session: Session;
+	session?: Session;
+	isLoading?: boolean;
 }
 
-export function SessionCard({ session }: SessionCardProps) {
+export function SessionCard({ session, isLoading }: SessionCardProps) {
 	const removeSession = useRPGStore((s) => s.removeSession);
 	const [editOpen, setEditOpen] = useState(false);
+
+	if (isLoading || !session) {
+		return (
+			<div className="flex flex-col rounded-xl border border-border bg-card-elevated p-4 space-y-4">
+				<div className="flex items-start gap-3">
+					<Skeleton className="h-12 w-12 rounded-lg shrink-0" />
+					<div className="min-w-0 flex-1 space-y-2">
+						<Skeleton className="h-5 w-3/4" />
+						<div className="flex gap-2">
+							<Skeleton className="h-3 w-20" />
+							<Skeleton className="h-3 w-16" />
+						</div>
+					</div>
+				</div>
+				<div className="rounded-md bg-background/40 p-3 ring-1 ring-border/60 space-y-2">
+					<Skeleton className="h-2 w-12" />
+					<Skeleton className="h-3 w-full" />
+					<Skeleton className="h-3 w-full" />
+					<Skeleton className="h-3 w-2/3" />
+				</div>
+				<div className="flex items-center gap-1.5">
+					<Skeleton className="h-3 w-3 rounded-full" />
+					<Skeleton className="h-3 w-32" />
+				</div>
+			</div>
+		);
+	}
 
 	return (
 		<div className="flex flex-col">

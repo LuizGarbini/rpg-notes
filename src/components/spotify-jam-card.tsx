@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarGroup, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { Skeleton } from "./ui/skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 import { SpotifyConnect } from "./spotify-connect";
 
 // Usaremos uma API externa para gerar o QR Code e evitar erros de dependência não instalada

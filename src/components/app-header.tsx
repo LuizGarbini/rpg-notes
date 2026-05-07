@@ -20,6 +20,7 @@ import { useAuth } from "@/lib/auth";
 import { useRPGStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Button, buttonVariants } from "./ui/button";
 import {
 	DropdownMenu,
@@ -82,6 +83,8 @@ export function AppHeader({ isSidebarOpen, onToggleSidebar }: AppHeaderProps) {
 		});
 		await navigate({ to: "/auth", replace: true });
 	}
+
+	const isLoading = useRPGStore((state) => state.isLoadingRemote);
 
 	return (
 		<>
@@ -193,12 +196,16 @@ export function AppHeader({ isSidebarOpen, onToggleSidebar }: AppHeaderProps) {
 								"flex h-9 w-9 items-center justify-center overflow-hidden rounded-full border border-border/70 transition-[opacity,transform,box-shadow] duration-150 ease-[cubic-bezier(0.16,1,0.3,1)] hover:opacity-90 hover:shadow-md active:scale-[0.97] focus:outline-none",
 							)}
 						>
-							<Avatar className="h-full w-full">
-								<AvatarImage src={userImage} />
-								<AvatarFallback className="bg-primary/10 text-[10px] font-bold text-primary">
-									{initials}
-								</AvatarFallback>
-							</Avatar>
+							{isLoading ? (
+								<Skeleton className="h-full w-full rounded-full" />
+							) : (
+								<Avatar className="h-full w-full">
+									<AvatarImage src={userImage} />
+									<AvatarFallback className="bg-primary/10 text-[10px] font-bold text-primary">
+										{initials}
+									</AvatarFallback>
+								</Avatar>
+							)}
 						</DropdownMenuTrigger>
 						<DropdownMenuContent className="w-56" align="end">
 							<DropdownMenuGroup>
