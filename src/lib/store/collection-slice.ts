@@ -78,9 +78,13 @@ export interface CollectionSlice {
 	removeLore: (id: string) => void;
 }
 
-export const createCollectionSlice: StateCreator<RPGState, [], [], CollectionSlice> = (set) => ({
+export const createCollectionSlice: StateCreator<RPGState, [], [], CollectionSlice> = (set, get) => ({
 	items: [],
 	addItem: (item) => {
+		if (get().globalRecordsCount >= 20) {
+			set({ syncError: "Limite de registros atingido (20)." });
+			return {} as Item;
+		}
 		const created = generateEntry(itemDefaults, item) as Item;
 		const log = {
 			action: "create" as const,
@@ -91,11 +95,13 @@ export const createCollectionSlice: StateCreator<RPGState, [], [], CollectionSli
 		set((state) => ({
 			items: [...state.items, created],
 			activityLog: pushLog(state.activityLog, log),
+			globalRecordsCount: state.globalRecordsCount + 1,
 			syncError: null,
 		}));
+		const campaignId = get().activeCampaignId;
 		void Promise.all([
-			createRemoteEntity("item", created),
-			createRemoteActivity(log),
+			createRemoteEntity("item", created, campaignId),
+			createRemoteActivity(log, campaignId),
 		]).catch((error) => set({ syncError: remoteErrorMessage(error) }));
 		return created;
 	},
@@ -137,6 +143,7 @@ export const createCollectionSlice: StateCreator<RPGState, [], [], CollectionSli
 				return {
 					items: state.items.filter((i) => i.id !== id),
 					activityLog: pushLog(state.activityLog, log),
+					globalRecordsCount: Math.max(0, state.globalRecordsCount - 1),
 					syncError: null,
 				};
 			}
@@ -145,6 +152,10 @@ export const createCollectionSlice: StateCreator<RPGState, [], [], CollectionSli
 
 	locations: [],
 	addLocation: (location) => {
+		if (get().globalRecordsCount >= 20) {
+			set({ syncError: "Limite de registros atingido (20)." });
+			return {} as GameLocation;
+		}
 		const created = generateEntry(locationDefaults, location) as GameLocation;
 		const log = {
 			action: "create" as const,
@@ -155,11 +166,13 @@ export const createCollectionSlice: StateCreator<RPGState, [], [], CollectionSli
 		set((state) => ({
 			locations: [...state.locations, created],
 			activityLog: pushLog(state.activityLog, log),
+			globalRecordsCount: state.globalRecordsCount + 1,
 			syncError: null,
 		}));
+		const campaignId = get().activeCampaignId;
 		void Promise.all([
-			createRemoteEntity("location", created),
-			createRemoteActivity(log),
+			createRemoteEntity("location", created, campaignId),
+			createRemoteActivity(log, campaignId),
 		]).catch((error) => set({ syncError: remoteErrorMessage(error) }));
 		return created;
 	},
@@ -201,6 +214,7 @@ export const createCollectionSlice: StateCreator<RPGState, [], [], CollectionSli
 				return {
 					locations: state.locations.filter((l) => l.id !== id),
 					activityLog: pushLog(state.activityLog, log),
+					globalRecordsCount: Math.max(0, state.globalRecordsCount - 1),
 					syncError: null,
 				};
 			}
@@ -209,6 +223,10 @@ export const createCollectionSlice: StateCreator<RPGState, [], [], CollectionSli
 
 	lores: [],
 	addLore: (lore) => {
+		if (get().globalRecordsCount >= 20) {
+			set({ syncError: "Limite de registros atingido (20)." });
+			return {} as Lore;
+		}
 		const created = generateEntry(loreDefaults, lore) as Lore;
 		const log = {
 			action: "create" as const,
@@ -219,11 +237,13 @@ export const createCollectionSlice: StateCreator<RPGState, [], [], CollectionSli
 		set((state) => ({
 			lores: [...state.lores, created],
 			activityLog: pushLog(state.activityLog, log),
+			globalRecordsCount: state.globalRecordsCount + 1,
 			syncError: null,
 		}));
+		const campaignId = get().activeCampaignId;
 		void Promise.all([
-			createRemoteEntity("lore", created),
-			createRemoteActivity(log),
+			createRemoteEntity("lore", created, campaignId),
+			createRemoteActivity(log, campaignId),
 		]).catch((error) => set({ syncError: remoteErrorMessage(error) }));
 		return created;
 	},
@@ -265,6 +285,7 @@ export const createCollectionSlice: StateCreator<RPGState, [], [], CollectionSli
 				return {
 					lores: state.lores.filter((l) => l.id !== id),
 					activityLog: pushLog(state.activityLog, log),
+					globalRecordsCount: Math.max(0, state.globalRecordsCount - 1),
 					syncError: null,
 				};
 			}

@@ -72,9 +72,13 @@ export interface CharacterSlice {
 	removeCharacter: (id: string) => void;
 }
 
-export const createCharacterSlice: StateCreator<RPGState, [], [], CharacterSlice> = (set) => ({
+export const createCharacterSlice: StateCreator<RPGState, [], [], CharacterSlice> = (set, get) => ({
 	characters: [],
 	addCharacter: (character) => {
+		if (get().globalRecordsCount >= 20) {
+			set({ syncError: "Limite de registros atingido (20)." });
+			return {} as Character; // Retorna objeto vazio pois o tipo exige um Character
+		}
 		const created = generateEntry(characterDefaults, {
 			...character,
 			sheetLayout:
@@ -90,11 +94,13 @@ export const createCharacterSlice: StateCreator<RPGState, [], [], CharacterSlice
 		set((state) => ({
 			characters: [...state.characters, created],
 			activityLog: pushLog(state.activityLog, log),
+			globalRecordsCount: state.globalRecordsCount + 1,
 			syncError: null,
 		}));
+		const campaignId = get().activeCampaignId;
 		void Promise.all([
-			createRemoteEntity("character", created),
-			createRemoteActivity(log),
+			createRemoteEntity("character", created, campaignId),
+			createRemoteActivity(log, campaignId),
 		]).catch((error) => set({ syncError: remoteErrorMessage(error) }));
 		return created;
 	},
@@ -111,7 +117,7 @@ export const createCharacterSlice: StateCreator<RPGState, [], [], CharacterSlice
 			};
 			void Promise.all([
 				updateRemoteEntity("character", updated),
-				createRemoteActivity(log),
+				createRemoteActivity(log, get().activeCampaignId),
 			]).catch((error) => set({ syncError: remoteErrorMessage(error) }));
 			return {
 				characters: state.characters.map((c) => (c.id === id ? updated : c)),
@@ -131,11 +137,12 @@ export const createCharacterSlice: StateCreator<RPGState, [], [], CharacterSlice
 				};
 				void Promise.all([
 					deleteRemoteEntity("character", id),
-					createRemoteActivity(log),
+					createRemoteActivity(log, get().activeCampaignId),
 				]).catch((error) => set({ syncError: remoteErrorMessage(error) }));
 				return {
 					characters: state.characters.filter((c) => c.id !== id),
 					activityLog: pushLog(state.activityLog, log),
+					globalRecordsCount: Math.max(0, state.globalRecordsCount - 1),
 					syncError: null,
 				};
 			}

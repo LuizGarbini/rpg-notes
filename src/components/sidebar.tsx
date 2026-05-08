@@ -1,6 +1,5 @@
 import {
 	BookOpen,
-	ChevronDown,
 	FileText,
 	GitFork,
 	House,
@@ -13,6 +12,7 @@ import {
 	Users,
 } from "lucide-react";
 import { useRPGStore } from "@/lib/store";
+import { CampaignSwitcher } from "./campaign-switcher";
 import { SidebarNav } from "./sidebar-nav";
 
 const FREE_CREATION_LIMIT = 20;
@@ -43,19 +43,7 @@ interface SidebarProps {
 
 export function Sidebar({ isOpen, onItemClick }: SidebarProps) {
 	const isCollapsed = !isOpen;
-	const charactersCount = useRPGStore((s) => s.characters.length);
-	const npcsCount = useRPGStore((s) => s.npcs.length);
-	const sessionsCount = useRPGStore((s) => s.sessions.length);
-	const itemsCount = useRPGStore((s) => s.items.length);
-	const locationsCount = useRPGStore((s) => s.locations.length);
-	const loresCount = useRPGStore((s) => s.lores.length);
-	const usedCreations =
-		charactersCount +
-		npcsCount +
-		sessionsCount +
-		itemsCount +
-		locationsCount +
-		loresCount;
+	const usedCreations = useRPGStore((s) => s.globalRecordsCount);
 	const usagePercentage = Math.min(
 		100,
 		Math.round((usedCreations / FREE_CREATION_LIMIT) * 100),
@@ -99,39 +87,7 @@ export function Sidebar({ isOpen, onItemClick }: SidebarProps) {
 						</div>
 					</div>
 
-					<button
-						type="button"
-						className={`flex w-full items-center overflow-hidden rounded-2xl border border-border/60 bg-background/45 transition-[background-color,border-color,box-shadow,transform,padding] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-primary/25 hover:bg-primary/8 active:scale-[0.98] ${
-							isCollapsed
-								? "justify-center gap-0 p-2"
-								: "justify-start gap-3 p-3"
-						}`}
-					>
-						<div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-linear-to-br from-primary to-fuchsia-600 text-[10px] font-bold text-white shadow-sm">
-							WC
-						</div>
-						<div
-							className={`flex min-w-0 flex-1 flex-col overflow-hidden leading-tight transition-[max-width,opacity,transform] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-								isCollapsed
-									? "max-w-0 -translate-x-2 opacity-0"
-									: "max-w-36 translate-x-0 opacity-100"
-							}`}
-						>
-							<span className="truncate text-[12px] font-bold text-foreground">
-								Worldcraft
-							</span>
-							<span className="truncate text-[10px] text-muted-foreground">
-								Campanha Principal
-							</span>
-						</div>
-						<ChevronDown
-							className={`h-3.5 w-3.5 shrink-0 text-muted-foreground transition-[opacity,transform,width] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-								isCollapsed
-									? "w-0 -translate-x-2 opacity-0"
-									: "w-3.5 translate-x-0 opacity-100"
-							}`}
-						/>
-					</button>
+					<CampaignSwitcher isCollapsed={isCollapsed} />
 				</div>
 
 				{/* Nav Sections */}

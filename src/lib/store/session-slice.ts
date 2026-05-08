@@ -31,9 +31,13 @@ export interface SessionSlice {
 	removeSession: (id: string) => void;
 }
 
-export const createSessionSlice: StateCreator<RPGState, [], [], SessionSlice> = (set) => ({
+export const createSessionSlice: StateCreator<RPGState, [], [], SessionSlice> = (set, get) => ({
 	sessions: [],
 	addSession: (session) => {
+		if (get().globalRecordsCount >= 20) {
+			set({ syncError: "Limite de registros atingido (20)." });
+			return {} as Session;
+		}
 		const created = generateEntry(sessionDefaults, session) as Session;
 		const log = {
 			action: "create" as const,
@@ -44,11 +48,13 @@ export const createSessionSlice: StateCreator<RPGState, [], [], SessionSlice> = 
 		set((state) => ({
 			sessions: [...state.sessions, created],
 			activityLog: pushLog(state.activityLog, log),
+			globalRecordsCount: state.globalRecordsCount + 1,
 			syncError: null,
 		}));
+		const campaignId = get().activeCampaignId;
 		void Promise.all([
-			createRemoteEntity("session", created),
-			createRemoteActivity(log),
+			createRemoteEntity("session", created, campaignId),
+			createRemoteActivity(log, campaignId),
 		]).catch((error) => set({ syncError: remoteErrorMessage(error) }));
 		return created;
 	},
@@ -65,7 +71,7 @@ export const createSessionSlice: StateCreator<RPGState, [], [], SessionSlice> = 
 			};
 			void Promise.all([
 				updateRemoteEntity("session", updated),
-				createRemoteActivity(log),
+				createRemoteActivity(log, get().activeCampaignId),
 			]).catch((error) => set({ syncError: remoteErrorMessage(error) }));
 			return {
 				sessions: state.sessions.map((s) => (s.id === id ? updated : s)),
@@ -85,11 +91,12 @@ export const createSessionSlice: StateCreator<RPGState, [], [], SessionSlice> = 
 				};
 				void Promise.all([
 					deleteRemoteEntity("session", id),
-					createRemoteActivity(log),
+					createRemoteActivity(log, get().activeCampaignId),
 				]).catch((error) => set({ syncError: remoteErrorMessage(error) }));
 				return {
 					sessions: state.sessions.filter((s) => s.id !== id),
 					activityLog: pushLog(state.activityLog, log),
+					globalRecordsCount: Math.max(0, state.globalRecordsCount - 1),
 					syncError: null,
 				};
 			}

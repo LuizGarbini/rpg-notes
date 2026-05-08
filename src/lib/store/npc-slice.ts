@@ -33,9 +33,13 @@ export interface NpcSlice {
 	removeNpc: (id: string) => void;
 }
 
-export const createNpcSlice: StateCreator<RPGState, [], [], NpcSlice> = (set) => ({
+export const createNpcSlice: StateCreator<RPGState, [], [], NpcSlice> = (set, get) => ({
 	npcs: [],
 	addNpc: (npc) => {
+		if (get().globalRecordsCount >= 20) {
+			set({ syncError: "Limite de registros atingido (20)." });
+			return {} as Npc;
+		}
 		const created = generateEntry(npcDefaults, npc) as Npc;
 		const log = {
 			action: "create" as const,
@@ -46,11 +50,13 @@ export const createNpcSlice: StateCreator<RPGState, [], [], NpcSlice> = (set) =>
 		set((state) => ({
 			npcs: [...state.npcs, created],
 			activityLog: pushLog(state.activityLog, log),
+			globalRecordsCount: state.globalRecordsCount + 1,
 			syncError: null,
 		}));
+		const campaignId = get().activeCampaignId;
 		void Promise.all([
-			createRemoteEntity("npc", created),
-			createRemoteActivity(log),
+			createRemoteEntity("npc", created, campaignId),
+			createRemoteActivity(log, campaignId),
 		]).catch((error) => set({ syncError: remoteErrorMessage(error) }));
 		return created;
 	},
@@ -67,7 +73,7 @@ export const createNpcSlice: StateCreator<RPGState, [], [], NpcSlice> = (set) =>
 			};
 			void Promise.all([
 				updateRemoteEntity("npc", updated),
-				createRemoteActivity(log),
+				createRemoteActivity(log, get().activeCampaignId),
 			]).catch((error) => set({ syncError: remoteErrorMessage(error) }));
 			return {
 				npcs: state.npcs.map((n) => (n.id === id ? updated : n)),
@@ -87,11 +93,12 @@ export const createNpcSlice: StateCreator<RPGState, [], [], NpcSlice> = (set) =>
 				};
 				void Promise.all([
 					deleteRemoteEntity("npc", id),
-					createRemoteActivity(log),
+					createRemoteActivity(log, get().activeCampaignId),
 				]).catch((error) => set({ syncError: remoteErrorMessage(error) }));
 				return {
 					npcs: state.npcs.filter((n) => n.id !== id),
 					activityLog: pushLog(state.activityLog, log),
+					globalRecordsCount: Math.max(0, state.globalRecordsCount - 1),
 					syncError: null,
 				};
 			}

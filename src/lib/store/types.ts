@@ -323,6 +323,17 @@ export interface Lore {
 }
 
 // =====================================================
+//  Campanha
+// =====================================================
+export interface Campaign {
+	id: string;
+	name: string;
+	description: string;
+	createdAt: number;
+	updatedAt?: number;
+}
+
+// =====================================================
 //  Store State Interface
 // =====================================================
 export interface RPGState {
@@ -331,6 +342,18 @@ export interface RPGState {
 	loadRemoteData: () => Promise<void>;
 	setupRealtime: () => () => void;
 	clearLocalData: () => void;
+
+	// ----- Plan Limits -----
+	globalRecordsCount: number;
+
+	// ----- Campanhas -----
+	campaigns: Campaign[];
+	activeCampaignId: string | null;
+	loadCampaigns: () => Promise<void>;
+	createCampaign: (name: string, description?: string) => Promise<Campaign>;
+	updateCampaign: (id: string, data: Partial<Pick<Campaign, "name" | "description">>) => void;
+	deleteCampaign: (id: string) => Promise<void>;
+	switchCampaign: (id: string) => Promise<void>;
 
 	characters: Character[];
 	addCharacter: (character: Partial<Omit<Character, "id" | "createdAt">>) => Character;
