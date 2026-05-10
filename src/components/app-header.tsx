@@ -12,8 +12,9 @@ import {
 	Settings,
 	User,
 } from "lucide-react";
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useState, useEffect } from "react";
 import { JamPresenceSync } from "@/components/jam-presence-sync";
+import { GlobalSearch } from "@/components/global-search";
 import { SpotifyJamCard } from "@/components/spotify-jam-card";
 import { useToast } from "@/components/ui/toast";
 import { useAuth } from "@/lib/auth";
@@ -86,9 +87,23 @@ export function AppHeader({ isSidebarOpen, onToggleSidebar }: AppHeaderProps) {
 
 	const isLoading = useRPGStore((state) => state.isLoadingRemote);
 
+	const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+	useEffect(() => {
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+				e.preventDefault();
+				setIsSearchOpen(true);
+			}
+		};
+		window.addEventListener("keydown", handleKeyDown);
+		return () => window.removeEventListener("keydown", handleKeyDown);
+	}, []);
+
 	return (
 		<>
 			<JamPresenceSync />
+			<GlobalSearch open={isSearchOpen} onOpenChange={setIsSearchOpen} />
 			<header className="sticky top-0 z-50 flex min-h-16 w-full items-center justify-between border-b border-border/40 bg-card/45 px-6 backdrop-blur-xl">
 				<div className="flex flex-1 items-center gap-4">
 					<Button
@@ -115,15 +130,18 @@ export function AppHeader({ isSidebarOpen, onToggleSidebar }: AppHeaderProps) {
 					</div>
 
 					<div className="hidden flex-1 items-center justify-center md:flex">
-						<div className="relative w-full max-w-md">
-							<Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-							<div className="flex h-10 w-full items-center gap-2 rounded-2xl border border-border/70 bg-background/55 px-9 text-[13px] text-muted-foreground shadow-sm shadow-black/5 transition-[border-color,box-shadow,background-color] duration-150 ease-[cubic-bezier(0.16,1,0.3,1)] focus-within:border-primary/45 focus-within:bg-background/75 focus-within:ring-2 focus-within:ring-primary/15">
+						<button
+							onClick={() => setIsSearchOpen(true)}
+							className="relative w-full max-w-md group"
+						>
+							<Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground group-hover:text-primary transition-colors" />
+							<div className="flex h-10 w-full items-center gap-2 rounded-2xl border border-border/70 bg-background/55 px-9 text-[13px] text-muted-foreground shadow-sm shadow-black/5 transition-[border-color,box-shadow,background-color] duration-150 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:border-primary/45 group-hover:bg-background/75">
 								<span>Pesquisar no Grimório...</span>
 								<kbd className="pointer-events-none ml-auto hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
 									<span className="text-xs">⌘</span>K
 								</kbd>
 							</div>
-						</div>
+						</button>
 					</div>
 				</div>
 
