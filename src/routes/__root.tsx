@@ -112,7 +112,7 @@ function ProtectedLayout() {
 				<button
 					type="button"
 					aria-label="Fechar menu lateral"
-					className="fixed inset-0 z-90 bg-background/60 backdrop-blur-sm md:hidden"
+					className="fixed inset-0 z-90 bg-background/80 md:hidden"
 					onClick={() => setIsSidebarOpen(false)}
 				/>
 			)}
@@ -135,7 +135,7 @@ function ProtectedLayout() {
 			</div>
 
 			{/* Dashboard Island */}
-			<div className="flex flex-1 flex-col overflow-hidden bg-card/70 shadow-2xl shadow-black/10 backdrop-blur-xl sm:rounded-2xl sm:border sm:border-border/60">
+			<div className="flex flex-1 flex-col overflow-hidden bg-card/95 md:bg-card/70 shadow-2xl shadow-black/10 md:backdrop-blur-xl sm:rounded-2xl sm:border sm:border-border/60">
 				<AppHeader
 					isSidebarOpen={isSidebarOpen}
 					onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}

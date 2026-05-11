@@ -105,6 +105,7 @@ export function NpcCard({ npc, isLoading }: NpcCardProps) {
 							<img
 								src={npc.imageUrl}
 								alt={npc.name}
+								loading="lazy"
 								className="h-full w-full object-cover"
 							/>
 						) : (

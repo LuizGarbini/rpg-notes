@@ -90,6 +90,7 @@ export function CharacterCard({ character, isLoading }: CharacterCardProps) {
 					<img
 						src={character.imageUrl}
 						alt={character.characterName}
+						loading="lazy"
 						className="h-full w-full object-cover opacity-90 transition-transform duration-500 group-hover:scale-105"
 					/>
 				) : (

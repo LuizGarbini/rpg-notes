@@ -403,7 +403,7 @@ function MetricCard({
 }) {
 	if (isLoading) {
 		return (
-			<div className="rounded-2xl border border-border/70 bg-background/45 p-5 shadow-sm shadow-black/5 backdrop-blur-sm">
+			<div className="rounded-2xl border border-border/70 bg-background/80 md:bg-background/45 p-5 shadow-sm shadow-black/5 md:backdrop-blur-sm">
 				<div className="flex items-center justify-between gap-3">
 					<Skeleton className="h-3 w-16" />
 					<Skeleton className="h-4 w-4 rounded" />
@@ -415,7 +415,7 @@ function MetricCard({
 	}
 
 	return (
-		<div className="rounded-2xl border border-border/70 bg-background/45 p-5 shadow-sm shadow-black/5 backdrop-blur-sm">
+		<div className="rounded-2xl border border-border/70 bg-background/80 md:bg-background/45 p-5 shadow-sm shadow-black/5 md:backdrop-blur-sm">
 			<div className="flex items-center justify-between gap-3">
 				<p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
 					{label}
