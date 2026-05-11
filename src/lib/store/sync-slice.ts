@@ -120,7 +120,14 @@ export const createSyncSlice: StateCreator<RPGState, [], [], SyncSlice> = (set, 
 
 					// Ignorar eventos de outras campanhas para o estado local
 					const activeCampaign = get().activeCampaignId;
-					if (activeCampaign && newRow?.campaign_id && newRow.campaign_id !== activeCampaign) return;
+					if (
+						activeCampaign &&
+						newRow &&
+						"campaign_id" in newRow &&
+						newRow.campaign_id !== activeCampaign
+					) {
+						return;
+					}
 
 					set((state) => {
 						const currentArray = state[storeKey] as any[];
