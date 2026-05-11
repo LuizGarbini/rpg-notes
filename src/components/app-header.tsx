@@ -104,7 +104,7 @@ export function AppHeader({ isSidebarOpen, onToggleSidebar }: AppHeaderProps) {
 		<>
 			<JamPresenceSync />
 			<GlobalSearch open={isSearchOpen} onOpenChange={setIsSearchOpen} />
-			<header className="sticky top-0 z-50 flex min-h-16 w-full items-center justify-between border-b border-border/40 bg-card/45 px-6 backdrop-blur-xl">
+			<header className="sticky top-0 z-50 flex min-h-16 w-full items-center justify-between border-b border-border/40 bg-card/90 md:bg-card/45 px-6 md:backdrop-blur-xl">
 				<div className="flex flex-1 items-center gap-4">
 					<Button
 						variant="ghost"

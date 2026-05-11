@@ -102,7 +102,7 @@ function LandingPage() {
 			</div>
 
 			{/* Navbar */}
-			<header className="sticky top-0 z-50 border-b border-border/50 bg-background/70 backdrop-blur-xl">
+			<header className="sticky top-0 z-50 border-b border-border/50 bg-background/95 md:bg-background/70 md:backdrop-blur-xl">
 				<div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
 					<div className="flex items-center gap-2.5">
 						<div className="relative flex h-8 w-8 items-center justify-center rounded-md bg-primary/15 ring-1 ring-primary/30">
