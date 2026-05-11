@@ -139,11 +139,15 @@ function entityName(
 function rowFor(
 	kind: RemoteEntityKind,
 	entity: Record<string, unknown>,
+	campaignId?: string | null,
 ): EntityInsert {
-	const base = {
+	const base: Record<string, unknown> = {
 		id: stringValue(entity.id, crypto.randomUUID()),
 		data: toJson(entity),
 	};
+	if (campaignId) {
+		base.campaign_id = campaignId;
+	}
 
 	switch (kind) {
 		case "character":
@@ -301,29 +305,41 @@ async function updateEntityRow(
 	}
 }
 
-async function selectEntities(table: EntityTable): Promise<unknown[]> {
+async function selectEntities(table: EntityTable, campaignId?: string | null): Promise<unknown[]> {
 	const supabase = requireSupabase();
-	const { data, error } = await supabase
+	let query = supabase
 		.from(table)
-		.select("id,data,created_at,updated_at")
-		.order("updated_at", { ascending: false });
+		.select("id,data,created_at,updated_at");
+
+	if (campaignId) {
+		query = query.eq("campaign_id", campaignId);
+	}
+
+	const { data, error } = await query.order("updated_at", { ascending: false });
 	if (error) throw error;
 	return ((data ?? []) as EntityRow[]).map(fromEntityRow);
 }
 
-export async function loadRemoteState(): Promise<RemoteStateSnapshot> {
+export async function loadRemoteState(campaignId?: string | null): Promise<RemoteStateSnapshot> {
 	const supabase = requireSupabase();
+
+	let activityQuery = supabase
+		.from(SUPABASE_TABLES.activity)
+		.select("id,action,entity_kind,entity_id,entity_name,created_at");
+
+	if (campaignId) {
+		activityQuery = activityQuery.eq("campaign_id", campaignId);
+	}
+
 	const [characters, npcs, sessions, items, locations, lores, activityRows] =
 		await Promise.all([
-			selectEntities(SUPABASE_TABLES.characters),
-			selectEntities(SUPABASE_TABLES.npcs),
-			selectEntities(SUPABASE_TABLES.sessions),
-			selectEntities(SUPABASE_TABLES.items),
-			selectEntities(SUPABASE_TABLES.locations),
-			selectEntities(SUPABASE_TABLES.lores),
-			supabase
-				.from(SUPABASE_TABLES.activity)
-				.select("id,action,entity_kind,entity_id,entity_name,created_at")
+			selectEntities(SUPABASE_TABLES.characters, campaignId),
+			selectEntities(SUPABASE_TABLES.npcs, campaignId),
+			selectEntities(SUPABASE_TABLES.sessions, campaignId),
+			selectEntities(SUPABASE_TABLES.items, campaignId),
+			selectEntities(SUPABASE_TABLES.locations, campaignId),
+			selectEntities(SUPABASE_TABLES.lores, campaignId),
+			activityQuery
 				.order("created_at", { ascending: false })
 				.limit(200),
 		]);
@@ -346,8 +362,9 @@ export async function loadRemoteState(): Promise<RemoteStateSnapshot> {
 export async function createRemoteEntity<T extends { id: string }>(
 	kind: RemoteEntityKind,
 	entity: T,
+	campaignId?: string | null,
 ): Promise<T> {
-	const row = rowFor(kind, entity as Record<string, unknown>);
+	const row = rowFor(kind, entity as Record<string, unknown>, campaignId);
 	await insertEntityRow(kind, row);
 	return entity;
 }
@@ -371,8 +388,32 @@ export async function deleteRemoteEntity(
 	if (error) throw error;
 }
 
+export async function fetchGlobalTotalCount(): Promise<number> {
+	const supabase = requireSupabase();
+	const tables: EntityTable[] = [
+		SUPABASE_TABLES.characters,
+		SUPABASE_TABLES.npcs,
+		SUPABASE_TABLES.sessions,
+		SUPABASE_TABLES.items,
+		SUPABASE_TABLES.locations,
+		SUPABASE_TABLES.lores,
+	];
+
+	const counts = await Promise.all(
+		tables.map((table) =>
+			supabase
+				.from(table)
+				.select("*", { count: "exact", head: true })
+				.then(({ count }) => count || 0),
+		),
+	);
+
+	return counts.reduce((acc, count) => acc + count, 0);
+}
+
 export async function createRemoteActivity(
 	entry: Omit<RemoteActivityEntry, "id" | "timestamp">,
+	campaignId?: string | null,
 ): Promise<void> {
 	const supabase = requireSupabase();
 	const row: ActivityInsert = {
@@ -381,6 +422,9 @@ export async function createRemoteActivity(
 		entity_id: entry.entityId,
 		entity_name: entry.entityName,
 	};
+	if (campaignId) {
+		(row as Record<string, unknown>).campaign_id = campaignId;
+	}
 	const { error } = await supabase.from(SUPABASE_TABLES.activity).insert(row);
 	if (error) throw error;
 }

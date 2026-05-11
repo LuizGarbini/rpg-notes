@@ -1,7 +1,7 @@
 import type { StateCreator } from "zustand";
 import type { RPGState, ActivityEntry, Character, Npc, Session, Item, GameLocation, Lore } from "./types";
 import { remoteErrorMessage } from "./helpers";
-import { loadRemoteState } from "../remote-store";
+import { loadRemoteState, fetchGlobalTotalCount } from "../remote-store";
 import { getSupabase } from "../supabase";
 import { characterDefaults } from "./character-slice";
 import { npcDefaults } from "./npc-slice";
@@ -12,6 +12,7 @@ export interface SyncSlice {
 	isLoadingRemote: boolean;
 	syncError: string | null;
 	activityLog: ActivityEntry[];
+	globalRecordsCount: number;
 	loadRemoteData: () => Promise<void>;
 	setupRealtime: () => () => void;
 	clearLocalData: () => void;
@@ -22,6 +23,7 @@ export const createSyncSlice: StateCreator<RPGState, [], [], SyncSlice> = (set, 
 	isLoadingRemote: false,
 	syncError: null,
 	activityLog: [],
+	globalRecordsCount: 0,
 	loadRemoteData: async () => {
 		const state = get();
 		const hasData = 
@@ -39,12 +41,17 @@ export const createSyncSlice: StateCreator<RPGState, [], [], SyncSlice> = (set, 
 			set({ syncError: null });
 		}
 		try {
-			const remote = await loadRemoteState();
+			const campaignId = get().activeCampaignId;
+			const [remote, globalCount] = await Promise.all([
+				loadRemoteState(campaignId),
+				fetchGlobalTotalCount(),
+			]);
 			
 			// Validação defensiva básica
 			const ensureArray = (val: unknown) => Array.isArray(val) ? val : [];
 
 			set({
+				globalRecordsCount: globalCount,
 				characters: ensureArray(remote.characters).map((c) => ({
 					...characterDefaults,
 					...(c as Partial<Character>),
@@ -101,6 +108,26 @@ export const createSyncSlice: StateCreator<RPGState, [], [], SyncSlice> = (set, 
 
 					const storeKey = tableToKey[table];
 					if (!storeKey) return;
+
+					// Atualizar contador global em caso de inserts/deletes remotos
+					if (table !== "activity_log") {
+						if (eventType === "INSERT") {
+							set((s) => ({ globalRecordsCount: s.globalRecordsCount + 1 }));
+						} else if (eventType === "DELETE") {
+							set((s) => ({ globalRecordsCount: Math.max(0, s.globalRecordsCount - 1) }));
+						}
+					}
+
+					// Ignorar eventos de outras campanhas para o estado local
+					const activeCampaign = get().activeCampaignId;
+					if (
+						activeCampaign &&
+						newRow &&
+						"campaign_id" in newRow &&
+						newRow.campaign_id !== activeCampaign
+					) {
+						return;
+					}
 
 					set((state) => {
 						const currentArray = state[storeKey] as any[];
