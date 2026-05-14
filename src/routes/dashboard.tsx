@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { motion, type Variants } from "framer-motion";
 import {
 	ArrowUpRight,
 	BookOpen,
@@ -12,6 +11,7 @@ import {
 	User,
 	Users,
 } from "lucide-react";
+import { useMemo } from "react";
 import { ActivityFeed } from "@/components/activity-feed";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -79,32 +79,6 @@ const sections = [
 	},
 ];
 
-const containerVariants: Variants = {
-	hidden: { opacity: 0 },
-	visible: {
-		opacity: 1,
-		transition: {
-			delayChildren: 0.04,
-			staggerChildren: 0.09,
-		},
-	},
-};
-
-const itemVariants: Variants = {
-	hidden: { opacity: 0, scale: 0.98, y: 22 },
-	visible: {
-		opacity: 1,
-		scale: 1,
-		y: 0,
-		transition: {
-			damping: 18,
-			mass: 0.85,
-			stiffness: 230,
-			type: "spring",
-		},
-	},
-};
-
 function Dashboard() {
 	const characters = useRPGStore((s) => s.characters);
 	const npcs = useRPGStore((s) => s.npcs);
@@ -115,33 +89,41 @@ function Dashboard() {
 	const activityLog = useRPGStore((s) => s.activityLog);
 	const isLoading = useRPGStore((s) => s.isLoadingRemote);
 
-	const counts = {
-		characters: characters.length,
-		npcs: npcs.length,
-		sessions: sessions.length,
-		items: items.length,
-		locations: locations.length,
-		lores: lores.length,
-	};
+	const counts = useMemo(
+		() => ({
+			characters: characters.length,
+			npcs: npcs.length,
+			sessions: sessions.length,
+			items: items.length,
+			locations: locations.length,
+			lores: lores.length,
+		}),
+		[
+			characters.length,
+			items.length,
+			locations.length,
+			lores.length,
+			npcs.length,
+			sessions.length,
+		],
+	);
 
 	const totalEntries = Object.values(counts).reduce((a, b) => a + b, 0);
 
-	const lastSession = [...sessions].sort(
-		(a, b) => b.createdAt - a.createdAt,
-	)[0];
+	const lastSession = useMemo(
+		() =>
+			sessions.reduce<(typeof sessions)[number] | undefined>(
+				(latest, session) =>
+					!latest || session.createdAt > latest.createdAt ? session : latest,
+				undefined,
+			),
+		[sessions],
+	);
 	const lastActivity = activityLog[0];
 
 	return (
-		<motion.div
-			variants={containerVariants}
-			initial="hidden"
-			animate="visible"
-			className="mx-auto flex w-full max-w-7xl flex-col gap-9 px-6 py-10 sm:px-8"
-		>
-			<motion.section
-				variants={itemVariants}
-				className="relative overflow-hidden rounded-[1.75rem] border border-border/70 bg-linear-to-br from-card via-card/90 to-primary-muted/30 p-7 shadow-xl shadow-black/5 sm:p-10"
-			>
+		<div className="mx-auto flex w-full max-w-7xl flex-col gap-9 px-6 py-10 sm:px-8">
+			<section className="relative overflow-hidden rounded-[1.75rem] border border-border/70 bg-linear-to-br from-card via-card/90 to-primary-muted/30 p-7 shadow-xl shadow-black/5 sm:p-10">
 				<div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
 				<div className="absolute -bottom-28 left-1/3 h-64 w-64 rounded-full bg-fuchsia-500/5 blur-3xl" />
 				<div className="relative grid gap-10 lg:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.65fr)] lg:items-center">
@@ -204,12 +186,9 @@ function Dashboard() {
 						/>
 					</div>
 				</div>
-			</motion.section>
+			</section>
 
-			<motion.section
-				variants={itemVariants}
-				className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6"
-			>
+			<section className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
 				{sections.map((section) => (
 					<StatPill
 						key={section.to}
@@ -221,9 +200,9 @@ function Dashboard() {
 						isLoading={isLoading}
 					/>
 				))}
-			</motion.section>
+			</section>
 
-			<motion.section variants={itemVariants} className="space-y-5">
+			<section className="space-y-5">
 				<SectionHeading
 					eyebrow="Coleções"
 					title="Continue construindo o mundo"
@@ -244,16 +223,13 @@ function Dashboard() {
 						/>
 					))}
 				</div>
-			</motion.section>
+			</section>
 
-			<motion.section
-				variants={itemVariants}
-				className="grid grid-cols-1 gap-5 xl:grid-cols-[1.25fr_0.75fr]"
-			>
+			<section className="grid grid-cols-1 gap-5 xl:grid-cols-[1.25fr_0.75fr]">
 				<ActivityFeed limit={10} isLoading={isLoading} />
 				<LastSessionCard lastSession={lastSession} isLoading={isLoading} />
-			</motion.section>
-		</motion.div>
+			</section>
+		</div>
 	);
 }
 

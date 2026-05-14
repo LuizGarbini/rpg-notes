@@ -1,12 +1,11 @@
 import { Coins, Gem, Link2, Weight } from "lucide-react";
 import { useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { Item } from "@/lib/store";
 import { useRPGStore } from "@/lib/store";
-import { EntityLinkChips } from "./entity-links";
 import { EntityActions } from "./entity-actions";
+import { EntityLinkChips } from "./entity-links";
 import { ItemEditButton } from "./item-form";
-
-import { Skeleton } from "@/components/ui/skeleton";
 
 interface ItemCardProps {
 	item?: Item;
@@ -84,7 +83,6 @@ export function ItemCard({ item, isLoading }: ItemCardProps) {
 	const rarity = rarityStyles[rarityKey] ?? rarityStyles.comum;
 
 	return (
-		<>
 		<div className="flex flex-col">
 			<div
 				className={`group relative flex flex-col rounded-2xl border border-border/70 bg-card-elevated p-4 shadow-sm shadow-black/5 transition-all duration-150 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-lg hover:shadow-black/5 ${rarity.ring}`}
@@ -104,6 +102,8 @@ export function ItemCard({ item, isLoading }: ItemCardProps) {
 							<img
 								src={item.imageUrl}
 								alt={item.name}
+								loading="lazy"
+								decoding="async"
 								className="h-full w-full object-cover"
 							/>
 						) : (
@@ -183,7 +183,6 @@ export function ItemCard({ item, isLoading }: ItemCardProps) {
 				trigger={null}
 			/>
 		</div>
-		</>
 	);
 }
 

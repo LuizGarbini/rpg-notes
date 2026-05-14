@@ -1,12 +1,11 @@
 import { Compass, Eye, Mountain, Users } from "lucide-react";
 import { useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { GameLocation } from "@/lib/store";
 import { useRPGStore } from "@/lib/store";
-import { EntityLinkChips } from "./entity-links";
 import { EntityActions } from "./entity-actions";
+import { EntityLinkChips } from "./entity-links";
 import { LocationEditButton } from "./location-form";
-
-import { Skeleton } from "@/components/ui/skeleton";
 
 interface LocationCardProps {
 	location?: GameLocation;
@@ -77,6 +76,8 @@ export function LocationCard({ location, isLoading }: LocationCardProps) {
 						<img
 							src={location.imageUrl}
 							alt={location.name}
+							loading="lazy"
+							decoding="async"
 							className="h-full w-full object-cover opacity-90 transition-transform duration-500 group-hover:scale-105"
 						/>
 					) : (

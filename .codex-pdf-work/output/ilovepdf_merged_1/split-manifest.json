@@ -1,0 +1,136 @@
+{
+  "spreadPdf": "C:\\Users\\gabri\\projetos\\rpg-notes\\.codex-pdf-work\\output\\ilovepdf_merged_1\\documento_corrigido_upscale.pdf",
+  "splitPdf": "C:\\Users\\gabri\\projetos\\rpg-notes\\.codex-pdf-work\\output\\ilovepdf_merged_1\\paginas_separadas_corrigidas_upscale.pdf",
+  "splitPages": [
+    {
+      "spread": 1,
+      "side": "left",
+      "file": "C:\\Users\\gabri\\projetos\\rpg-notes\\.codex-pdf-work\\output\\ilovepdf_merged_1\\pages-split-upscaled\\spread-01-left.jpg",
+      "width": 3666,
+      "height": 5260
+    },
+    {
+      "spread": 1,
+      "side": "right",
+      "file": "C:\\Users\\gabri\\projetos\\rpg-notes\\.codex-pdf-work\\output\\ilovepdf_merged_1\\pages-split-upscaled\\spread-01-right.jpg",
+      "width": 3666,
+      "height": 5260
+    },
+    {
+      "spread": 2,
+      "side": "left",
+      "file": "C:\\Users\\gabri\\projetos\\rpg-notes\\.codex-pdf-work\\output\\ilovepdf_merged_1\\pages-split-upscaled\\spread-02-left.jpg",
+      "width": 3666,
+      "height": 5260
+    },
+    {
+      "spread": 2,
+      "side": "right",
+      "file": "C:\\Users\\gabri\\projetos\\rpg-notes\\.codex-pdf-work\\output\\ilovepdf_merged_1\\pages-split-upscaled\\spread-02-right.jpg",
+      "width": 3666,
+      "height": 5260
+    },
+    {
+      "spread": 3,
+      "side": "left",
+      "file": "C:\\Users\\gabri\\projetos\\rpg-notes\\.codex-pdf-work\\output\\ilovepdf_merged_1\\pages-split-upscaled\\spread-03-left.jpg",
+      "width": 3666,
+      "height": 5260
+    },
+    {
+      "spread": 3,
+      "side": "right",
+      "file": "C:\\Users\\gabri\\projetos\\rpg-notes\\.codex-pdf-work\\output\\ilovepdf_merged_1\\pages-split-upscaled\\spread-03-right.jpg",
+      "width": 3666,
+      "height": 5260
+    },
+    {
+      "spread": 4,
+      "side": "left",
+      "file": "C:\\Users\\gabri\\projetos\\rpg-notes\\.codex-pdf-work\\output\\ilovepdf_merged_1\\pages-split-upscaled\\spread-04-left.jpg",
+      "width": 3666,
+      "height": 5260
+    },
+    {
+      "spread": 4,
+      "side": "right",
+      "file": "C:\\Users\\gabri\\projetos\\rpg-notes\\.codex-pdf-work\\output\\ilovepdf_merged_1\\pages-split-upscaled\\spread-04-right.jpg",
+      "width": 3666,
+      "height": 5260
+    }
+  ],
+  "ocr": [
+    {
+      "spread": 1,
+      "side": "left",
+      "file": "C:\\Users\\gabri\\projetos\\rpg-notes\\.codex-pdf-work\\output\\ilovepdf_merged_1\\pages-split-upscaled\\spread-01-left.jpg",
+      "width": 3666,
+      "height": 5260,
+      "id": "spread-01-left",
+      "confidence": 71
+    },
+    {
+      "spread": 1,
+      "side": "right",
+      "file": "C:\\Users\\gabri\\projetos\\rpg-notes\\.codex-pdf-work\\output\\ilovepdf_merged_1\\pages-split-upscaled\\spread-01-right.jpg",
+      "width": 3666,
+      "height": 5260,
+      "id": "spread-01-right",
+      "confidence": 90
+    },
+    {
+      "spread": 2,
+      "side": "left",
+      "file": "C:\\Users\\gabri\\projetos\\rpg-notes\\.codex-pdf-work\\output\\ilovepdf_merged_1\\pages-split-upscaled\\spread-02-left.jpg",
+      "width": 3666,
+      "height": 5260,
+      "id": "spread-02-left",
+      "confidence": 36
+    },
+    {
+      "spread": 2,
+      "side": "right",
+      "file": "C:\\Users\\gabri\\projetos\\rpg-notes\\.codex-pdf-work\\output\\ilovepdf_merged_1\\pages-split-upscaled\\spread-02-right.jpg",
+      "width": 3666,
+      "height": 5260,
+      "id": "spread-02-right",
+      "confidence": 76
+    },
+    {
+      "spread": 3,
+      "side": "left",
+      "file": "C:\\Users\\gabri\\projetos\\rpg-notes\\.codex-pdf-work\\output\\ilovepdf_merged_1\\pages-split-upscaled\\spread-03-left.jpg",
+      "width": 3666,
+      "height": 5260,
+      "id": "spread-03-left",
+      "confidence": 68
+    },
+    {
+      "spread": 3,
+      "side": "right",
+      "file": "C:\\Users\\gabri\\projetos\\rpg-notes\\.codex-pdf-work\\output\\ilovepdf_merged_1\\pages-split-upscaled\\spread-03-right.jpg",
+      "width": 3666,
+      "height": 5260,
+      "id": "spread-03-right",
+      "confidence": 91
+    },
+    {
+      "spread": 4,
+      "side": "left",
+      "file": "C:\\Users\\gabri\\projetos\\rpg-notes\\.codex-pdf-work\\output\\ilovepdf_merged_1\\pages-split-upscaled\\spread-04-left.jpg",
+      "width": 3666,
+      "height": 5260,
+      "id": "spread-04-left",
+      "confidence": 54
+    },
+    {
+      "spread": 4,
+      "side": "right",
+      "file": "C:\\Users\\gabri\\projetos\\rpg-notes\\.codex-pdf-work\\output\\ilovepdf_merged_1\\pages-split-upscaled\\spread-04-right.jpg",
+      "width": 3666,
+      "height": 5260,
+      "id": "spread-04-right",
+      "confidence": 41
+    }
+  ]
+}

@@ -219,6 +219,26 @@
     user-select: none;
     -webkit-user-drag: none;
   }
+
+  .perf-lite *,
+  .perf-lite *::before,
+  .perf-lite *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
 }
 
 @layer utilities {
@@ -295,6 +315,37 @@
     right: 6px;
     border-bottom: 1px solid;
     border-right: 1px solid;
+  }
+
+  .perf-lite .arcane-grid {
+    background-image: none !important;
+    mask-image: none !important;
+  }
+
+  .perf-lite [class*="backdrop-blur"] {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  .perf-lite [class*="blur-2xl"],
+  .perf-lite [class*="blur-3xl"],
+  .perf-lite [class*="blur-["] {
+    display: none !important;
+  }
+
+  .perf-lite [class*="shadow-2xl"],
+  .perf-lite [class*="shadow-xl"],
+  .perf-lite [class*="shadow-lg"] {
+    --tw-shadow: 0 1px 2px 0 oklch(0 0 0 / 8%) !important;
+    box-shadow: var(--tw-shadow) !important;
+  }
+
+  @media (hover: none), (pointer: coarse) {
+    .group:hover [class*="group-hover:scale"],
+    .group:hover [class*="group-hover:-translate"],
+    .group:hover [class*="group-hover:translate"] {
+      transform: none !important;
+    }
   }
 }
 

@@ -1,0 +1,39 @@
+{
+  "source": "C:/Users/gabri/Downloads/ilovepdf_merged (1).pdf",
+  "pageCount": 4,
+  "totalTextChars": 0,
+  "pages": [
+    {
+      "pageNumber": 1,
+      "rotation": 0,
+      "width": 2550,
+      "height": 3506,
+      "textChars": 0,
+      "sample": ""
+    },
+    {
+      "pageNumber": 2,
+      "rotation": 0,
+      "width": 2550,
+      "height": 3506,
+      "textChars": 0,
+      "sample": ""
+    },
+    {
+      "pageNumber": 3,
+      "rotation": 0,
+      "width": 2550,
+      "height": 3506,
+      "textChars": 0,
+      "sample": ""
+    },
+    {
+      "pageNumber": 4,
+      "rotation": 0,
+      "width": 2550,
+      "height": 3506,
+      "textChars": 0,
+      "sample": ""
+    }
+  ]
+}

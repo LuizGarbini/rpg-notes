@@ -12,16 +12,16 @@ import {
 	Settings,
 	User,
 } from "lucide-react";
-import { type ReactNode, useState, useEffect } from "react";
-import { JamPresenceSync } from "@/components/jam-presence-sync";
+import { type ReactNode, useEffect, useState } from "react";
 import { GlobalSearch } from "@/components/global-search";
+import { JamPresenceSync } from "@/components/jam-presence-sync";
 import { SpotifyJamCard } from "@/components/spotify-jam-card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/toast";
 import { useAuth } from "@/lib/auth";
 import { useRPGStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Button, buttonVariants } from "./ui/button";
 import {
 	DropdownMenu,
@@ -102,9 +102,11 @@ export function AppHeader({ isSidebarOpen, onToggleSidebar }: AppHeaderProps) {
 
 	return (
 		<>
-			<JamPresenceSync />
-			<GlobalSearch open={isSearchOpen} onOpenChange={setIsSearchOpen} />
-			<header className="sticky top-0 z-50 flex min-h-16 w-full items-center justify-between border-b border-border/40 bg-card/90 md:bg-card/45 px-6 md:backdrop-blur-xl">
+			{spotifyJamLink && <JamPresenceSync />}
+			{isSearchOpen && (
+				<GlobalSearch open={isSearchOpen} onOpenChange={setIsSearchOpen} />
+			)}
+			<header className="sticky top-0 z-50 flex min-h-16 w-full items-center justify-between border-b border-border/40 bg-card px-6">
 				<div className="flex flex-1 items-center gap-4">
 					<Button
 						variant="ghost"
@@ -131,6 +133,7 @@ export function AppHeader({ isSidebarOpen, onToggleSidebar }: AppHeaderProps) {
 
 					<div className="hidden flex-1 items-center justify-center md:flex">
 						<button
+							type="button"
 							onClick={() => setIsSearchOpen(true)}
 							className="relative w-full max-w-md group"
 						>

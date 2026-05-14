@@ -86,6 +86,7 @@ export function ImageUploader({
 							<img
 								src={value}
 								alt={label}
+								decoding="async"
 								className="h-full w-full object-cover"
 							/>
 							<div className="absolute inset-0 hidden items-center justify-center bg-black/50 text-white group-hover:flex">
@@ -120,7 +121,7 @@ export function ImageUploader({
 						)}
 					</div>
 					<p className="text-[10px] text-muted-foreground/70">
-						JPG, PNG ou WebP — máx 8MB. Redimensionada para 1024px.
+						JPG, PNG ou WebP — máx 8MB. Redimensionada para 640px.
 					</p>
 					{error && <p className="text-[11px] text-rose-300">{error}</p>}
 				</div>

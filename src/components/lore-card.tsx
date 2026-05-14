@@ -1,12 +1,11 @@
 import { BookOpen, Lock } from "lucide-react";
 import { useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { Lore } from "@/lib/store";
 import { useRPGStore } from "@/lib/store";
-import { EntityLinkChips } from "./entity-links";
 import { EntityActions } from "./entity-actions";
+import { EntityLinkChips } from "./entity-links";
 import { LoreEditButton } from "./lore-form";
-
-import { Skeleton } from "@/components/ui/skeleton";
 
 interface LoreCardProps {
 	lore?: Lore;
@@ -103,6 +102,8 @@ export function LoreCard({ lore, isLoading }: LoreCardProps) {
 							<img
 								src={lore.imageUrl}
 								alt={lore.title}
+								loading="lazy"
+								decoding="async"
 								className="h-full w-full object-cover"
 							/>
 						) : (

@@ -1,12 +1,24 @@
-import { useState, useEffect, useMemo } from "react";
-import { Search, User, Users, ScrollText, Package, MapIcon, BookOpen, Command } from "lucide-react";
-import { useRPGStore } from "@/lib/store";
 import { useNavigate } from "@tanstack/react-router";
 import {
-	Dialog,
-	DialogContent,
-} from "./ui/dialog";
+	BookOpen,
+	Command,
+	MapIcon,
+	Package,
+	ScrollText,
+	Search,
+	User,
+	Users,
+} from "lucide-react";
+import {
+	useCallback,
+	useDeferredValue,
+	useEffect,
+	useMemo,
+	useState,
+} from "react";
+import { useRPGStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
+import { Dialog, DialogContent } from "./ui/dialog";
 
 interface GlobalSearchProps {
 	open: boolean;
@@ -18,12 +30,12 @@ type SearchResult = {
 	title: string;
 	subtitle?: string;
 	type: "character" | "npc" | "session" | "item" | "location" | "lore";
-	url: string;
 };
 
 export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
 	const navigate = useNavigate();
 	const [query, setQuery] = useState("");
+	const deferredQuery = useDeferredValue(query);
 	const [selectedIndex, setSelectedIndex] = useState(0);
 
 	const characters = useRPGStore((s) => s.characters);
@@ -34,51 +46,47 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
 	const lores = useRPGStore((s) => s.lores);
 
 	const results = useMemo(() => {
-		if (!query.trim()) return [];
+		if (!open) return [];
 
-		const q = query.toLowerCase();
+		const q = deferredQuery.trim().toLowerCase();
+		if (!q) return [];
+
 		const allResults: SearchResult[] = [
 			...characters.map((c) => ({
 				id: c.id,
 				title: c.characterName || "Sem nome",
 				subtitle: c.class || c.race || "Personagem",
 				type: "character" as const,
-				url: `/sheets/${c.id}`,
 			})),
 			...npcs.map((n) => ({
 				id: n.id,
 				title: n.name || "Sem nome",
 				subtitle: n.role || n.race || "NPC",
 				type: "npc" as const,
-				url: `/npcs`, // Ajustar conforme a rota de detalhe de NPC se existir
 			})),
 			...sessions.map((s) => ({
 				id: s.id,
 				title: s.title || "Sessão sem título",
 				subtitle: s.date || "Sessão",
 				type: "session" as const,
-				url: `/sessions`,
 			})),
 			...items.map((i) => ({
 				id: i.id,
 				title: i.name || "Item sem nome",
 				subtitle: i.rarity || "Item",
 				type: "item" as const,
-				url: `/items`,
 			})),
 			...locations.map((l) => ({
 				id: l.id,
 				title: l.name || "Local sem nome",
 				subtitle: l.type || "Local",
 				type: "location" as const,
-				url: `/locations`,
 			})),
 			...lores.map((l) => ({
 				id: l.id,
 				title: l.title || "Lore sem título",
 				subtitle: "História",
 				type: "lore" as const,
-				url: `/lore`,
 			})),
 		];
 
@@ -89,11 +97,41 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
 					r.subtitle?.toLowerCase().includes(q),
 			)
 			.slice(0, 8);
-	}, [query, characters, npcs, sessions, items, locations, lores]);
+	}, [
+		open,
+		deferredQuery,
+		characters,
+		npcs,
+		sessions,
+		items,
+		locations,
+		lores,
+	]);
 
-	useEffect(() => {
-		setSelectedIndex(0);
-	}, [query]);
+	const handleSelect = useCallback(
+		(result: SearchResult) => {
+			if (result.type === "character") {
+				void navigate({
+					to: "/sheets/$characterId",
+					params: { characterId: result.id },
+				});
+			} else if (result.type === "npc") {
+				void navigate({ to: "/npcs" });
+			} else if (result.type === "session") {
+				void navigate({ to: "/sessions" });
+			} else if (result.type === "item") {
+				void navigate({ to: "/items" });
+			} else if (result.type === "location") {
+				void navigate({ to: "/locations" });
+			} else {
+				void navigate({ to: "/lore" });
+			}
+
+			onOpenChange(false);
+			setQuery("");
+		},
+		[navigate, onOpenChange],
+	);
 
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
@@ -101,10 +139,14 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
 
 			if (e.key === "ArrowDown") {
 				e.preventDefault();
+				if (results.length === 0) return;
 				setSelectedIndex((prev) => (prev + 1) % results.length);
 			} else if (e.key === "ArrowUp") {
 				e.preventDefault();
-				setSelectedIndex((prev) => (prev - 1 + results.length) % results.length);
+				if (results.length === 0) return;
+				setSelectedIndex(
+					(prev) => (prev - 1 + results.length) % results.length,
+				);
 			} else if (e.key === "Enter" && results[selectedIndex]) {
 				e.preventDefault();
 				handleSelect(results[selectedIndex]);
@@ -113,13 +155,7 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
 
 		window.addEventListener("keydown", handleKeyDown);
 		return () => window.removeEventListener("keydown", handleKeyDown);
-	}, [open, results, selectedIndex]);
-
-	const handleSelect = (result: SearchResult) => {
-		void navigate({ to: result.url as any });
-		onOpenChange(false);
-		setQuery("");
-	};
+	}, [handleSelect, open, results, selectedIndex]);
 
 	const icons = {
 		character: User,
@@ -132,7 +168,10 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent showCloseButton={false} className="max-w-2xl overflow-hidden p-0 shadow-2xl">
+			<DialogContent
+				showCloseButton={false}
+				className="max-w-2xl overflow-hidden p-0 shadow-2xl"
+			>
 				<div className="relative flex items-center border-b border-border/50 px-4 py-3.5">
 					<Search className="h-5 w-5 text-muted-foreground" />
 					<input
@@ -140,10 +179,15 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
 						className="ml-3 flex-1 bg-transparent text-base text-foreground outline-none placeholder:text-muted-foreground"
 						placeholder="Pesquisar personagens, itens, lores..."
 						value={query}
-						onChange={(e) => setQuery(e.target.value)}
+						onChange={(e) => {
+							setQuery(e.target.value);
+							setSelectedIndex(0);
+						}}
 					/>
 					<div className="flex items-center gap-1.5 rounded-md border bg-muted/50 px-2 py-0.5 shadow-xs">
-						<span className="text-[9px] font-bold text-muted-foreground tracking-tight">ESC</span>
+						<span className="text-[9px] font-bold text-muted-foreground tracking-tight">
+							ESC
+						</span>
 					</div>
 				</div>
 
@@ -166,23 +210,30 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
 								const Icon = icons[result.type];
 								return (
 									<button
+										type="button"
 										key={`${result.type}-${result.id}`}
 										onClick={() => handleSelect(result)}
 										className={cn(
 											"flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition-colors",
 											index === selectedIndex
 												? "bg-primary/10 text-primary"
-												: "hover:bg-muted/50 text-foreground"
+												: "hover:bg-muted/50 text-foreground",
 										)}
 									>
-										<div className={cn(
-											"flex h-9 w-9 items-center justify-center rounded-lg border",
-											index === selectedIndex ? "border-primary/30 bg-primary/10" : "border-border/50 bg-background"
-										)}>
+										<div
+											className={cn(
+												"flex h-9 w-9 items-center justify-center rounded-lg border",
+												index === selectedIndex
+													? "border-primary/30 bg-primary/10"
+													: "border-border/50 bg-background",
+											)}
+										>
 											<Icon className="h-4 w-4" />
 										</div>
 										<div className="flex flex-1 flex-col min-w-0">
-											<span className="truncate text-sm font-bold">{result.title}</span>
+											<span className="truncate text-sm font-bold">
+												{result.title}
+											</span>
 											{result.subtitle && (
 												<span className="truncate text-[11px] text-muted-foreground uppercase tracking-wider font-semibold">
 													{result.subtitle}
@@ -220,7 +271,9 @@ export function GlobalSearch({ open, onOpenChange }: GlobalSearchProps) {
 							<div className="flex h-5 w-10 items-center justify-center rounded border bg-background text-[10px] font-bold shadow-sm">
 								Enter
 							</div>
-							<span className="text-[10px] text-muted-foreground">Selecionar</span>
+							<span className="text-[10px] text-muted-foreground">
+								Selecionar
+							</span>
 						</div>
 					</div>
 					<p className="text-[10px] font-medium text-muted-foreground">

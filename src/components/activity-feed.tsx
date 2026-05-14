@@ -11,6 +11,7 @@ import {
 	User,
 	Users,
 } from "lucide-react";
+import { useMemo } from "react";
 import {
 	type ActivityAction,
 	ENTITY_LABELS,
@@ -55,7 +56,15 @@ interface ActivityFeedProps {
 
 export function ActivityFeed({ limit = 8, isLoading }: ActivityFeedProps) {
 	const activity = useRPGStore((s) => s.activityLog);
-	const items = activity.slice(0, limit);
+	const items = useMemo(() => activity.slice(0, limit), [activity, limit]);
+	const skeletonKeys = useMemo(
+		() =>
+			Array.from(
+				{ length: limit },
+				(_, index) => `activity-skeleton-${limit}-${index}`,
+			),
+		[limit],
+	);
 
 	return (
 		<section className="rounded-2xl border border-white/5 bg-card/30 p-8 shadow-xl ring-1 ring-white/5 backdrop-blur-md">
@@ -78,8 +87,11 @@ export function ActivityFeed({ limit = 8, isLoading }: ActivityFeedProps) {
 
 			{isLoading ? (
 				<ol className="flex flex-col gap-4">
-					{[...Array(limit)].map((_, i) => (
-						<li key={`skeleton-${i}`} className="flex items-center gap-4 rounded-xl border border-white/5 bg-white/5 px-4 py-3.5">
+					{skeletonKeys.map((key) => (
+						<li
+							key={key}
+							className="flex items-center gap-4 rounded-xl border border-white/5 bg-white/5 px-4 py-3.5"
+						>
 							<Skeleton className="h-9 w-9 rounded-lg" />
 							<div className="flex-1 space-y-2">
 								<Skeleton className="h-3 w-24" />
@@ -98,7 +110,8 @@ export function ActivityFeed({ limit = 8, isLoading }: ActivityFeedProps) {
 						Nada por aqui ainda
 					</p>
 					<p className="mt-2 text-[12px] text-muted-foreground/50 leading-relaxed font-medium">
-						Crie ou edite algum registro para ver o histórico do seu mundo aparecer aqui.
+						Crie ou edite algum registro para ver o histórico do seu mundo
+						aparecer aqui.
 					</p>
 				</div>
 			) : (

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Package } from "lucide-react";
-import { useState } from "react";
+import { useDeferredValue, useMemo, useState } from "react";
 import { EmptyState } from "@/components/empty-state";
 import { ItemCard } from "@/components/item-card";
 import { ItemForm } from "@/components/item-form";
@@ -17,10 +17,13 @@ const loadingCardKeys = ["item-1", "item-2", "item-3", "item-4"];
 function RouteComponent() {
 	const items = useRPGStore((state) => state.items);
 	const [searchQuery, setSearchQuery] = useState("");
+	const deferredSearchQuery = useDeferredValue(searchQuery);
 
-	const filteredItems = items.filter((i) =>
-		i.name.toLowerCase().includes(searchQuery.toLowerCase()),
-	);
+	const filteredItems = useMemo(() => {
+		const query = deferredSearchQuery.trim().toLowerCase();
+		if (!query) return items;
+		return items.filter((item) => item.name.toLowerCase().includes(query));
+	}, [items, deferredSearchQuery]);
 
 	const isLoading = useRPGStore((state) => state.isLoadingRemote);
 

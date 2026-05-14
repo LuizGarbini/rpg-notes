@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ScrollText } from "lucide-react";
-import { useState } from "react";
+import { useDeferredValue, useMemo, useState } from "react";
 import { EmptyState } from "@/components/empty-state";
 import { ListLayout } from "@/components/list-layout";
 import { PageHeader } from "@/components/page-header";
@@ -17,10 +17,17 @@ const loadingCardKeys = ["session-1", "session-2", "session-3", "session-4"];
 function RouteComponent() {
 	const sessions = useRPGStore((state) => state.sessions);
 	const [searchQuery, setSearchQuery] = useState("");
+	const deferredSearchQuery = useDeferredValue(searchQuery);
 
-	const filteredSessions = sessions
-		.filter((s) => s.title.toLowerCase().includes(searchQuery.toLowerCase()))
-		.sort((a, b) => b.createdAt - a.createdAt);
+	const filteredSessions = useMemo(() => {
+		const query = deferredSearchQuery.trim().toLowerCase();
+		const filtered = query
+			? sessions.filter((session) =>
+					session.title.toLowerCase().includes(query),
+				)
+			: sessions;
+		return [...filtered].sort((a, b) => b.createdAt - a.createdAt);
+	}, [sessions, deferredSearchQuery]);
 
 	const isLoading = useRPGStore((state) => state.isLoadingRemote);
 
