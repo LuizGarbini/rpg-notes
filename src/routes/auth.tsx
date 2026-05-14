@@ -10,7 +10,19 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/toast";
 import { useAuth } from "@/lib/auth";
 
+const AUTH_MODES = ["login", "register", "forgot", "reset"] as const;
+type AuthMode = (typeof AUTH_MODES)[number];
+
+function isAuthMode(value: unknown): value is AuthMode {
+	return (
+		typeof value === "string" && AUTH_MODES.includes(value as AuthMode)
+	);
+}
+
 export const Route = createFileRoute("/auth")({
+	validateSearch: (search: Record<string, unknown>) => ({
+		mode: isAuthMode(search.mode) ? search.mode : "login",
+	}),
 	component: AuthPage,
 });
 
@@ -66,17 +78,14 @@ function firstFormError<T extends Record<string, unknown>>(
 
 /* ─── Page ─── */
 
-type AuthMode = "login" | "register" | "forgot" | "reset";
-
 function AuthPage() {
-	const search = new URLSearchParams(window.location.search);
-	const initialMode = (search.get("mode") as AuthMode) || "login";
+	const { mode: initialMode } = Route.useSearch();
 	const [mode, setMode] = useState<AuthMode>(initialMode);
 	const { session, loading } = useAuth();
 	const navigate = useNavigate();
 
 	useEffect(() => {
-		if (!loading && session && mode !== "register" && mode !== "reset") {
+		if (!loading && session && mode !== "reset") {
 			void navigate({ to: "/dashboard", replace: true });
 		}
 	}, [loading, navigate, session, mode]);
@@ -406,7 +415,7 @@ function RegisterForm() {
 				<Button
 					type="button"
 					className="w-full"
-					onClick={() => window.location.assign("/auth")}
+					onClick={() => window.location.assign("/auth?mode=login")}
 				>
 					Ir para o login
 				</Button>
@@ -696,7 +705,7 @@ function ResetPasswordForm() {
 				<Button
 					className="w-full"
 					onClick={() => {
-						window.location.href = "/auth";
+						window.location.href = "/auth?mode=login";
 					}}
 				>
 					Ir para o Login

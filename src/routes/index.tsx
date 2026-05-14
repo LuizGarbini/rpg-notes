@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useId } from "react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/")({
 	component: LandingPage,
@@ -69,6 +70,8 @@ const particles = Array.from({ length: 6 }, (_, index) => ({
 
 function LandingPage() {
 	const featuresId = useId();
+	const { loading, session } = useAuth();
+	const isAuthenticated = !!session;
 
 	return (
 		<div className="relative min-h-screen overflow-hidden">
@@ -133,19 +136,32 @@ function LandingPage() {
 							</span>
 						</div>
 					</div>
-					<div className="flex items-center gap-2">
-						<Link to="/auth">
-							<Button variant="ghost" size="sm">
-								Entrar
-							</Button>
-						</Link>
-						<Link to="/auth">
-							<Button size="sm">
-								<Sparkles className="h-3.5 w-3.5" />
-								Criar Conta
-							</Button>
-						</Link>
-					</div>
+					{!loading && (
+						<div className="flex items-center gap-2">
+							{isAuthenticated ? (
+								<Link to="/dashboard">
+									<Button size="sm" className="gap-2">
+										<Sparkles className="h-3.5 w-3.5" />
+										Acessar dashboard
+									</Button>
+								</Link>
+							) : (
+								<>
+									<Link to="/auth" search={{ mode: "login" }}>
+										<Button variant="ghost" size="sm">
+											Entrar
+										</Button>
+									</Link>
+									<Link to="/auth" search={{ mode: "register" }}>
+										<Button size="sm">
+											<Sparkles className="h-3.5 w-3.5" />
+											Criar Conta
+										</Button>
+									</Link>
+								</>
+							)}
+						</div>
+					)}
 				</div>
 			</header>
 
@@ -166,12 +182,26 @@ function LandingPage() {
 					aventura — tudo em um só lugar, bonito e organizado.
 				</p>
 				<div className="mt-8 flex items-center justify-center gap-3">
-					<Link to="/auth">
-						<Button size="lg" className="gap-2 px-6">
+					{loading ? (
+						<Button size="lg" className="gap-2 px-6" disabled>
 							<Sparkles className="h-4 w-4" />
-							Começar Agora
+							Carregando...
 						</Button>
-					</Link>
+					) : isAuthenticated ? (
+						<Link to="/dashboard">
+							<Button size="lg" className="gap-2 px-6">
+								<Sparkles className="h-4 w-4" />
+								Acessar dashboard
+							</Button>
+						</Link>
+					) : (
+						<Link to="/auth" search={{ mode: "register" }}>
+							<Button size="lg" className="gap-2 px-6">
+								<Sparkles className="h-4 w-4" />
+								Começar Agora
+							</Button>
+						</Link>
+					)}
 					<Button
 						variant="outline"
 						size="lg"
@@ -224,16 +254,31 @@ function LandingPage() {
 						<span className="text-gradient-primary">aventura</span>?
 					</h2>
 					<p className="mt-3 text-[13px] text-muted-foreground leading-relaxed">
-						Crie sua conta gratuitamente e comece a documentar sua campanha
-						agora mesmo.
+						{isAuthenticated
+							? "Sua campanha continua esperando por você no dashboard."
+							: "Crie sua conta gratuitamente e comece a documentar sua campanha agora mesmo."}
 					</p>
 					<div className="mt-6">
-						<Link to="/auth">
-							<Button size="lg" className="gap-2 px-8">
+						{loading ? (
+							<Button size="lg" className="gap-2 px-8" disabled>
 								<Sparkles className="h-4 w-4" />
-								Criar Conta Grátis
+								Carregando...
 							</Button>
-						</Link>
+						) : isAuthenticated ? (
+							<Link to="/dashboard">
+								<Button size="lg" className="gap-2 px-8">
+									<Sparkles className="h-4 w-4" />
+									Acessar dashboard
+								</Button>
+							</Link>
+						) : (
+							<Link to="/auth" search={{ mode: "register" }}>
+								<Button size="lg" className="gap-2 px-8">
+									<Sparkles className="h-4 w-4" />
+									Criar Conta Grátis
+								</Button>
+							</Link>
+						)}
 					</div>
 				</div>
 			</section>

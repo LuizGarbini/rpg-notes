@@ -82,7 +82,7 @@ export function AppHeader({ isSidebarOpen, onToggleSidebar }: AppHeaderProps) {
 			title: "Sessão encerrada",
 			description: "Você saiu do seu grimório com segurança.",
 		});
-		await navigate({ to: "/auth", replace: true });
+		await navigate({ to: "/auth", search: { mode: "login" }, replace: true });
 	}
 
 	const isLoading = useRPGStore((state) => state.isLoadingRemote);

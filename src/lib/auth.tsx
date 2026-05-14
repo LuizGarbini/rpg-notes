@@ -5,6 +5,7 @@ import {
 	useContext,
 	useEffect,
 	useMemo,
+	useRef,
 	useState,
 } from "react";
 import { getSupabase } from "./supabase";
@@ -30,6 +31,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	const supabase = getSupabase();
 	const [session, setSession] = useState<Session | null>(null);
 	const [loading, setLoading] = useState(true);
+	const suppressAutoSignInRef = useRef(false);
 
 	useEffect(() => {
 		if (!supabase) {
@@ -47,7 +49,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 		const {
 			data: { subscription },
-		} = supabase.auth.onAuthStateChange((_event, nextSession) => {
+		} = supabase.auth.onAuthStateChange((event, nextSession) => {
+			if (suppressAutoSignInRef.current && event === "SIGNED_IN") {
+				setSession(null);
+				setLoading(false);
+				return;
+			}
+
 			setSession(nextSession);
 			setLoading(false);
 		});
@@ -65,6 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			loading,
 			signIn: async (email, password) => {
 				if (!supabase) return "Supabase não está configurado.";
+				suppressAutoSignInRef.current = false;
 				const { error } = await supabase.auth.signInWithPassword({
 					email,
 					password,
@@ -73,6 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			},
 			signUp: async (name, email, password) => {
 				if (!supabase) return "Supabase não está configurado.";
+				suppressAutoSignInRef.current = true;
 				const { data, error } = await supabase.auth.signUp({
 					email,
 					password,
@@ -80,13 +90,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 						data: { name },
 					},
 				});
-				if (error) return error.message;
+				if (error) {
+					suppressAutoSignInRef.current = false;
+					return error.message;
+				}
 
 				if (data.session) {
-					const { error: signOutError } = await supabase.auth.signOut({
-						scope: "local",
-					});
-					if (signOutError) return signOutError.message;
+					const { error: signOutError } = await supabase.auth.signOut();
+					if (signOutError) {
+						suppressAutoSignInRef.current = false;
+						return signOutError.message;
+					}
 				}
 				setSession(null);
 				return null;
