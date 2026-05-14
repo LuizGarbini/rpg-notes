@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import {
 	ArrowLeft,
+	ArrowRightLeft,
 	BookOpen,
 	Download,
 	Edit,
@@ -15,12 +16,14 @@ import {
 } from "lucide-react";
 import { type ComponentType, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { CharacterExportDialog } from "@/components/character-export-dialog";
 import {
 	buildCharacterFormDefaults,
 	type CharacterFormValues,
 	CharacterModuleFields,
 	sanitizeCharacterFormValues,
 } from "@/components/character-sheet-fields";
+import { CharacterTransferDialog } from "@/components/character-transfer-dialog";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -77,7 +80,8 @@ function CharacterSheetPage() {
 	const [editingModule, setEditingModule] = useState<SheetModuleConfig | null>(
 		null,
 	);
-	const [isExportingPdf, setIsExportingPdf] = useState(false);
+	const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
+	const [isTransferDialogOpen, setIsTransferDialogOpen] = useState(false);
 
 	if (isLoading) {
 		return (
@@ -168,24 +172,6 @@ function CharacterSheetPage() {
 		setEditingModule(nextModule);
 	}
 
-	async function handleExportPdf() {
-		setIsExportingPdf(true);
-		try {
-			const { downloadCharacterSheetPdf } = await import(
-				"@/components/character-sheet-pdf"
-			);
-			await downloadCharacterSheetPdf(currentCharacter);
-		} catch (error) {
-			window.alert(
-				error instanceof Error
-					? error.message
-					: "Não foi possível exportar a ficha em PDF.",
-			);
-		} finally {
-			setIsExportingPdf(false);
-		}
-	}
-
 	return (
 		<div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-6 py-6 sm:px-8">
 			<header className="relative overflow-hidden rounded-[1.75rem] border border-border/70 bg-linear-to-br from-card via-card/95 to-primary-muted/25 p-6 shadow-xl shadow-black/5">
@@ -258,12 +244,20 @@ function CharacterSheetPage() {
 						<Button
 							type="button"
 							variant="outline"
-							onClick={handleExportPdf}
-							disabled={isExportingPdf}
+							onClick={() => setIsTransferDialogOpen(true)}
+							className="gap-2"
+						>
+							<ArrowRightLeft className="h-4 w-4" />
+							Transferir
+						</Button>
+						<Button
+							type="button"
+							variant="outline"
+							onClick={() => setIsExportDialogOpen(true)}
 							className="gap-2"
 						>
 							<Download className="h-4 w-4" />
-							{isExportingPdf ? "Exportando..." : "Exportar PDF"}
+							Exportar PDF
 						</Button>
 						<Button
 							type="button"
@@ -350,6 +344,16 @@ function CharacterSheetPage() {
 					});
 					setEditingModule(null);
 				}}
+			/>
+			<CharacterTransferDialog
+				character={currentCharacter}
+				open={isTransferDialogOpen}
+				onOpenChange={setIsTransferDialogOpen}
+			/>
+			<CharacterExportDialog
+				character={currentCharacter}
+				open={isExportDialogOpen}
+				onOpenChange={setIsExportDialogOpen}
 			/>
 		</div>
 	);

@@ -359,6 +359,10 @@ export interface RPGState {
 	addCharacter: (character: Partial<Omit<Character, "id" | "createdAt">>) => Character;
 	updateCharacter: (id: string, character: Partial<Character>) => void;
 	removeCharacter: (id: string) => void;
+	transferCharacterToCampaign: (
+		id: string,
+		targetCampaignId: string,
+	) => Promise<Character | null>;
 
 	npcs: Npc[];
 	addNpc: (npc: Partial<Omit<Npc, "id" | "createdAt">>) => Npc;

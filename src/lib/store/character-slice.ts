@@ -1,8 +1,21 @@
 import type { StateCreator } from "zustand";
+import {
+	createRemoteActivity,
+	createRemoteEntity,
+	deleteRemoteEntity,
+	updateRemoteEntity,
+} from "../remote-store";
+import {
+	createDefaultSheetLayout,
+	normalizeSheetLayout,
+} from "../sheet-modules";
+import {
+	entityNameOf,
+	generateEntry,
+	pushLog,
+	remoteErrorMessage,
+} from "./helpers";
 import type { Character, RPGState } from "./types";
-import { generateEntry, pushLog, entityNameOf, remoteErrorMessage } from "./helpers";
-import { createRemoteEntity, createRemoteActivity, updateRemoteEntity, deleteRemoteEntity } from "../remote-store";
-import { createDefaultSheetLayout } from "../sheet-modules";
 
 export const characterDefaults: Omit<Character, "id" | "createdAt"> = {
 	system: "dnd5e",
@@ -67,12 +80,23 @@ export const characterDefaults: Omit<Character, "id" | "createdAt"> = {
 
 export interface CharacterSlice {
 	characters: Character[];
-	addCharacter: (character: Partial<Omit<Character, "id" | "createdAt">>) => Character;
+	addCharacter: (
+		character: Partial<Omit<Character, "id" | "createdAt">>,
+	) => Character;
 	updateCharacter: (id: string, character: Partial<Character>) => void;
 	removeCharacter: (id: string) => void;
+	transferCharacterToCampaign: (
+		id: string,
+		targetCampaignId: string,
+	) => Promise<Character | null>;
 }
 
-export const createCharacterSlice: StateCreator<RPGState, [], [], CharacterSlice> = (set, get) => ({
+export const createCharacterSlice: StateCreator<
+	RPGState,
+	[],
+	[],
+	CharacterSlice
+> = (set, get) => ({
 	characters: [],
 	addCharacter: (character) => {
 		if (get().globalRecordsCount >= 20) {
@@ -148,4 +172,58 @@ export const createCharacterSlice: StateCreator<RPGState, [], [], CharacterSlice
 			}
 			return state;
 		}),
+	transferCharacterToCampaign: async (id, targetCampaignId) => {
+		const source = get().characters.find((character) => character.id === id);
+		if (!source) return null;
+
+		if (get().globalRecordsCount >= 20) {
+			set({ syncError: "Limite de registros atingido (20)." });
+			return null;
+		}
+
+		const now = Date.now();
+		const transferred: Character = {
+			...source,
+			id: crypto.randomUUID(),
+			createdAt: now,
+			updatedAt: now,
+			sheetLayout: normalizeSheetLayout(source),
+			familyRelations: [],
+			entityLinks: [],
+		};
+		const log = {
+			action: "create" as const,
+			entityKind: "character" as const,
+			entityId: transferred.id,
+			entityName: entityNameOf(transferred),
+		};
+		const isActiveCampaign = get().activeCampaignId === targetCampaignId;
+
+		if (isActiveCampaign) {
+			set((state) => ({
+				characters: [...state.characters, transferred],
+				activityLog: pushLog(state.activityLog, log),
+				globalRecordsCount: state.globalRecordsCount + 1,
+				syncError: null,
+			}));
+		} else {
+			set({ syncError: null });
+		}
+
+		try {
+			await Promise.all([
+				createRemoteEntity("character", transferred, targetCampaignId),
+				createRemoteActivity(log, targetCampaignId),
+			]);
+			if (!isActiveCampaign) {
+				set((state) => ({
+					globalRecordsCount: state.globalRecordsCount + 1,
+				}));
+			}
+			return transferred;
+		} catch (error) {
+			set({ syncError: remoteErrorMessage(error) });
+			throw error;
+		}
+	},
 });
