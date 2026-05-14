@@ -61,7 +61,7 @@ function ProtectedLayout() {
 		if (loading) return;
 		if (!session) {
 			clearLocalData();
-			void navigate({ to: "/auth", replace: true });
+			void navigate({ to: "/auth", search: { mode: "login" }, replace: true });
 			return;
 		}
 
