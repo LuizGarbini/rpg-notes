@@ -1,5 +1,4 @@
 import { defineConfig } from 'vite'
-import { devtools } from '@tanstack/devtools-vite'
 import viteReact from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
@@ -7,19 +6,29 @@ import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import { fileURLToPath, URL } from 'node:url'
 
 // https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [
-    devtools(),
+export default defineConfig(async ({ command, mode }) => {
+  const plugins = []
+
+  if (command === 'serve' && mode !== 'test') {
+    const { devtools } = await import('@tanstack/devtools-vite')
+    plugins.push(devtools())
+  }
+
+  plugins.push(
     tanstackRouter({
       target: 'react',
       autoCodeSplitting: true,
     }),
     viteReact(),
     tailwindcss(),
-  ],
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
+  )
+
+  return {
+    plugins,
+    resolve: {
+      alias: {
+        '@': fileURLToPath(new URL('./src', import.meta.url)),
+      },
     },
-  },
+  }
 })

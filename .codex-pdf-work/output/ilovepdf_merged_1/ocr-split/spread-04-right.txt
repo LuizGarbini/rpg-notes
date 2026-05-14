@@ -1,0 +1,21 @@
+-           Wiring Diagram
+;                Engine
+ 5 7 Toe .   pr gt
+        tir      el                           Potentiometer
+\                                                                     LAN DE hh {4 *
+a a, we ow. Ee :  boise         a          Pretsura
+5                               pidge   \: 5 i bo Ee ? | by   ; i i              Pa   Sensor
+6    5    0 EY       :   2 ares. HEE TSH Ths Tle © EE iia 5 i             ATV
+n/      nL Fe     2       Hod       i       oh        ol Sal. et TI
+Sans = 1                       I   I   ee
+~ Black Wire s ]  . i:
+;      hr     HY Swen  &    a nen gay
+Go A :   Green wire   ar or
+                                       Black Wiper, Gir on de   fv
+Technical Parameters
+395/390        220V         2200W    3000PSI | 22KG.
+ 1490/495/590|  220V         2500W    3000PSI       25KG
+595/690        220V         2800W   3000PSI | 28KG
+795/790        220V         3200W    3000PSI | 40KG
+1095/890       220V         3800W    3000PSI | 45KG
+“AD

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { BookOpen } from "lucide-react";
-import { useState } from "react";
+import { useDeferredValue, useMemo, useState } from "react";
 import { EmptyState } from "@/components/empty-state";
 import { ListLayout } from "@/components/list-layout";
 import { LoreCard } from "@/components/lore-card";
@@ -17,10 +17,13 @@ const loadingCardKeys = ["lore-1", "lore-2", "lore-3", "lore-4"];
 function RouteComponent() {
 	const lores = useRPGStore((state) => state.lores);
 	const [searchQuery, setSearchQuery] = useState("");
+	const deferredSearchQuery = useDeferredValue(searchQuery);
 
-	const filteredLores = lores.filter((l) =>
-		l.title.toLowerCase().includes(searchQuery.toLowerCase()),
-	);
+	const filteredLores = useMemo(() => {
+		const query = deferredSearchQuery.trim().toLowerCase();
+		if (!query) return lores;
+		return lores.filter((lore) => lore.title.toLowerCase().includes(query));
+	}, [lores, deferredSearchQuery]);
 
 	const isLoading = useRPGStore((state) => state.isLoadingRemote);
 

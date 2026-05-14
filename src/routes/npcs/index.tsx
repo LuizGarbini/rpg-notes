@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Users } from "lucide-react";
-import { useState } from "react";
+import { useDeferredValue, useMemo, useState } from "react";
 import { EmptyState } from "@/components/empty-state";
 import { ListLayout } from "@/components/list-layout";
 import { NpcCard } from "@/components/npc-card";
@@ -17,10 +17,13 @@ const loadingCardKeys = ["npc-1", "npc-2", "npc-3", "npc-4"];
 function RouteComponent() {
 	const npcs = useRPGStore((state) => state.npcs);
 	const [searchQuery, setSearchQuery] = useState("");
+	const deferredSearchQuery = useDeferredValue(searchQuery);
 
-	const filteredNpcs = npcs.filter((npc) =>
-		npc.name.toLowerCase().includes(searchQuery.toLowerCase()),
-	);
+	const filteredNpcs = useMemo(() => {
+		const query = deferredSearchQuery.trim().toLowerCase();
+		if (!query) return npcs;
+		return npcs.filter((npc) => npc.name.toLowerCase().includes(query));
+	}, [npcs, deferredSearchQuery]);
 
 	const isLoading = useRPGStore((state) => state.isLoadingRemote);
 

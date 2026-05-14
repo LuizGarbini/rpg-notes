@@ -1,5 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Heart, Shield, Sparkles, User, Zap } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
 	abilityModifier,
 	type Character,
@@ -9,12 +10,12 @@ import {
 } from "@/lib/store";
 import { EntityActions } from "./entity-actions";
 
-import { Skeleton } from "@/components/ui/skeleton";
-
 interface CharacterCardProps {
 	character?: Character;
 	isLoading?: boolean;
 }
+
+const abilitySkeletonKeys = ["str", "dex", "con", "int", "wis", "cha"];
 
 export function CharacterCard({ character, isLoading }: CharacterCardProps) {
 	const removeCharacter = useRPGStore((s) => s.removeCharacter);
@@ -39,8 +40,8 @@ export function CharacterCard({ character, isLoading }: CharacterCardProps) {
 						<Skeleton className="h-10 w-full rounded-md" />
 					</div>
 					<div className="grid grid-cols-6 gap-1 border-t border-border/60 pt-3">
-						{[...Array(6)].map((_, i) => (
-							<div key={i} className="flex flex-col items-center gap-1">
+						{abilitySkeletonKeys.map((key) => (
+							<div key={key} className="flex flex-col items-center gap-1">
 								<Skeleton className="h-2 w-4" />
 								<Skeleton className="h-3 w-6" />
 							</div>
@@ -91,6 +92,7 @@ export function CharacterCard({ character, isLoading }: CharacterCardProps) {
 						src={character.imageUrl}
 						alt={character.characterName}
 						loading="lazy"
+						decoding="async"
 						className="h-full w-full object-cover opacity-90 transition-transform duration-500 group-hover:scale-105"
 					/>
 				) : (
@@ -212,7 +214,6 @@ export function CharacterCard({ character, isLoading }: CharacterCardProps) {
 					</p>
 				)}
 			</div>
-
 		</Link>
 	);
 }

@@ -5,12 +5,13 @@ import {
 	useNavigate,
 } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Sidebar } from "@/components/sidebar";
 import { AppHeader } from "@/components/app-header";
 import { GlobalError } from "@/components/global-error";
 import { NotFound } from "@/components/not-found";
+import { Sidebar } from "@/components/sidebar";
 import { ToastProvider } from "@/components/ui/toast";
 import { AuthProvider, useAuth } from "@/lib/auth";
+import { usePerformanceMode } from "@/lib/performance-mode";
 import { useRPGStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -21,6 +22,8 @@ export const Route = createRootRoute({
 });
 
 function RootLayout() {
+	usePerformanceMode();
+
 	return (
 		<ToastProvider>
 			<AuthProvider>
@@ -68,7 +71,10 @@ function ProtectedLayout() {
 			// Se não há campanhas, criar a padrão
 			const state = useRPGStore.getState();
 			if (state.campaigns.length === 0) {
-				const defaultCampaign = await createCampaign("Campanha Principal", "Sua primeira aventura");
+				const defaultCampaign = await createCampaign(
+					"Campanha Principal",
+					"Sua primeira aventura",
+				);
 				await useRPGStore.getState().switchCampaign(defaultCampaign.id);
 			} else if (!state.activeCampaignId) {
 				await useRPGStore.getState().switchCampaign(state.campaigns[0].id);
@@ -103,10 +109,7 @@ function ProtectedLayout() {
 	}
 
 	return (
-		<div className="relative flex h-screen overflow-hidden bg-background sm:gap-4 sm:p-4">
-			<div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(ellipse_900px_560px_at_12%_0%,var(--primary-muted),transparent_62%),radial-gradient(ellipse_700px_520px_at_100%_100%,oklch(0.55_0.2_320/0.08),transparent_64%),linear-gradient(180deg,var(--background),var(--muted))]" />
-			<div className="pointer-events-none fixed inset-0 -z-10 arcane-grid opacity-[0.035]" />
-
+		<div className="relative flex h-screen overflow-hidden bg-background sm:gap-3 sm:p-3">
 			{/* Mobile Sidebar Overlay */}
 			{isSidebarOpen && (
 				<button
@@ -120,7 +123,7 @@ function ProtectedLayout() {
 			{/* Sidebar Island */}
 			<div
 				className={cn(
-					"fixed inset-y-0 left-0 z-100 flex flex-col overflow-hidden transition-all duration-300 bg-background md:relative md:z-0 md:flex md:translate-x-0 md:rounded-2xl md:border md:border-border/60 md:bg-card/70 md:shadow-2xl md:shadow-black/10 md:backdrop-blur-xl",
+					"fixed inset-y-0 left-0 z-100 flex flex-col overflow-hidden bg-background transition-transform duration-150 md:relative md:z-0 md:flex md:translate-x-0 md:rounded-xl md:border md:border-border/60 md:bg-card",
 					isSidebarOpen ? "translate-x-0" : "-translate-x-full",
 				)}
 			>
@@ -135,12 +138,12 @@ function ProtectedLayout() {
 			</div>
 
 			{/* Dashboard Island */}
-			<div className="flex flex-1 flex-col overflow-hidden bg-card/95 md:bg-card/70 shadow-2xl shadow-black/10 md:backdrop-blur-xl sm:rounded-2xl sm:border sm:border-border/60">
+			<div className="flex flex-1 flex-col overflow-hidden bg-card sm:rounded-xl sm:border sm:border-border/60">
 				<AppHeader
 					isSidebarOpen={isSidebarOpen}
 					onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
 				/>
-				<main className="relative z-10 flex-1 overflow-y-auto overflow-x-hidden bg-linear-to-b from-background/25 via-transparent to-muted/20 scrollbar-none">
+				<main className="relative z-10 flex-1 overflow-y-auto overflow-x-hidden bg-background scrollbar-none">
 					{syncError && (
 						<div className="mx-4 mt-4 rounded-lg border border-destructive/20 bg-destructive/10 px-4 py-2 text-[12px] font-medium text-destructive sm:mx-6">
 							Falha ao sincronizar: {syncError}

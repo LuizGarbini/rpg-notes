@@ -3,6 +3,7 @@ import {
 	Bell,
 	Download,
 	Eye,
+	Gauge,
 	Moon,
 	Settings,
 	ShieldCheck,
@@ -11,6 +12,11 @@ import {
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { downloadCampaignBackup } from "@/lib/campaign-backup";
+import {
+	getPerformanceModePreference,
+	type PerformanceModePreference,
+	setPerformanceModePreference,
+} from "@/lib/performance-mode";
 import { useRPGStore } from "@/lib/store";
 
 export const Route = createFileRoute("/settings")({
@@ -26,7 +32,8 @@ const preferences = [
 	},
 	{
 		title: "Aparência escura",
-		description: "Tema editorial escuro do grimório, otimizado para mesa online.",
+		description:
+			"Tema editorial escuro do grimório, otimizado para mesa online.",
 		Icon: Moon,
 		defaultChecked: true,
 	},
@@ -38,9 +45,39 @@ const preferences = [
 	},
 ];
 
+const performanceOptions: Array<{
+	value: PerformanceModePreference;
+	label: string;
+	description: string;
+}> = [
+	{
+		value: "auto",
+		label: "Automático",
+		description: "Liga o modo leve só quando o aparelho ou sistema indicar.",
+	},
+	{
+		value: "off",
+		label: "Normal",
+		description: "Mantém a experiência visual completa.",
+	},
+	{
+		value: "on",
+		label: "Leve",
+		description: "Reduz efeitos visuais para priorizar fluidez.",
+	},
+];
+
 function SettingsPage() {
 	const [checked, setChecked] = useState(
-		() => new Set(preferences.filter((item) => item.defaultChecked).map((item) => item.title)),
+		() =>
+			new Set(
+				preferences
+					.filter((item) => item.defaultChecked)
+					.map((item) => item.title),
+			),
+	);
+	const [performanceMode, setPerformanceMode] = useState(
+		getPerformanceModePreference,
 	);
 	const backupState = useRPGStore((state) => ({
 		characters: state.characters,
@@ -69,6 +106,11 @@ function SettingsPage() {
 			}
 			return next;
 		});
+	}
+
+	function selectPerformanceMode(preference: PerformanceModePreference) {
+		setPerformanceMode(preference);
+		setPerformanceModePreference(preference);
 	}
 
 	return (
@@ -107,6 +149,46 @@ function SettingsPage() {
 					</div>
 
 					<div className="mt-5 grid gap-3">
+						<div className="rounded-2xl border border-border/70 bg-background/45 p-4 shadow-sm shadow-black/5">
+							<div className="flex items-start gap-4">
+								<div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primary">
+									<Gauge className="h-4 w-4" />
+								</div>
+								<div className="min-w-0 flex-1">
+									<p className="text-[14px] font-bold text-foreground">
+										Modo de performance
+									</p>
+									<p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">
+										Controle quando o app reduz efeitos visuais.
+									</p>
+									<div className="mt-3 grid gap-2 sm:grid-cols-3">
+										{performanceOptions.map((option) => {
+											const isSelected = performanceMode === option.value;
+											return (
+												<button
+													key={option.value}
+													type="button"
+													onClick={() => selectPerformanceMode(option.value)}
+													className={`rounded-xl border px-3 py-2 text-left transition-colors ${
+														isSelected
+															? "border-primary/35 bg-primary/12 text-primary"
+															: "border-border/70 bg-card/60 text-muted-foreground hover:border-primary/25 hover:text-foreground"
+													}`}
+												>
+													<span className="block text-[12px] font-bold">
+														{option.label}
+													</span>
+													<span className="mt-1 block text-[10px] leading-relaxed">
+														{option.description}
+													</span>
+												</button>
+											);
+										})}
+									</div>
+								</div>
+							</div>
+						</div>
+
 						{preferences.map(({ title, description, Icon }) => {
 							const isChecked = checked.has(title);
 							return (
@@ -184,8 +266,8 @@ function SettingsPage() {
 							Exportar dados da campanha
 						</h2>
 						<p className="mt-2 max-w-2xl text-[13px] leading-relaxed text-muted-foreground">
-							Baixe um JSON versionado com fichas, elenco, NPCs, sessões,
-							itens, locais, lore, conexões e histórico de atividade. Tokens de
+							Baixe um JSON versionado com fichas, elenco, NPCs, sessões, itens,
+							locais, lore, conexões e histórico de atividade. Tokens de
 							serviços externos não entram no arquivo.
 						</p>
 					</div>
