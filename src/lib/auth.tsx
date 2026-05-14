@@ -73,14 +73,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 			},
 			signUp: async (name, email, password) => {
 				if (!supabase) return "Supabase não está configurado.";
-				const { error } = await supabase.auth.signUp({
+				const { data, error } = await supabase.auth.signUp({
 					email,
 					password,
 					options: {
 						data: { name },
 					},
 				});
-				return error?.message ?? null;
+				if (error) return error.message;
+
+				if (data.session) {
+					const { error: signOutError } = await supabase.auth.signOut({
+						scope: "local",
+					});
+					if (signOutError) return signOutError.message;
+				}
+				setSession(null);
+				return null;
 			},
 			signOut: async () => {
 				if (!supabase) {
